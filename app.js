@@ -145,6 +145,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Clipboard helper
+    window.copyToClipboard = (text, btn) => {
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" style="width:14px; color:var(--accent-green);"></i>';
+            showToast("Copied to clipboard!");
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = original;
+                lucide.createIcons();
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            showToast("Copy failed.");
+        });
+    };
+
     // Toast notification
     const showToast = (msg) => {
         const t = document.createElement('div');
@@ -324,6 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetId === 'tracker') renderTracker();
             if (targetId === 'saved') renderSavedRewrites();
             if (targetId === 'analyze') renderAnalytics();
+
+            // Dynamic Tab Title
+            const tabName = btn.querySelector('span')?.innerText || 'Dashboard';
+            document.title = `ViralReels | ${tabName}`;
         });
     });
 
@@ -365,15 +386,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return { topic, shortTopic: words[0] || "it" };
     };
 
-    const toItemCard = (text, type) => `
-        <div class="item-card">
-            <p class="item-text" style="white-space:pre-wrap;">${text}</p>
-            <div class="item-actions">
-                ${type ? `<button class="action-btn" onclick="saveToVault('${text.replace(/'/g, "\\'")}', '${type}', this)"><i data-lucide="archive"></i> Save</button>` : ''}
-                <button class="action-btn" onclick="navigator.clipboard.writeText('${text.replace(/'/g, "\\'")}'); this.innerHTML = '<i data-lucide=\\'check\\'></i> Copied'"><i data-lucide="copy"></i> Copy</button>
+    const toItemCard = (text, type) => {
+        const escapedText = text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        return `
+            <div class="item-card">
+                <p class="item-text" style="white-space:pre-wrap;">${text}</p>
+                <div class="item-actions">
+                    <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i></button>
+                    ${type ? `<button class="action-btn" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i></button>` : ''}
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    };
 
     window.saveToVault = (text, type, btnElem) => {
         if (type === 'hook') {
