@@ -3,6 +3,22 @@ const express = require('express');
 const cors = require('cors');
 const { OpenAI } = require('openai');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin gracefully
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log("🔥 Firebase Admin Initialized Successfully");
+    } catch (e) {
+        console.error("🔥 Firebase Admin Init Error:", e.message);
+    }
+} else {
+    console.warn("⚠️ FIREBASE_SERVICE_ACCOUNT not found. DB webhooks won't work.");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,7 +50,24 @@ app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => 
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         console.log(`✅ Payment received! Session ID: ${session.id}`);
-        // TODO: Database logic -> Update user's Supabase/Firebase record to PRO
+        
+        const uid = session.client_reference_id;
+        if (uid) {
+            try {
+                // Update Firestore User Record
+                const db = admin.firestore();
+                db.collection('users').doc(uid).set({
+                    isPro: true,
+                    proActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    stripeSessionId: session.id
+                }, { merge: true });
+                console.log(`✅ Successfully upgraded Firebase User [${uid}] to Pro!`);
+            } catch (err) {
+                console.error(`❌ Failed to update Firebase for user ${uid}: ${err.message}`);
+            }
+        } else {
+            console.warn("⚠️ No client_reference_id found. Cannot upgrade anonymous checkout.");
+        }
     }
 
     res.status(200).send();
@@ -186,9 +219,11 @@ app.post('/api/trends', async (req, res) => {
 // Endpoint 6: Stripe Checkout Session Generator
 app.post('/api/checkout', async (req, res) => {
     const FRONTEND_URL = process.env.FRONTEND_URL || 'https://viralreels-ai.netlify.app';
+    const { uid } = req.body;
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
+            client_reference_id: uid || null,
             line_items: [{
                 price_data: {
                     currency: 'usd',

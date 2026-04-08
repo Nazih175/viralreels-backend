@@ -1146,9 +1146,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<div class="loader"></div>';
                 try {
+                    const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
                     const res = await fetch('/api/checkout', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
+                        headers: { 'Content-Type': 'application/json' },
+                        body: bodyData
                     });
                     const data = await res.json();
                     if (data.url) {
