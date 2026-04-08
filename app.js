@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idea, platform, length })
+                body: JSON.stringify({ idea, platform, length, isPro })
             });
 
             if (!res.ok) throw new Error("API Error");
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/generate-hooks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: inputStr })
+                body: JSON.stringify({ topic: inputStr, isPro })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -659,7 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/trends', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ niche: val })
+                body: JSON.stringify({ niche: val, isPro })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -706,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/rewrite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ script: val })
+                body: JSON.stringify({ script: val, isPro })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone } })
+                    body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
                 });
                 if (!res.ok) throw new Error("API Error");
                 const data = await res.json();

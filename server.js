@@ -83,136 +83,179 @@ app.get('/api/health', (req, res) => {
 // Endpoint 1: Analyzer (Predictor)
 app.post('/api/analyze', async (req, res) => {
     try {
-        const { idea, platform, length } = req.body;
-        
+        const { idea, platform, length, isPro } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+
+        const freePrompt = `You are a short-form video algorithm expert. Analyze the video idea for its viral potential on social media. Return JSON with: 'score' (integer 0-100 viral potential), 'hookStrength' (integer 0-10), 'retention' (integer 0-100 estimated % retention), and 'tips' (array of 3 actionable strings to improve the video).`;
+
+        const proPrompt = `You are a world-class short-form video algorithm strategist with deep expertise in TikTok, Instagram Reels, and YouTube Shorts. You have studied thousands of viral videos and understand exactly what the recommendation algorithms favor.
+
+For the given platform and video length, apply these platform-specific scoring rules:
+- TikTok: Prioritize hook in first 1.5 seconds, loop-ability, sound-on engagement, comment bait, and duet/stitch potential. Optimal lengths: 7s, 15s, 30s, 60s.
+- Instagram Reels: Weight visual aesthetic, share-to-story rate, and saves. First frame must stop the scroll. Optimal lengths: 15s, 30s, 45s.
+- YouTube Shorts: Weight watch-time completion (under 60s performs best), keyword-rich concept titles, and click-through from shelf. Strong subscribe hooks at end.
+
+Return JSON strictly with: 'score' (integer 0-100), 'hookStrength' (integer 0-10), 'retention' (integer 0-100 estimated %), 'tips' (array of 5 highly specific, actionable strings referencing the platform algorithm), and 'insight' (string: a 1-sentence elite-level strategic insight about why this idea will or won't go viral on this specific platform).`;
+
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini", // Cost efficient for V1
-            response_format: { type: "json_object" },
+            model,
+            response_format: { type: 'json_object' },
             messages: [
-                { 
-                    role: "system", 
-                    content: "You are an AI algorithm predictor. Analyze the video idea and return JSON strictly with: 'score' (integer 0-100), 'hookStrength' (integer 0-10), 'retention' (integer 0-100 percentage estimation), and 'tips' (array of 3 strings of highly actionable adjustment advice)." 
-                },
-                { 
-                    role: "user", 
-                    content: `Platform: ${platform}. Length: ${length}. Idea: ${idea}` 
-                }
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: `Platform: ${platform}. Length: ${length}. Idea: ${idea}` }
             ]
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
-        console.error("Analyzer Error:", e.message);
-        res.status(500).json({ error: "Failed to communicate with AI Engine." });
+        console.error('Analyzer Error:', e.message);
+        res.status(500).json({ error: 'Failed to communicate with AI Engine.' });
     }
 });
 
 // Endpoint 2: Hooks & Captions Generator
 app.post('/api/generate-hooks', async (req, res) => {
     try {
-        const { topic } = req.body;
-        
+        const { topic, isPro } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+
+        const freePrompt = `You are a viral copywriter. Generate 4 compelling video hooks and 2 captions for the given topic. Return JSON with: 'hooks' (array of 4 strings) and 'captions' (array of 2 strings).`;
+
+        const proPrompt = `You are an elite viral content strategist who has written hooks for creators with 10M+ followers across TikTok, Instagram, and YouTube Shorts.
+
+Generate hooks using these proven psychological trigger frameworks:
+1. PATTERN INTERRUPT: Break the viewer's scroll with an unexpected, counterintuitive statement.
+2. CURIOSITY GAP: Tease a revelation without giving it away (e.g., "The reason most people fail at X is not what you think").
+3. IDENTITY CHALLENGE: Make the viewer question something they believe about themselves.
+4. SOCIAL PROOF SHOCK: Lead with a surprising statistic or result.
+5. DIRECT PROVOCATION: Make a bold, slightly controversial claim.
+6. TRANSFORMATION PROMISE: Immediately frame a before/after in the viewer's mind.
+
+Generate 6 hooks (one per framework) and 3 platform-optimized captions (one for TikTok, one for Instagram, one for YouTube Shorts). Return JSON with: 'hooks' (array of 6 strings, each labeled with its framework in brackets) and 'captions' (array of 3 strings, each labeled with its platform in brackets).`;
+
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            response_format: { type: "json_object" },
+            model,
+            response_format: { type: 'json_object' },
             messages: [
-                { 
-                    role: "system", 
-                    content: "You are a master viral copywriter. Generate 4 viral video hooks and 2 SEO-optimized captions. Return JSON strictly with: 'hooks' (array of 4 strings) and 'captions' (array of 2 strings)." 
-                },
-                { 
-                    role: "user", 
-                    content: `Generate hooks and captions for the topic: ${topic}` 
-                }
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: `Generate hooks and captions for the topic: ${topic}` }
             ]
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
-        console.error("Hooks Error:", e.message);
-        res.status(500).json({ error: "Failed to generate hooks." });
+        console.error('Hooks Error:', e.message);
+        res.status(500).json({ error: 'Failed to generate hooks.' });
     }
 });
 
 // Endpoint 3: Script Rewriter
 app.post('/api/rewrite', async (req, res) => {
     try {
-        const { script } = req.body;
-        
+        const { script, isPro } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+
+        const freePrompt = `You are a short-form scriptwriter. Rewrite the user's script into an engaging viral 60-second video format with clear [Hook], [Context], [Value], and [CTA] sections.`;
+
+        const proPrompt = `You are an elite short-form content director who has scripted viral videos totaling over 500 million views across TikTok, Instagram Reels, and YouTube Shorts.
+
+Rewrite the script following this advanced viral architecture:
+
+[HOOK - 0-3 seconds]: The absolute most attention-grabbing, pattern-interrupting opening line possible. No slow builds. No "Hey guys". Start with the most shocking or intriguing element.
+
+[TENSION BUILD - 3-15 seconds]: Establish the core problem or conflict. Use "you" language to make the viewer feel identified. Build curiosity and urgency.
+
+[VALUE DELIVERY - 15-45 seconds]: Deliver the core content in punchy, digestible statements. Each line should be a standalone insight. Use specific numbers or examples. No filler language.
+
+[RETENTION HOOK - 30-second mark]: Insert a mid-video curiosity bridge (e.g., "But here's what nobody tells you about this...") to fight the algorithm drop-off point.
+
+[CTA - Final 5 seconds]: End with a specific, single call-to-action that drives the metric that matters (follow, save, share, or comment). Make it feel natural, not salesy.
+
+Also add a line at the bottom labeled [CAPTION SUGGESTION] with a TikTok-optimized caption and 3 relevant hashtags.`;
+
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model,
             messages: [
-                { 
-                    role: "system", 
-                    content: "You are an elite short-form scriptwriter. Rewrite the user's boring script into a highly engaging, viral 60-second video script format with clear [Hook], [Context], [Value Proposition], and [CTA] sections." 
-                },
-                { 
-                    role: "user", 
-                    content: script 
-                }
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: script }
             ]
         });
 
         res.json({ rewritten: completion.choices[0].message.content });
     } catch (e) {
-        console.error("Rewrite Error:", e.message);
-        res.status(500).json({ error: "Failed to rewrite script." });
+        console.error('Rewrite Error:', e.message);
+        res.status(500).json({ error: 'Failed to rewrite script.' });
     }
 });
 
 // Endpoint 4: AI Consultant Chat
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message, persona } = req.body;
-        const niche = persona?.niche || "general";
+        const { message, persona, isPro } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const niche = persona?.niche || 'general';
         const tone = persona?.tone || 50;
-        let toneDesc = tone < 30 ? "Soft, empathetic, and relatable." : tone > 70 ? "Aggressive, high-energy, and direct." : "Balanced, professional, and clear.";
+        let toneDesc = tone < 30 ? 'Soft, empathetic, and deeply relatable.' : tone > 70 ? 'High-energy, aggressive, and brutally direct.' : 'Balanced, professional, and clear.';
+
+        const freePrompt = `You are a social media growth consultant. The creator focuses on the '${niche}' niche. Your tone: ${toneDesc} Give concise, actionable advice about social media algorithms and content strategy.`;
+
+        const proPrompt = `You are an elite social media algorithm consultant — the equivalent of having a $10,000/month private advisor. You have deep knowledge of TikTok's ForYouPage distribution model, Instagram Reels' ranking signals (shares, saves, reach rate, send rate), and YouTube Shorts' browse feature optimization.
+
+The creator focuses on the '${niche}' niche. Your communication tone: ${toneDesc}
+
+Rules you must follow:
+1. Always give platform-specific advice when relevant (e.g., "On TikTok specifically...", "For Instagram Reels, the algorithm heavily weights...").
+2. Reference real algorithm mechanics: watch-time percentage, rewatch rate, engagement velocity, early share rate, hashtag categorization, explore page signals.
+3. Back up claims with pattern-based reasoning (e.g., "Creators in your niche who post X format at Y time see higher FYP distribution because...").
+4. Keep responses focused and under 5 sentences, but pack maximum insight into every sentence.
+5. If asked about content ideas, always include a specific hook suggestion.`;
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model,
             messages: [
-                { 
-                    role: "system", 
-                    content: `You are a social media viral consultant responding directly to a creator. The creator focuses on the '${niche}' niche. Your brand voice/tone must be: ${toneDesc} Answer the user's questions concisely (max 2-3 sentences) with actionable algorithm advice.` 
-                },
-                { 
-                    role: "user", 
-                    content: message 
-                }
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: message }
             ]
         });
 
         res.json({ reply: completion.choices[0].message.content });
     } catch (e) {
-        console.error("Chat Error:", e.message);
-        res.status(500).json({ error: "Consultant is offline. Disconnect or try again." });
+        console.error('Chat Error:', e.message);
+        res.status(500).json({ error: 'Consultant is offline. Disconnect or try again.' });
     }
 });
 
 // Endpoint 5: Trends Radar
 app.post('/api/trends', async (req, res) => {
     try {
-        const { niche } = req.body;
-        
+        const { niche, isPro } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+
+        const freePrompt = `Identify 3 to 5 trending video formats or concepts for the given niche. Return JSON with: 'trends' (array of objects each with 'title', 'rep' (integer 3-5 rating), and 'desc' (short description)).`;
+
+        const proPrompt = `You are a trend intelligence analyst specializing in short-form content across TikTok, Instagram Reels, and YouTube Shorts. You track virality patterns and emerging format signals in real time.
+
+For the given niche, identify 6 specific, currently-trending content formats or concepts. For each trend, provide:
+- Its current momentum level (is it emerging, peak, or declining?)
+- Which platform it is performing best on right now
+- A specific, ready-to-execute video concept the creator can film today
+- The core psychological reason this format is resonating with audiences
+
+Return JSON with: 'trends' (array of 6 objects each containing: 'title' (string), 'rep' (integer 3-5 rating), 'desc' (detailed 2-sentence description including platform and psychological insight)).`;
+
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            response_format: { type: "json_object" },
+            model,
+            response_format: { type: 'json_object' },
             messages: [
-                { 
-                    role: "system", 
-                    content: "Identify 3 to 5 trending video formats/concepts for the given niche. Return JSON strictly with: 'trends' (array of objects, each containing 'title', 'rep' (integer 3-5 rating), and 'desc' (short description))." 
-                },
-                { 
-                    role: "user", 
-                    content: `Niche: ${niche}` 
-                }
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: `Niche: ${niche}` }
             ]
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
-        console.error("Trends Error:", e.message);
-        res.status(500).json({ error: "Failed to fetch trends." });
+        console.error('Trends Error:', e.message);
+        res.status(500).json({ error: 'Failed to fetch trends.' });
     }
 });
 
