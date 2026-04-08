@@ -157,7 +157,10 @@ app.post('/api/trends', async (req, res) => {
 
 // Endpoint 6: Stripe Checkout Session Generator
 app.post('/api/checkout', async (req, res) => {
+<<<<<<< HEAD
     const FRONTEND_URL = process.env.FRONTEND_URL || 'https://viralreels-ai.netlify.app';
+=======
+>>>>>>> d5bffd86adcf7e6078eba9c4d6436aba8c42aaf9
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -169,6 +172,7 @@ app.post('/api/checkout', async (req, res) => {
                         description: 'Unlimited AI Uses & Premium Video AI'
                     },
                     unit_amount: 999, // $9.99
+<<<<<<< HEAD
                     recurring: { interval: 'month' },
                 },
                 quantity: 1,
@@ -176,6 +180,14 @@ app.post('/api/checkout', async (req, res) => {
             mode: 'subscription',
             success_url: `${FRONTEND_URL}/?checkout=success`,
             cancel_url: `${FRONTEND_URL}/?checkout=canceled`,
+=======
+                },
+                quantity: 1,
+            }],
+            mode: 'subscription', // Change to 'payment' for one-time
+            success_url: `http://localhost:${PORT}/?checkout=success`,
+            cancel_url: `http://localhost:${PORT}/?checkout=canceled`,
+>>>>>>> d5bffd86adcf7e6078eba9c4d6436aba8c42aaf9
         });
 
         res.json({ url: session.url });
