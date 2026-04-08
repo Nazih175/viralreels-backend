@@ -1,0 +1,1259 @@
+/**
+ * ViralReels AI - App Logic (V1 Usage Engine)
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+
+    // -- State & Storage --
+    let currentAnalyzedIdea = null;
+    let savedEvents = JSON.parse(localStorage.getItem('viralreels_events')) || {};
+    let savedHooks = JSON.parse(localStorage.getItem('viralreels_tracked_hooks')) || [];
+    let savedRewrites = JSON.parse(localStorage.getItem('viralreels_saved_rewrites')) || [];
+    let analyticsData = JSON.parse(localStorage.getItem('vr_analytics_data')) || [];
+    let isPro = localStorage.getItem('vr_pro_status') === 'true';
+    let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
+    let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
+    let persona = JSON.parse(localStorage.getItem('vr_persona')) || { niche: 'tech', tone: 50 };
+    let currentAnalyzeData = null;
+    let calDate = new Date();
+
+    // =============================================
+    // == USAGE LIMIT ENGINE ==
+    // =============================================
+    const LIMITS = { analyze: 5, hooks: 5, captions: 5, trends: 3, rewrite: 3 };
+    const AD_DURATION = 30; // seconds
+    let adTimer = null;
+    let currentAdRechargeTarget = null; // which tool to recharge after ad
+
+    const getToday = () => new Date().toISOString().split('T')[0];
+
+    const getUsage = () => {
+        const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
+        if (!stored || stored.date !== getToday()) {
+            // New day — reset to full limits
+            const fresh = { date: getToday(), ...LIMITS };
+            localStorage.setItem('vr_usage', JSON.stringify(fresh));
+            return fresh;
+        }
+        return stored;
+    };
+
+    const saveUsage = (usage) => localStorage.setItem('vr_usage', JSON.stringify(usage));
+
+    const getRemainingUses = (tool) => isPro ? 999 : (getUsage()[tool] ?? LIMITS[tool]);
+
+    const consumeUse = (tool) => {
+        if (isPro) return;
+        const usage = getUsage();
+        if (usage[tool] > 0) usage[tool]--;
+        saveUsage(usage);
+        renderAllBadges();
+    };
+
+    const rechargeUses = (tool, amount) => {
+        const usage = getUsage();
+        usage[tool] = Math.min(LIMITS[tool], (usage[tool] || 0) + amount);
+        saveUsage(usage);
+        renderAllBadges();
+    };
+
+    // Badge renderer (color-coded by urgency)
+    const renderBadge = (tool) => {
+        const el = document.getElementById(`usage-badge-${tool}`);
+        if (!el) return;
+        const rem = getRemainingUses(tool);
+        const max = LIMITS[tool];
+
+        if (isPro) {
+            el.className = `usage-badge plenty`;
+            el.innerHTML = `<i data-lucide="infinity" style="width:12px; height:12px;"></i> Unlimited Uses`;
+            lucide.createIcons();
+            return;
+        }
+
+        let cls = 'plenty', icon = '⚡';
+        if (rem === 0) { cls = 'empty'; icon = '🔒'; }
+        else if (rem === 1) { cls = 'critical'; icon = '⚠️'; }
+        else if (rem <= Math.ceil(max / 2)) { cls = 'low'; icon = '⚡'; }
+        el.className = `usage-badge ${cls}`;
+        el.innerHTML = `<span>${icon}</span> ${rem} / ${max} free uses today`;
+    };
+
+    const renderAllBadges = () => Object.keys(LIMITS).forEach(renderBadge);
+
+    // Render reset time string
+    const getResetIn = () => {
+        const now = new Date();
+        const midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0);
+        const diff = midnight - now;
+        const h = Math.floor(diff / 3_600_000);
+        const m = Math.floor((diff % 3_600_000) / 60_000);
+        return `${h}h ${m}m`;
+    };
+
+    // Show limit block inside a target container element
+    const showLimitBlock = (containerEl, tool) => {
+        const block = document.createElement('div');
+        block.className = 'limit-block-card content-padding mb-6';
+        block.id = `limit-block-${tool}`;
+        block.innerHTML = `
+            <div class="limit-icon"><i data-lucide="lock" style="width:22px; color:var(--text-danger);"></i></div>
+            <h3 class="font-bold text-lg mb-1" style="color:var(--text-danger);">Daily Limit Reached</h3>
+            <p class="text-secondary text-sm mb-1">You've used all <strong>${LIMITS[tool]}</strong> free ${tool} uses today.</p>
+            <p class="text-xs text-muted">Resets in <strong style="color:var(--accent-gold);">${getResetIn()}</strong></p>
+            <div class="limit-block-actions">
+                <button class="btn-watch-ad watch-ad-btn" data-tool="${tool}">
+                    <i data-lucide="play" style="width:16px;"></i> Watch a 30s Ad → Get +2 Uses
+                </button>
+                <button class="btn-primary w-full open-paywall-btn" style="background:var(--gradient-premium); color:black;">
+                    <i data-lucide="crown" style="width:16px;"></i> Go Pro for Unlimited Access
+                </button>
+                <p class="text-xs text-muted" style="margin-top:4px;">⏰ Or wait for the automatic reset in ${getResetIn()}</p>
+            </div>
+        `;
+        // Remove any existing block first
+        const existing = containerEl.querySelector('.limit-block-card');
+        if (existing) existing.remove();
+        containerEl.prepend(block);
+        lucide.createIcons();
+
+        // Wire up buttons
+        block.querySelector('.watch-ad-btn').addEventListener('click', () => startAd(tool));
+        block.querySelector('.open-paywall-btn').addEventListener('click', () => {
+            document.getElementById('paywallOverlay').classList.remove('hidden');
+        });
+    };
+
+    // Toast notification
+    const showToast = (msg) => {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `<i data-lucide="check-circle" style="width:16px;"></i> ${msg}`;
+        document.body.appendChild(t);
+        lucide.createIcons();
+        setTimeout(() => t.remove(), 3000);
+    };
+
+    // -- AD MODAL ENGINE (REWARD VIDEO ADS) --
+    // TODO: Replace this simulated timer with the Google AdSense H5 Games SDK for Reward Video Ads
+    // Script: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script>
+    const adModal = document.getElementById('adModal');
+    const adProgressBar = document.getElementById('adProgressBar');
+    const adSeconds = document.getElementById('adSeconds');
+    const adSkipBtn = document.getElementById('adSkipBtn');
+
+    const startAd = (tool) => {
+        currentAdRechargeTarget = tool;
+        adModal.classList.remove('hidden');
+        adProgressBar.style.width = '0%';
+        adSeconds.textContent = AD_DURATION;
+        adSkipBtn.disabled = true;
+        adSkipBtn.style.opacity = '0.4';
+        adSkipBtn.style.cursor = 'not-allowed';
+
+        let elapsed = 0;
+        adTimer = setInterval(() => {
+            elapsed++;
+            const pct = (elapsed / AD_DURATION) * 100;
+            adProgressBar.style.width = `${pct}%`;
+            adSeconds.textContent = AD_DURATION - elapsed;
+
+            if (elapsed >= AD_DURATION) {
+                clearInterval(adTimer);
+                adSkipBtn.disabled = false;
+                adSkipBtn.style.opacity = '1';
+                adSkipBtn.style.cursor = 'pointer';
+                adSkipBtn.textContent = '✓ Collect +2 Uses';
+                adSkipBtn.style.background = 'var(--accent-green)';
+                adSkipBtn.style.color = 'black';
+            }
+        }, 1000);
+    };
+
+    adSkipBtn.addEventListener('click', () => {
+        if (adSkipBtn.disabled) return;
+        clearInterval(adTimer);
+        adModal.classList.add('hidden');
+
+        if (currentAdRechargeTarget) {
+            rechargeUses(currentAdRechargeTarget, 2);
+            // Remove the limit block so user can try again
+            const block = document.getElementById(`limit-block-${currentAdRechargeTarget}`);
+            if (block) block.remove();
+            showToast(`+2 ${currentAdRechargeTarget} uses added! You're back in.`);
+            currentAdRechargeTarget = null;
+        }
+
+        // Reset ad UI for next time
+        adSkipBtn.textContent = 'Skip Ad';
+        adSkipBtn.style.background = '';
+        adSkipBtn.style.color = '';
+        adProgressBar.style.width = '0%';
+        adSeconds.textContent = AD_DURATION;
+    });
+
+    // Initialize badges on load
+    renderAllBadges();
+    // =============================================
+    // == END USAGE LIMIT ENGINE ==
+    // =============================================
+
+
+
+    // -- Overlays & Modals --
+    const authOverlay = document.getElementById('authOverlay');
+    const appContainer = document.getElementById('appContainer');
+    const paywallOverlay = document.getElementById('paywallOverlay');
+    const aboutModal = document.getElementById('aboutModal');
+    const settingsModal = document.getElementById('settingsModal');
+    const calendarEventModal = document.getElementById('calendarEventModal');
+
+    // Auth (Logic handed off to Firebase at the bottom of the file)
+
+    // Header Modals
+    document.getElementById('aboutBtn').addEventListener('click', () => aboutModal.classList.remove('hidden'));
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        settingsModal.classList.remove('hidden');
+        updateBillingUI();
+    });
+    document.querySelectorAll('.modal-closer').forEach(btn => {
+        btn.addEventListener('click', (e) => e.currentTarget.closest('.fullscreen-overlay').classList.add('hidden'));
+    });
+
+    document.getElementById('upgradeBtn').addEventListener('click', function () {
+        this.innerHTML = '<div class="loader" style="border-top-color:black;"></div>';
+        setTimeout(() => {
+            this.innerHTML = '<i data-lucide="check-circle"></i> Upgraded!';
+            this.style.background = 'var(--accent-green)';
+            isPro = true;
+            isSubCancelled = false;
+            localStorage.setItem('vr_pro_status', 'true');
+            localStorage.setItem('vr_sub_cancelled', 'false');
+            lucide.createIcons();
+            setTimeout(() => {
+                paywallOverlay.classList.add('hidden');
+                showToast("Welcome to ViralReels Pro!");
+                // Auto-navigate to Chat to show it off
+                document.getElementById('navAiChat').click();
+            }, 1000);
+        }, 1500);
+    });
+
+    // -- Settings Logic --
+    document.getElementById('themeToggle').addEventListener('change', (e) => {
+        if (e.target.checked) document.body.classList.remove('light-theme');
+        else document.body.classList.add('light-theme');
+    });
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+        if (confirm("Are you sure you want to delete all saved data from this device?")) {
+            localStorage.clear();
+            savedEvents = {}; savedHooks = []; savedRewrites = [];
+            renderCalendar(); renderTracker(); renderSavedRewrites();
+            alert("Local storage wiped.");
+        }
+    });
+    document.getElementById('delAccountBtn').addEventListener('click', () => {
+        alert("Account deletion requested. Support team will process this shortly.");
+        localStorage.clear();
+        if (confirm("DANGER! This will permanently delete your ViralReels profile and subscription access. Proceed?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    });
+
+    // -- Premium Paywall --
+    document.getElementById('closePaywallBtn').addEventListener('click', () => paywallOverlay.classList.add('hidden'));
+
+    // -- Navigation (12-Icon Routing) --
+    const navItems = document.querySelectorAll('.nav-item');
+    const tabViews = document.querySelectorAll('.tab-view');
+
+    navItems.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-tab');
+            if ((targetId === 'videoai' || targetId === 'chat') && !isPro) {
+                paywallOverlay.classList.remove('hidden');
+                return;
+            }
+            navItems.forEach(b => b.classList.remove('active'));
+            tabViews.forEach(v => {
+                v.classList.remove('active-view');
+                v.classList.add('hidden');
+            });
+            btn.classList.add('active');
+            lucide.createIcons();
+            const viewTarget = document.getElementById(`view-${targetId}`);
+            if (viewTarget) {
+                viewTarget.classList.remove('hidden');
+                viewTarget.classList.add('active-view');
+            }
+
+            // Re-render blocks
+            if (targetId === 'calendar') renderCalendar();
+            if (targetId === 'tracker') renderTracker();
+            if (targetId === 'saved') renderSavedRewrites();
+            if (targetId === 'analyze') renderAnalytics();
+        });
+    });
+
+    // -- Sub-tabs Engine (Pill Routing) --
+    document.querySelectorAll('.pill-tabs').forEach(tabGroup => {
+        tabGroup.addEventListener('click', (e) => {
+            const btnTarget = e.target.closest('.pill');
+            if (btnTarget) {
+                const targetSub = btnTarget.getAttribute('data-subtab');
+
+                // --- PREMIUM BLOCKER ---
+                if (targetSub === 'sub-analyze-metrics' && !isPro) {
+                    paywallOverlay.classList.remove('hidden');
+                    return; // Prevent tab switch!
+                }
+
+                tabGroup.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+                btnTarget.classList.add('active');
+
+                const section = btnTarget.closest('section');
+                section.querySelectorAll('.item-list-container').forEach(c => {
+                    c.classList.add('hidden');
+                    c.classList.remove('active-subtab');
+                });
+
+                const t = document.getElementById(targetSub);
+                if (t) {
+                    t.classList.remove('hidden');
+                    t.classList.add('active-subtab');
+                }
+            }
+        });
+    });
+
+    // -- Utility Functions --
+    const getKeywords = (text) => {
+        const words = text.split(" ").filter(w => w.length > 3);
+        const topic = words.slice(0, 3).join(" ") || "this concept";
+        return { topic, shortTopic: words[0] || "it" };
+    };
+
+    const toItemCard = (text, type) => `
+        <div class="item-card">
+            <p class="item-text" style="white-space:pre-wrap;">${text}</p>
+            <div class="item-actions">
+                ${type ? `<button class="action-btn" onclick="saveToVault('${text.replace(/'/g, "\\'")}', '${type}', this)"><i data-lucide="archive"></i> Save</button>` : ''}
+                <button class="action-btn" onclick="navigator.clipboard.writeText('${text.replace(/'/g, "\\'")}'); this.innerHTML = '<i data-lucide=\\'check\\'></i> Copied'"><i data-lucide="copy"></i> Copy</button>
+            </div>
+        </div>
+    `;
+
+    window.saveToVault = (text, type, btnElem) => {
+        if (type === 'hook') {
+            savedHooks.unshift(text); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks));
+        } else if (type === 'rewrite') {
+            savedRewrites.unshift(text); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
+        }
+        btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); lucide.createIcons();
+    };
+
+    // -- 1. ANALYZE VIEW --
+    document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idea = document.getElementById('ideaInput').value;
+        const btn = document.getElementById('analyzeSubmitBtn');
+
+        // --- USAGE GATE ---
+        if (getRemainingUses('analyze') <= 0) {
+            showLimitBlock(document.getElementById('sub-analyze-scout'), 'analyze');
+            return;
+        }
+        consumeUse('analyze');
+        btn.querySelector('span').innerText = "Analyzing Context...";
+        btn.querySelector('i').classList.add('hidden');
+        btn.querySelector('.loader').classList.remove('hidden');
+        document.getElementById('resultsDashboard').classList.add('hidden');
+
+        try {
+            const platform = document.getElementById('platformSelect')?.value || 'all';
+            const length = document.getElementById('lengthInput')?.value || '15s';
+            
+            const res = await fetch('https://viralreels-ai.onrender.com/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idea, platform, length })
+            });
+
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+            
+            const score = data.score;
+            currentAnalyzedIdea = { idea, score };
+            currentAnalyzeData = { id: Date.now().toString(), idea, platform, score };
+
+            document.getElementById('resViralScore').innerText = score;
+            document.querySelector('.score-container').style.setProperty('--progress', `${score}%`);
+            document.getElementById('resScoreText').innerText = score > 80 ? "Viral Potential 🔥" : "Solid 📈";
+            document.getElementById('resHookBar').style.width = `${(data.hookStrength / 10) * 100}%`;
+            document.getElementById('resHookRating').innerText = `${data.hookStrength}/10`;
+            document.getElementById('resRetentionBar').style.width = `${data.retention}%`;
+            document.getElementById('resRetentionPerc').innerText = `${data.retention}%`;
+            document.getElementById('resTipsList').innerHTML = (data.tips || []).map(t => `<li class="tip-item text-xs">${t}</li>`).join('');
+
+        } catch (err) {
+            console.error(err);
+            showToast("Server error. Check your backend connection.");
+        } finally {
+            btn.querySelector('span').innerText = "Generate Analysis";
+            btn.querySelector('i').classList.remove('hidden');
+            btn.querySelector('.loader').classList.add('hidden');
+            document.getElementById('resultsDashboard').classList.remove('hidden');
+        }
+    });
+
+    // -- ANALYTICS BINDINGS --
+    const logBtn = document.getElementById('btnLogAnalytics');
+    if (logBtn) {
+        logBtn.addEventListener('click', () => {
+            if (!currentAnalyzeData) return;
+            analyticsData.push({ ...currentAnalyzeData, actualViews: 0 });
+            localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
+            alert("Idea logged to Analytics DB! Switch to the Analytics sub-tab to enter Real Views later.");
+            renderAnalytics();
+        });
+    }
+
+    // -- 2. HOOKS VIEW (Upgraded GPT Style) --
+    document.getElementById('customHookForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const inputStr = document.getElementById('customHookInput').value;
+        const btn = e.target.querySelector('button');
+
+        // --- USAGE GATE ---
+        if (getRemainingUses('hooks') <= 0) {
+            showLimitBlock(document.getElementById('view-hooks'), 'hooks');
+            return;
+        }
+        consumeUse('hooks');
+        btn.innerHTML = '<div class="loader"></div>';
+
+        try {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-hooks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic: inputStr })
+            });
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+
+            document.getElementById('hooksGeneratorsEmpty').classList.add('hidden');
+            document.getElementById('hooksGeneratorsContent').classList.remove('hidden');
+            document.getElementById('sub-hooks-list').innerHTML = (data.hooks || []).map(h => toItemCard(h, 'hook')).join('');
+            document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
+        } catch (err) {
+            console.error(err);
+            showToast("Server error. Check your backend connection.");
+        } finally {
+            lucide.createIcons(); btn.innerHTML = '<i data-lucide="zap"></i>';
+        }
+    });
+
+    // -- 3. TRACKER VIEW --
+    const renderTracker = () => {
+        const list = document.getElementById('trackerList');
+        const empty = document.getElementById('trackerEmpty');
+        if (savedHooks.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
+            empty.classList.add('hidden');
+            list.innerHTML = savedHooks.map((h, i) => {
+                const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
+                return `
+                <div class="item-card flex-col pr-2">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="item-text mb-0 w-full" style="font-size:0.85rem; white-space:pre-wrap;">${h}</p>
+                        <button class="icon-button flex-shrink-0" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                    </div>
+                    ${isVerified ? `
+                    <div class="flex items-center gap-1 text-green font-bold uppercase" style="font-size:0.6rem; letter-spacing:1px; background:rgba(6,214,160,0.1); padding:4px 8px; border-radius:4px; width:fit-content;">
+                        <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
+                    </div>` : `
+                    <div class="text-xs text-muted" style="font-size:0.65rem;">Unlinked to performance data</div>`}
+                </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+    };
+    window.deleteHook = (index) => { savedHooks.splice(index, 1); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks)); renderTracker(); };
+
+    // -- 4. CALENDAR VIEW --
+    let activeDayKey = null;
+    const renderCalendar = () => {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        const year = calDate.getFullYear();
+        const month = calDate.getMonth();
+        const today = new Date();
+        const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('calMonthDisplay').innerText = `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) { grid.innerHTML += '<div class="cal-day empty"></div>'; }
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'cal-day';
+            dayDiv.innerHTML = `<span class="day-num">${d}</span>`;
+            if (isCurrentMonth && d === today.getDate()) dayDiv.classList.add('is-today');
+
+            const dateKey = `${year}-${month}-${d}`;
+            if (savedEvents[dateKey]) dayDiv.classList.add('has-event');
+
+            dayDiv.addEventListener('click', () => {
+                activeDayKey = dateKey;
+                document.getElementById('eventModalDateText').innerText = `Save Idea on ${monthNames[month]} ${d}`;
+                let eventData = { title: "", desc: "" };
+                if (savedEvents[dateKey]) {
+                    try {
+                        var parsed = JSON.parse(savedEvents[dateKey]);
+                        if (typeof parsed === "object") eventData = parsed; else eventData.title = savedEvents[dateKey];
+                    } catch (e) { eventData.title = savedEvents[dateKey]; }
+                }
+                document.getElementById('eventTitleInput').value = eventData.title || '';
+                document.getElementById('eventDescInput').value = eventData.desc || '';
+                calendarEventModal.classList.remove('hidden');
+            });
+            grid.appendChild(dayDiv);
+        }
+    };
+    document.getElementById('prevMonthBtn').addEventListener('click', () => { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); });
+    document.getElementById('nextMonthBtn').addEventListener('click', () => { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); });
+    document.getElementById('saveEventBtn').addEventListener('click', () => {
+        const title = document.getElementById('eventTitleInput').value.trim();
+        const desc = document.getElementById('eventDescInput').value.trim();
+        if (title && activeDayKey) {
+            savedEvents[activeDayKey] = JSON.stringify({ title, desc });
+            localStorage.setItem('viralreels_events', JSON.stringify(savedEvents));
+            calendarEventModal.classList.add('hidden'); renderCalendar();
+        }
+    });
+
+    // -- 5. CAPTIONS VIEW (GPT Overhaul) --
+    document.getElementById('dedCapForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const topic = document.getElementById('dedCapInput').value;
+        const style = document.getElementById('dedCapStyle').value;
+        const btn = document.getElementById('dedCapBtn');
+
+        // --- USAGE GATE ---
+        if (getRemainingUses('captions') <= 0) {
+            showLimitBlock(document.getElementById('view-captions'), 'captions');
+            return;
+        }
+        consumeUse('captions');
+        btn.innerHTML = '<div class="loader"></div>';
+
+        setTimeout(() => {
+            const out = document.getElementById('dedCapOutput');
+            out.innerHTML = [1, 2, 3, 4, 5].map(i => {
+                let txt = "";
+                if (style === 'controversial') txt = `Unpopular opinion about ${topic}. Most "experts" are lying to you just to sell courses. But hear me out... 👇\n\nIf you disagree, prove me entirely wrong in the comments! #Debate #${topic.replace(/\s+/g, '')}`;
+                else if (style === 'educational') txt = `3 Things you absolutely didn't know about ${topic}. \n\nNumber 2 literally changed my entire workflow forever 📚 Bookmark this video before you lose it!\n\n#Learning #Tech #${topic.replace(/\s+/g, '')}tips`;
+                else if (style === 'storytime') txt = `I cannot believe this actually happened when I blindly tried out ${topic}. \n\nStorytime Below... 💀👇 (Wait for the twist)\n\n#Story #Viral`;
+                else if (style === 'funny') txt = `Me pretending I know literally anything about ${topic} just to survive the day 😭💀 \n\nSend this to that one friend who relates way too hard.\n\n#Comedy #Relatable`;
+                else if (style === 'serious') txt = `The reality of ${topic} is heavily misunderstood by the mainstream. In this breakdown, I analyze the core mechanical changes driving this shift. Let me know your thoughts on this ecosystem 👇\n\n#Growth #${topic.replace(/\s+/g, '')}`;
+                else txt = `The unfiltered truth about ${topic}. Did you expect this format to actually work? \n\nSound off below! 👇\n\n#fyp #${topic.replace(/\s+/g, '')}`;
+                return toItemCard(txt, null);
+            }).join('');
+            out.classList.remove('hidden');
+            btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
+            lucide.createIcons();
+        }, 1500);
+    });
+
+    // -- 6. TAGS VIEW --
+    document.getElementById('dedTagsForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const base = document.getElementById('dedTagsInput').value.replace(/[^a-zA-Z0-9]/g, '');
+        const btn = e.target.querySelector('button');
+        btn.innerHTML = '<div class="loader"></div>';
+        setTimeout(() => {
+            document.getElementById('dedTagsOutput').classList.remove('hidden');
+            document.getElementById('tagsTrending').innerHTML = ['#fyp', '#viral', '#trending', `#${base}Trend`].map(t => `<div class="hashtag"><i data-lucide="trending-up" style="width:12px;color:white"></i>${t}</div>`).join('');
+            document.getElementById('tagsNiche').innerHTML = [`#${base}Hacks`, `#${base}Tips`, `#${base}Creator`, `#${base}Life`, `#${base}Secrets`].map(t => `<div class="hashtag"><i data-lucide="target" style="width:12px;color:var(--accent-blue-light)"></i><span class="tag-niche">${t}</span></div>`).join('');
+            lucide.createIcons(); btn.innerHTML = '<i data-lucide="hash"></i>';
+        }, 1100);
+    });
+
+    // -- 7. CHECKLIST VIEW --
+    const checks = document.querySelectorAll('.task-check');
+    const scoreText = document.getElementById('checklistScore');
+    const scoreBar = document.getElementById('checklistScoreBar');
+    checks.forEach(check => {
+        check.addEventListener('change', () => {
+            let total = 0; checks.forEach(c => { if (c.checked) total += parseInt(c.dataset.weight); });
+            scoreText.innerText = `${total}%`; scoreBar.style.width = `${total}%`;
+            if (total === 100) {
+                scoreBar.style.background = 'var(--accent-green)'; scoreText.style.color = 'var(--accent-green)'; scoreText.style.background = 'none'; scoreText.style.webkitTextFillColor = 'var(--accent-green)';
+            } else {
+                scoreBar.style.background = 'var(--gradient-primary)'; scoreText.style.background = 'var(--gradient-primary)'; scoreText.style.webkitBackgroundClip = 'text'; scoreText.style.webkitTextFillColor = 'transparent';
+            }
+        });
+    });
+
+    // -- Reset Checklist --
+    document.getElementById('resetChecklistBtn').addEventListener('click', () => {
+        checks.forEach(c => c.checked = false);
+        scoreText.innerText = '0%';
+        scoreBar.style.width = '0%';
+        scoreBar.style.background = 'var(--gradient-primary)';
+        scoreText.style.background = 'var(--gradient-primary)';
+        scoreText.style.webkitBackgroundClip = 'text';
+        scoreText.style.webkitTextFillColor = 'transparent';
+        lucide.createIcons();
+    });
+
+    // -- 8. TRENDS VIEW (Exactly 5 Trends, Detailed Copilot output) --
+    document.getElementById('trendsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const val = document.getElementById('trendsInput').value;
+        const btn = e.target.querySelector('button');
+
+        // --- USAGE GATE ---
+        if (getRemainingUses('trends') <= 0) {
+            showLimitBlock(document.getElementById('view-trends'), 'trends');
+            return;
+        }
+        consumeUse('trends');
+        btn.innerHTML = '<div class="loader"></div>';
+
+        try {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/trends', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ niche: val })
+            });
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+
+            document.getElementById('trendsEmpty').classList.add('hidden');
+            const out = document.getElementById('trendsOutput');
+            out.innerHTML = (data.trends || []).map(t => {
+                const stars = Array(5).fill('').map((_, i) => `<i data-lucide="star" class="${i >= t.rep ? 'empty' : ''}"></i>`).join('');
+                return `
+                <div class="trend-card border-subtle">
+                    <div class="flex justify-between items-start mb-2">
+                        <strong class="text-md text-primary font-bold" style="padding-right: 1rem;">${t.title}</strong>
+                        <div class="stars-container flex-shrink-0">${stars}</div>
+                    </div>
+                    <p class="text-sm text-secondary line-height-15">${t.desc}</p>
+                </div>
+                `;
+            }).join('');
+            out.classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            showToast("Server error. Check your backend connection.");
+        } finally {
+            lucide.createIcons();
+            btn.innerHTML = '<i data-lucide="trending-up"></i>';
+        }
+    });
+
+    // -- 9. REWRITE VIEW (GPT Expanded Multi-paragraph Engine) --
+    document.getElementById('rewriteForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const val = document.getElementById('rewriteInput').value;
+        const btn = e.target.querySelector('button');
+
+        // --- USAGE GATE ---
+        if (getRemainingUses('rewrite') <= 0) {
+            showLimitBlock(document.getElementById('view-rewrite'), 'rewrite');
+            return;
+        }
+        consumeUse('rewrite');
+        btn.innerHTML = '<div class="loader"></div> Processing logic...';
+
+        try {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/rewrite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script: val })
+            });
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+            const rewritten = data.rewritten;
+
+            document.getElementById('rewriteOutput').innerHTML = `
+                <h4 class="font-bold text-accent mb-3 flex items-center gap-2"><i data-lucide="bot"></i> Viral AI Rewrite</h4>
+                <div class="p-4 bg-card-dark" style="border-radius:8px; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05);">${rewritten}</div>
+                <div class="item-actions mt-4"><button class="action-btn" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'rewrite', this)"><i data-lucide="archive"></i> Save AI Template</button></div>
+            `;
+            document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
+        } catch(e) {
+            console.error(e);
+            showToast("Server error. Check AI connection.");
+        } finally {
+            btn.innerHTML = '<i data-lucide="file-text"></i> Rewrite Script';
+        }
+    });
+
+    // -- 10. SAVED VIEW --
+    const renderSavedRewrites = () => {
+        const list = document.getElementById('savedList');
+        const empty = document.getElementById('savedEmpty');
+        if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
+            empty.classList.add('hidden');
+            list.innerHTML = savedRewrites.map((r, i) => `
+                <div class="item-card relative">
+                    <div class="text-xs text-muted mb-3 font-bold uppercase"><i data-lucide="file-text" style="width:12px;display:inline"></i> Saved AI Rewrite ${i + 1}</div>
+                    <p class="item-text text-sm" style="white-space:pre-wrap; line-height:1.5;">${r}</p>
+                    <button class="icon-button absolute" style="top:12px; right:12px;" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+    };
+    window.deleteRewrite = (index) => { savedRewrites.splice(index, 1); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites)); renderSavedRewrites(); };
+
+    // -- ANALYTICS RENDER ENGINE --
+    const renderAnalytics = () => {
+        const list = document.getElementById('analyticsList');
+        const empty = document.getElementById('analyticsEmpty');
+        if (!list || !empty) return;
+
+        if (analyticsData.length === 0) {
+            empty.classList.remove('hidden');
+            list.innerHTML = '';
+            list.appendChild(empty);
+            return;
+        }
+        empty.classList.add('hidden');
+        list.innerHTML = '';
+
+        analyticsData.slice().reverse().forEach((log) => {
+            const el = document.createElement('div');
+            el.className = 'glass-card p-3 rounded-md border-subtle bg-card-dark interactive-glow mb-2';
+
+            let viewInputStr = log.actualViews > 0
+                ? `<span class="text-xs font-bold text-green w-full block mt-2 p-2" style="background:rgba(6,214,160,0.1); border-radius:6px; border:1px solid rgba(6,214,160,0.3);"><i data-lucide="eye" style="display:inline; width:12px;"></i> Verified: ${log.actualViews.toLocaleString()} Views</span>`
+                : `<div class="flex gap-2 w-full mt-2"><input type="number" class="text-input p-2 flex-grow log-view-input" style="background:rgba(0,0,0,0.4);" placeholder="Enter Views"><button class="btn-primary log-view-btn text-xs p-2 whitespace-nowrap" data-id="${log.id}">Update</button></div>`;
+
+            el.innerHTML = `
+                <div class="flex justify-between items-start mb-1 gap-2">
+                    <strong class="text-xs w-full" style="line-height:1.4;">${log.idea}</strong>
+                    <span class="badge text-xs px-2 py-1 bg-card-dark border-subtle font-bold uppercase" style="border-radius:4px; color:var(--accent-blue-light); flex-shrink:0;">${log.platform}</span>
+                </div>
+                <div class="flex items-center justify-between border-top border-subtle pt-2 mt-2">
+                    <div class="flex items-center gap-2">
+                        <div class="score-circle" style="width:30px; height:30px; border-radius:50%; background:conic-gradient(var(--accent-purple) ${log.score}%, transparent 0); display:flex; justify-content:center; align-items:center;"><span class="text-xs font-bold bg-card" style="width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center;">${log.score}</span></div>
+                        <span class="text-xs text-secondary">Predicted Metric</span>
+                    </div>
+                </div>
+                ${viewInputStr}
+                <button class="action-btn w-full mt-2 flex justify-center text-red log-del-btn" style="border:1px solid rgba(239,71,111,0.2);" data-id="${log.id}"><i data-lucide="trash-2"></i> Delete Log</button>
+            `;
+            list.appendChild(el);
+        });
+
+        // Binds
+        list.querySelectorAll('.log-view-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const val = parseInt(e.target.previousElementSibling.value);
+                if (isNaN(val) || val <= 0) return alert("Enter valid view count");
+                const target = analyticsData.find(a => a.id === id);
+                if (target) {
+                    target.actualViews = val;
+                    localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
+                    renderAnalytics();
+                }
+            });
+        });
+
+        list.querySelectorAll('.log-del-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                analyticsData = analyticsData.filter(a => a.id !== id);
+                localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
+                renderAnalytics();
+            });
+        });
+
+        lucide.createIcons();
+    };
+
+    // -- AI CHAT LOGIC --
+    const chatForm = document.getElementById('chatForm');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+
+            // User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'chat-bubble bubble-user';
+            userDiv.textContent = msg;
+            chatMessages.appendChild(userDiv);
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // AI thinking
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'chat-bubble bubble-ai';
+            aiDiv.innerHTML = '<div class="loader" style="width:12px; height:12px;"></div>';
+            chatMessages.appendChild(aiDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
+                const personaTone = document.getElementById('personaTone').value;
+
+                const res = await fetch('https://viralreels-ai.onrender.com/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone } })
+                });
+                if (!res.ok) throw new Error("API Error");
+                const data = await res.json();
+
+                aiDiv.textContent = data.reply;
+            } catch(e) {
+                console.error(e);
+                aiDiv.textContent = "I'm offline right now. Check your server connection.";
+            } finally {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    }
+
+    // -- VIDEO AI LOGIC --
+    const mockUploadBtn = document.getElementById('mockUploadBtn');
+    const videoFileInput = document.getElementById('videoFileInput');
+    const videoAiUploadState = document.getElementById('videoAiUploadState');
+    const videoAiResultState = document.getElementById('videoAiResultState');
+    const videoAiLoadingOverlay = document.getElementById('videoAiLoadingOverlay');
+    const restartVideoAiBtn = document.getElementById('restartVideoAiBtn');
+
+    // UI Result Elements
+    const resVidAesthetic = document.getElementById('resVidAesthetic');
+    const resVidColor = document.getElementById('resVidColor');
+    const resVidResolution = document.getElementById('resVidResolution');
+    const resVidDuration = document.getElementById('resVidDuration');
+
+    if (mockUploadBtn && videoFileInput) {
+        mockUploadBtn.addEventListener('click', () => {
+            videoFileInput.click();
+        });
+
+        videoFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1. Validation (300MB = 300 * 1024 * 1024 bytes)
+            const MAX_SIZE = 300 * 1024 * 1024;
+            if (file.size > MAX_SIZE) {
+                alert(`Error: File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please select a video under 300MB.`);
+                videoFileInput.value = '';
+                return;
+            }
+
+            // 2. Transition UI
+            videoAiUploadState.classList.add('hidden');
+            videoAiResultState.classList.remove('hidden');
+            videoAiLoadingOverlay.classList.remove('hidden');
+
+            // 3. Technical Analysis
+            const videoUrl = URL.createObjectURL(file);
+            const tempVid = document.createElement('video');
+            tempVid.src = videoUrl;
+            tempVid.muted = true;
+            tempVid.playsInline = true;
+
+            tempVid.onloadedmetadata = () => {
+                const duration = tempVid.duration;
+                const width = tempVid.videoWidth;
+                const height = tempVid.videoHeight;
+
+                resVidDuration.textContent = `${duration.toFixed(2)}s`;
+                resVidResolution.textContent = `${width} x ${height}`;
+
+                // Seek into the video a bit (1s or halfway) to find a good frame
+                tempVid.currentTime = Math.min(1, duration / 2);
+            };
+
+            tempVid.onseeked = () => {
+                // 4. Capture Frame & Analyze Visuals
+                const canvas = document.createElement('canvas');
+                canvas.width = tempVid.videoWidth;
+                canvas.height = tempVid.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let r = 0, g = 0, b = 0, brightness = 0;
+
+                // Sample pixels (every 50th for speed)
+                for (let i = 0; i < imageData.length; i += 200) {
+                    r += imageData[i];
+                    g += imageData[i + 1];
+                    b += imageData[i + 2];
+                }
+
+                const pixelCount = imageData.length / 200;
+                const avgR = r / pixelCount;
+                const avgG = g / pixelCount;
+                const avgB = b / pixelCount;
+                const luminance = 0.2126 * avgR + 0.7152 * avgG + 0.0722 * avgB;
+
+                // Formatting Results
+                setTimeout(() => {
+                    videoAiLoadingOverlay.classList.add('hidden');
+
+                    // Logic based on real data
+                    const vibrance = (Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB));
+                    resVidColor.textContent = vibrance > 40 ? "Vibrant / High Contrast" : "Muted / Natural";
+
+                    const aestheticScore = Math.min(10, ((luminance / 255) * 5) + ((vibrance / 128) * 5)).toFixed(1);
+                    resVidAesthetic.textContent = `${aestheticScore}/10`;
+
+                    showToast("Deep Scan Complete - Real Data Verified");
+                    URL.revokeObjectURL(videoUrl);
+                }, 2000);
+            };
+
+            tempVid.onerror = () => {
+                alert("Error loading video file. It might be corrupted or in an unsupported format.");
+                restartVideoAiBtn.click();
+            };
+        });
+    }
+
+    if (restartVideoAiBtn) {
+        restartVideoAiBtn.addEventListener('click', () => {
+            videoAiResultState.classList.add('hidden');
+            videoAiUploadState.classList.remove('hidden');
+            if (videoFileInput) videoFileInput.value = '';
+        });
+    }
+
+    // -- SUBSCRIPTION MANAGEMENT --
+    const billingStatePro = document.getElementById('billingStatePro');
+    const billingStateStandard = document.getElementById('billingStateStandard');
+    const planRenewalText = document.getElementById('planRenewalText');
+    const cancelSubBtn = document.getElementById('cancelSubBtn');
+
+    function updateBillingUI() {
+        if (!billingStatePro || !billingStateStandard) return;
+
+        if (isPro) {
+            billingStatePro.classList.remove('hidden');
+            billingStateStandard.classList.add('hidden');
+
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 30);
+            const dateStr = futureDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            if (isSubCancelled) {
+                planRenewalText.innerHTML = `<span class="text-red">Expires on ${dateStr}</span>`;
+                cancelSubBtn.innerHTML = '<i data-lucide="refresh-cw"></i> Reactivate Auto-Renew';
+                cancelSubBtn.classList.remove('text-red');
+                cancelSubBtn.classList.add('text-gold');
+            } else {
+                planRenewalText.textContent = `Renews on ${dateStr}`;
+                cancelSubBtn.innerHTML = '<i data-lucide="x-circle"></i> Cancel Subscription';
+                cancelSubBtn.classList.add('text-red');
+                cancelSubBtn.classList.remove('text-gold');
+            }
+        } else {
+            billingStatePro.classList.add('hidden');
+            billingStateStandard.classList.remove('hidden');
+        }
+        lucide.createIcons();
+    }
+
+    // -- PERSONA LOGIC --
+    const personaNicheEl = document.getElementById('personaNiche');
+    const personaToneEl = document.getElementById('personaTone');
+
+    if (personaNicheEl && personaToneEl) {
+        personaNicheEl.value = persona.niche;
+        personaToneEl.value = persona.tone;
+
+        const updatePersona = () => {
+            persona = { niche: personaNicheEl.value, tone: personaToneEl.value };
+            localStorage.setItem('vr_persona', JSON.stringify(persona));
+            showToast("Persona updated - AI adjusted.");
+        };
+
+        personaNicheEl.addEventListener('change', updatePersona);
+        personaToneEl.addEventListener('input', updatePersona);
+    }
+
+    // -- EXPORT LOGIC --
+    function downloadCSV(data, filename) {
+        if (!data || !data.length) return showToast("No data to export");
+        const headers = Object.keys(data[0]).join(",");
+        const rows = data.map(item => Object.values(item).map(val => `"${val}"`).join(",")).join("\n");
+        const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + rows;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const exportAnalyzeBtn = document.getElementById('exportAnalyzeBtn');
+    if (exportAnalyzeBtn) {
+        exportAnalyzeBtn.addEventListener('click', () => {
+            downloadCSV(analyticsData, "viralreels_analytics.csv");
+        });
+    }
+
+    // -- ONBOARDING LOGIC --
+    const onboardingOverlay = document.getElementById('onboardingOverlay');
+    const onboardingNextBtn = document.getElementById('onboardingNextBtn');
+    const onboardingSkipBtn = document.getElementById('onboardingSkipBtn');
+    let tourStep = 0;
+
+    const tourSteps = [
+        { target: 'navAnalyze', text: "The Predictor: Throw ideas in here to see their viral potential instantly." },
+        { target: 'navHooks', text: "The Hook Vault: Generate world-class openers tailored to your brand." },
+        { target: 'navTrends', text: "Trend Engine: Discover the exact formats moving the needle today." },
+        { target: 'navAiChat', text: "AI Consultant: Your personal strategist is available 24/7." }
+    ];
+
+    function showTourStep() {
+        if (tourStep >= tourSteps.length) {
+            endTour();
+            return;
+        }
+
+        const step = tourSteps[tourStep];
+        const target = document.getElementById(step.target);
+
+        // Visual highlight
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('highlight-nav'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('highlight-nav');
+        }
+
+        document.getElementById('onboardingContent').innerHTML = `
+            <h2 class="text-xl font-bold mb-2">Step ${tourStep + 1} of ${tourSteps.length}</h2>
+            <p class="text-sm text-secondary mb-6">${step.text}</p>
+            <button class="btn-primary w-full" onclick="window.nextTourStep()">Next</button>
+        `;
+
+        const dots = document.querySelectorAll('.step-dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === tourStep));
+    }
+
+    window.nextTourStep = () => {
+        tourStep++;
+        showTourStep();
+    };
+
+    function endTour() {
+        onboardingOverlay.classList.add('hidden');
+        isOnboardingComplete = true; // Sync internal variable
+        localStorage.setItem('vr_onboarding_complete', 'true');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('highlight-nav'));
+        showToast("Tour complete! You're ready to dominate.");
+    }
+
+
+    if (onboardingNextBtn) {
+        onboardingNextBtn.addEventListener('click', () => {
+            showTourStep();
+        });
+    }
+
+    if (onboardingSkipBtn) {
+        onboardingSkipBtn.addEventListener('click', () => {
+            endTour();
+        });
+    }
+
+    const exportTrackerBtn = document.getElementById('exportTrackerBtn');
+    if (exportTrackerBtn) {
+        exportTrackerBtn.addEventListener('click', () => {
+            const data = savedHooks.map(h => ({ hook: h }));
+            downloadCSV(data, "viralreels_hooks.csv");
+        });
+    }
+
+    if (cancelSubBtn) {
+        cancelSubBtn.addEventListener('click', () => {
+            if (!isSubCancelled) {
+                if (confirm("Are you sure you want to cancel? You will keep Pro access until the end of your billing cycle, but it will not renew.")) {
+                    isSubCancelled = true;
+                    localStorage.setItem('vr_sub_cancelled', 'true');
+                    showToast("Cancellation confirmed. Renews off.");
+                    updateBillingUI();
+                }
+            } else {
+                isSubCancelled = false;
+                localStorage.setItem('vr_sub_cancelled', 'false');
+                showToast("Subscription reactivated!");
+                updateBillingUI();
+            }
+        });
+    }
+
+    // =============================================
+    // == STRIPE CHECKOUT INTEGRATION ==
+    // =============================================
+    const upgradeBtns = document.querySelectorAll('#upgradeBtn, #paywallActionBtn, .open-paywall-btn');
+    upgradeBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (btn.id === 'upgradeBtn' || btn.id === 'paywallActionBtn') {
+                e.preventDefault();
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<div class="loader"></div>';
+                try {
+                    const res = await fetch('https://viralreels-ai.onrender.com/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                        window.location.href = data.url;
+                    } else {
+                        showToast("Checkout failed. Try again.");
+                        btn.innerHTML = originalText;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("Server error. Cannot reach Stripe.");
+                    btn.innerHTML = originalText;
+                }
+            }
+        });
+    });
+
+    // =============================================
+    // == FIREBASE AUTHENTICATION CONFIGURATION ==
+    // =============================================
+    const authBaseActions = document.getElementById('authBaseActions');
+    const emailLoginForm = document.getElementById('emailLoginForm');
+    const backToMethodsBtn = document.getElementById('backToMethodsBtn');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+
+    // Toggle Forms UI
+    if (emailLoginBtn) {
+        emailLoginBtn.addEventListener('click', () => {
+            authBaseActions.classList.add('hidden');
+            emailLoginForm.classList.remove('hidden');
+        });
+    }
+    if (backToMethodsBtn) {
+        backToMethodsBtn.addEventListener('click', () => {
+            emailLoginForm.classList.add('hidden');
+            authBaseActions.classList.remove('hidden');
+        });
+    }
+
+    // FIREBASE INITIALIZATION
+    const firebaseConfig = {
+       apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
+  authDomain: "viralreels-ai.firebaseapp.com",
+  projectId: "viralreels-ai",
+  storageBucket: "viralreels-ai.firebasestorage.app",
+  messagingSenderId: "592489150764",
+  appId: "1:592489150764:web:facdb8915f5c7a58d75489",
+  measurementId: "G-FNHMDWD7KC"
+};
+
+    if (window.firebase && window.firebase.auth) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+
+            // Check Auth State
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    authOverlay.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    lucide.createIcons();
+                    showToast("Logged in securely.");
+                    if (!isOnboardingComplete) {
+                        document.getElementById('onboardingOverlay').classList.remove('hidden');
+                    }
+                } else {
+                    authOverlay.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                }
+            });
+
+            // Email Form Submit
+            if (emailLoginForm) {
+                emailLoginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('authEmail').value;
+                    const pass = document.getElementById('authPass').value;
+                    authSubmitBtn.innerHTML = '<div class="loader"></div>';
+                    
+                    auth.signInWithEmailAndPassword(email, pass)
+                    .catch((error) => {
+                        // Lazy signup for seamless creator onboarding
+                        if (error.code.includes('user-not-found') || error.code.includes('invalid-credential')) {
+                            return auth.createUserWithEmailAndPassword(email, pass);
+                        }
+                        throw error;
+                    })
+                    .catch((error) => {
+                        console.error("Auth Error:", error);
+                        showToast("Auth Error: Check API Key or try again.");
+                        authSubmitBtn.innerHTML = 'Sign In / Create Account';
+                    });
+                });
+            }
+
+            // Google Login
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', () => {
+                    googleLoginBtn.innerHTML = '<div class="loader"></div> Processing...';
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    auth.signInWithPopup(provider).catch(err => {
+                        console.error(err);
+                        showToast("Google Auth Failed. Check API Key.");
+                        googleLoginBtn.innerHTML = '<i data-lucide="chrome"></i> Continue with Google';
+                        lucide.createIcons();
+                    });
+                });
+            }
+        } catch (e) {
+            console.warn("Firebase Auth bypassed for testing.", e);
+            setupMockAuth();
+        }
+    } else {
+        console.warn("Firebase scripts not loaded. Mock Auth Active.");
+        setupMockAuth();
+    }
+
+    function setupMockAuth() {
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', () => {
+                authOverlay.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                lucide.createIcons();
+                if (!isOnboardingComplete) document.getElementById('onboardingOverlay').classList.remove('hidden');
+            });
+        }
+        if (emailLoginForm) {
+            emailLoginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                authOverlay.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                lucide.createIcons();
+                if (!isOnboardingComplete) document.getElementById('onboardingOverlay').classList.remove('hidden');
+            });
+        }
+    }
+});

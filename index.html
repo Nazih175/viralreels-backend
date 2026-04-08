@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary Meta Tags -->
+    <title>ViralReels AI - Dominate the Algorithm</title>
+    <meta name="title" content="ViralReels AI - Dominate the Algorithm">
+    <meta name="description"
+        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+
+    <!-- App Icons & PWA Logo -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f0f13'/%3E%3Crect x='22' y='55' width='12' height='25' rx='4' fill='%23a855f7'/%3E%3Crect x='44' y='35' width='12' height='45' rx='4' fill='%23ec4899'/%3E%3Crect x='66' y='15' width='12' height='65' rx='4' fill='%23eab308'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-title" content="ViralReels">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://viralreels-ai.vercel.app/">
+    <meta property="og:title" content="ViralReels AI - Dominate the Algorithm">
+    <meta property="og:description"
+        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+    <meta property="og:image" content="./assets/social_preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://viralreels-ai.vercel.app/">
+    <meta property="twitter:title" content="ViralReels AI - Dominate the Algorithm">
+    <meta property="twitter:description"
+        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+    <meta property="twitter:image" content="./assets/social_preview.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- App Store / Play Store Readiness Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ViralReels">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0f">
+</head>
+
+<body class="dark-theme no-scroll">
+
+    <!-- Auth Overlay (Reverted/Standardized) -->
+    <div id="authOverlay" class="fullscreen-overlay z-auth">
+        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border);">
+            <div class="auth-logo-bg mb-4 flex justify-center" style="background: none;">
+                <!-- High-End Dark Neon SVG Logo (Cleaned) -->
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                    style="width: 80px; height: 80px; filter: drop-shadow(0 0 12px rgba(168,85,247,0.5));">
+                    <defs>
+                        <linearGradient id="neonGradAuth" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#a855f7" />
+                            <stop offset="50%" stop-color="#ec4899" />
+                            <stop offset="100%" stop-color="#eab308" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" stroke="#2a2a35"
+                        stroke-width="2" />
+                    <!-- Ascending Bars -->
+                    <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAuth)" />
+                    <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAuth)" />
+                    <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuth)" />
+                </svg>
+            </div>
+            <h1 class="auth-title">ViralReels <span class="gradient-text">AI</span></h1>
+            <h2 class="auth-subtitle">Turn ANY idea into a viral video.</h2>
+            <p class="auth-desc text-xs mb-6">Gain the unfair advantage. Analyze ideas, generate hooks, and discover
+                trends—all powered by AI built for creators.</p>
+            <div class="auth-actions" id="authBaseActions">
+                <button class="btn-primary w-full" id="googleLoginBtn"><i data-lucide="chrome"></i> Continue with
+                    Google</button>
+                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn"
+                    style="background:var(--bg-card-dark);"><i data-lucide="mail"></i> Continue with Email</button>
+            </div>
+
+            <form id="emailLoginForm" class="hidden text-left w-full mt-2">
+                <div class="mb-3">
+                    <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Email Address</label>
+                    <input type="email" id="authEmail" class="text-input w-full"
+                        style="padding:10px; background:rgba(0,0,0,0.3);" required placeholder="creator@example.com">
+                </div>
+                <div class="mb-3">
+                    <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Password</label>
+                    <input type="password" id="authPass" class="text-input w-full"
+                        style="padding:10px; background:rgba(0,0,0,0.3);" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary w-full mb-2" id="authSubmitBtn">Sign In / Create
+                    Account</button>
+                <button type="button" class="btn-secondary w-full text-xs" id="backToMethodsBtn"
+                    style="background:transparent; border:none;">← Back</button>
+            </form>
+            <p class="auth-footer mt-4 text-xs text-muted">By continuing, you agree to our Terms.</p>
+        </div>
+    </div>
+
+    <!-- Premium Paywall Overlay -->
+    <div id="paywallOverlay" class="fullscreen-overlay z-paywall hidden">
+        <div class="paywall-card glass-card interactive-glow flex-col premium-glow">
+            <button class="close-btn modal-closer" id="closePaywallBtn"><i data-lucide="x"></i></button>
+
+            <div class="hero-premium-bg mb-2">
+                <div class="pro-badge mb-1 mx-auto" style="padding: 4px 10px; font-size: 0.7rem;"><i
+                        data-lucide="crown"></i> PRO</div>
+                <h2 class="paywall-title" style="font-size: 1.25rem;">Unlock <span
+                        class="gradient-premium-text">ViralReels Pro</span></h2>
+            </div>
+
+            <p class="paywall-desc text-secondary text-xs mb-2">Get our most powerful AI models and analytics.</p>
+
+            <div class="pro-features-grid mb-3 text-left">
+                <!-- 1. Unlimited Uses -->
+                <div class="pro-feature-item flex gap-2 items-start bg-card-dark p-2 rounded-md border-subtle">
+                    <div style="background: rgba(6,214,160,0.15); padding: 4px; border-radius: 6px; flex-shrink: 0;"><i
+                            data-lucide="infinity" class="text-green" style="width: 14px; height: 14px;"></i></div>
+                    <div>
+                        <strong class="text-primary font-bold block"
+                            style="font-size: 10px; line-height: 1.1; margin-bottom: 2px;">Unlimited Uses</strong>
+                        <p class="text-muted" style="font-size: 9px; line-height: 1.1;">No daily limits or ads.</p>
+                    </div>
+                </div>
+
+                <!-- 2. Video AI -->
+                <div class="pro-feature-item flex gap-2 items-start bg-card-dark p-2 rounded-md border-subtle">
+                    <div style="background: rgba(255,183,3,0.15); padding: 4px; border-radius: 6px; flex-shrink: 0;"><i
+                            data-lucide="video" class="text-gold" style="width: 14px; height: 14px;"></i></div>
+                    <div>
+                        <strong class="text-primary font-bold block"
+                            style="font-size: 10px; line-height: 1.1; margin-bottom: 2px;">Video AI</strong>
+                        <p class="text-muted" style="font-size: 9px; line-height: 1.1;">Deep visual/audio scans.</p>
+                    </div>
+                </div>
+
+                <!-- 3. AI Chat -->
+                <div class="pro-feature-item flex gap-2 items-start bg-card-dark p-2 rounded-md border-subtle">
+                    <div
+                        style="background: rgba(157, 78, 221, 0.15); padding: 4px; border-radius: 6px; flex-shrink: 0;">
+                        <i data-lucide="sparkles" class="text-purple" style="width: 14px; height: 14px;"></i></div>
+                    <div>
+                        <strong class="text-primary font-bold block"
+                            style="font-size: 10px; line-height: 1.1; margin-bottom: 2px;">AI Chat</strong>
+                        <p class="text-muted" style="font-size: 9px; line-height: 1.1;">24/7 viral consultant.</p>
+                    </div>
+                </div>
+
+                <!-- 4. Analytics Log -->
+                <div class="pro-feature-item flex gap-2 items-start bg-card-dark p-2 rounded-md border-subtle">
+                    <div style="background: rgba(67, 97, 238, 0.15); padding: 4px; border-radius: 6px; flex-shrink: 0;">
+                        <i data-lucide="bar-chart-2" class="text-accent" style="width: 14px; height: 14px;"></i></div>
+                    <div>
+                        <strong class="text-primary font-bold block"
+                            style="font-size: 10px; line-height: 1.1; margin-bottom: 2px;">Analytics Log</strong>
+                        <p class="text-muted" style="font-size: 9px; line-height: 1.1;">Track real views & ROI.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="price-box mb-2 bg-card-dark p-2 rounded-lg border-subtle flex justify-between items-center">
+                <div class="text-left">
+                    <span class="price text-gold"
+                        style="color:var(--accent-gold); font-size: 1.1rem; font-weight: 800;">$9.99<span
+                            class="period text-xs text-muted" style="font-weight: 500;">/mo</span></span>
+                </div>
+                <button class="btn-primary pulse-btn border-none"
+                    style="background:var(--gradient-premium); color:black; padding: 6px 16px; font-size: 0.85rem;"
+                    id="upgradeBtn">Upgrade Now</button>
+            </div>
+            <p class="text-xs text-muted mb-0">Cancel anytime. Billed securely.</p>
+        </div>
+    </div>
+
+    <!-- Ad Modal (Simulated Ad Player) -->
+    <div id="adModal" class="fullscreen-overlay z-paywall hidden">
+        <div class="glass-card interactive-glow"
+            style="width:100%; max-width:400px; text-align:center; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="mb-4 p-3 rounded-md"
+                style="background:rgba(0,0,0,0.5); position:relative; min-height:160px; display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid rgba(255,255,255,0.05);">
+                <span class="text-xs text-muted uppercase tracking-wide mb-3 font-bold">Advertisement</span>
+                <i data-lucide="play-circle"
+                    style="width:48px; height:48px; color:rgba(255,255,255,0.2); margin-bottom:12px;"></i>
+                <p class="text-secondary text-sm">Your ad is playing...</p>
+                <p class="text-xs text-muted mt-1">Sponsored by ViralReels Partners</p>
+                <button id="adSkipBtn" class="btn-secondary text-xs mt-4"
+                    style="padding:6px 16px; opacity:0.4; cursor:not-allowed;" disabled>Skip Ad</button>
+            </div>
+            <!-- Progress Bar -->
+            <div class="stat-bar-container mb-3" style="height:4px;">
+                <div id="adProgressBar" class="stat-bar"
+                    style="width:0%; background:var(--accent-gold); transition:none;"></div>
+            </div>
+            <p id="adCountdownText" class="text-xs text-muted mb-2">Ad ends in <strong id="adSeconds"
+                    style="color:var(--accent-gold);">30</strong>s</p>
+            <p class="text-xs text-secondary">Watch the full ad to earn <strong style="color:var(--accent-green);">+2
+                    free uses</strong></p>
+        </div>
+    </div>
+
+    <!-- Usage Limit Block Card (injected dynamically via JS) -->
+
+    <div id="aboutModal" class="fullscreen-overlay z-paywall hidden">
+        <div class="glass-card about-card text-left scroll-container"
+            style="max-height: 85vh; width:100%; max-width:450px;">
+            <button class="close-btn modal-closer" id="closeAboutBtn"><i data-lucide="x"></i></button>
+            <div class="about-hero text-center mb-6 mt-4">
+                <div class="auth-logo-bg mb-2 flex justify-center" style="background: none;">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                        style="width: 50px; height: 50px; filter: drop-shadow(0 0 12px rgba(168,85,247,0.5));">
+                        <defs>
+                            <linearGradient id="neonGradAbout" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#a855f7" />
+                                <stop offset="50%" stop-color="#ec4899" />
+                                <stop offset="100%" stop-color="#eab308" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" stroke="#2a2a35"
+                            stroke-width="2" />
+                        <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAbout)" />
+                        <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAbout)" />
+                        <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAbout)" />
+                    </svg>
+                </div>
+                <h1 class="auth-title">ViralReels <span class="gradient-text">AI</span></h1>
+                <p class="text-accent font-bold mt-1">Creator Intelligence Platform</p>
+            </div>
+            <div class="about-tools-grid mb-6">
+                <!-- Row 1 -->
+                <div class="tool-box text-center">
+                    <i data-lucide="bar-chart-2" class="text-blue mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Analyzer</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Score viral readiness.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="magnet" class="text-purple mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Hooks</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Generate scroll-stopping lines.
+                    </p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="archive" class="text-orange mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Tracker</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Database your hook library.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="calendar" class="text-green mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Calendar</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Schedule content uploads.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="type" class="text-blue mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Captions</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Generate optimized SEO bodies.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="hash" class="text-purple mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Tags</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Discover hyper-niche hashtags.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="check-square" class="text-red mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Checklist</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">18-step pre-publish review.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="trending-up" class="text-gold mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Trends</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">5-star viral format radar.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="file-text" class="text-cyan mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Rewrite</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Turn scripts into viral hooks.</p>
+                </div>
+                <div class="tool-box text-center">
+                    <i data-lucide="save" class="text-orange mx-auto mb-2"></i>
+                    <h4 class="text-xs font-bold">Saved</h4>
+                    <p class="text-xs text-secondary mt-1" style="font-size:0.65rem;">Your local script vault.</p>
+                </div>
+            </div>
+            <h3 class="font-bold mb-2 text-md text-accent">About the App</h3>
+            <p class="text-secondary text-sm mb-6 line-height-15">We built ViralReels AI to help ambitious creators skip
+                the exhausting trial-and-error phase of social media growth. By reverse engineering high-retention
+                content formats, we provide actionable data before you even hit record.</p>
+            <div class="pro-feature-box mt-4 p-4 rounded-xl"
+                style="background: rgba(255,183,3,0.1); border: 1px solid rgba(255,183,3,0.3);">
+                <h3 class="font-bold mb-2 text-md" style="color:var(--accent-gold)">What Do I Get In Pro?</h3>
+                <p class="text-secondary text-sm mb-2">Upgrade to unlock the ultimate creator arsenal:</p>
+                <ul class="text-sm text-secondary style-none pl-0">
+                    <li class="flex items-center gap-2 mb-1"><i data-lucide="infinity"
+                            style="width:14px; color:var(--accent-gold)"></i> Unlimited Daily Uses</li>
+                    <li class="flex items-center gap-2 mb-1"><i data-lucide="bar-chart-2"
+                            style="width:14px; color:var(--accent-gold)"></i> Pro Analytics Log</li>
+                    <li class="flex items-center gap-2 mb-1"><i data-lucide="video"
+                            style="width:14px; color:var(--accent-gold)"></i> Video AI Analysis</li>
+                    <li class="flex items-center gap-2 mb-1"><i data-lucide="sparkles"
+                            style="width:14px; color:var(--accent-gold)"></i> Unlimited AI Consultations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Settings Modal (Expanded) -->
+    <div id="settingsModal" class="fullscreen-overlay z-paywall hidden">
+        <div class="glass-card about-card text-left scroll-container interactive-glow"
+            style="max-height: 85vh; width:100%; max-width:450px;">
+            <button class="close-btn modal-closer" id="closeSettingsBtn"><i data-lucide="x"></i></button>
+            <h2 class="font-bold text-xl mb-6 mt-2 flex items-center gap-2"><i data-lucide="settings"
+                    class="text-muted"></i> User Settings</h2>
+
+            <div class="mb-6">
+                <h4
+                    class="text-xs text-secondary uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle">
+                    Identity Persona</h4>
+                <div class="persona-grid">
+                    <div class="persona-stat-box">
+                        <label class="persona-label">Content Niche</label>
+                        <select id="personaNiche"
+                            class="text-input w-full p-2 bg-transparent border-none text-sm text-primary">
+                            <option value="tech">Artificial Intelligence / Tech</option>
+                            <option value="gaming">Gaming & Esports</option>
+                            <option value="fitness">Health & Fitness</option>
+                            <option value="business">Business & Wealth</option>
+                            <option value="finance">Finance & Crypto</option>
+                            <option value="lifestyle">Lifestyle / Travel</option>
+                            <option value="fashion">Fashion & Beauty</option>
+                            <option value="cooking">Cooking & Food</option>
+                            <option value="creative">Creative Art / Design</option>
+                            <option value="philosophy">Motivation & Philosophy</option>
+                        </select>
+                    </div>
+                    <div class="persona-stat-box">
+                        <label class="persona-label">Brand Voice (Relatable ↔ Aggressive)</label>
+                        <input type="range" id="personaTone" class="tone-slider" min="1" max="100" value="50">
+                        <div class="flex justify-between text-xs text-muted mt-2">
+                            <span>Soft</span>
+                            <span>Neutral</span>
+                            <span>Hype</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4
+                    class="text-xs text-secondary uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle">
+                    Appearance & Localization</h4>
+                <div class="flex items-center justify-between p-2 mb-2">
+                    <div>
+                        <strong class="text-primary font-bold text-sm block">Dark Mode</strong>
+                        <span class="text-xs text-secondary">Switch to eye-friendly dark design</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between p-2 mb-2">
+                    <div>
+                        <strong class="text-primary font-bold text-sm block">App Language</strong>
+                    </div>
+                    <div class="custom-select-wrapper" style="width: 120px;">
+                        <select class="text-sm bg-card-dark" style="padding: 6px;">
+                            <option>English</option>
+                            <option>Español</option>
+                            <option>Français</option>
+                        </select><i data-lucide="chevron-down" class="select-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4
+                    class="text-xs text-secondary uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle">
+                    Notifications</h4>
+                <div class="flex items-center justify-between p-2 mb-2">
+                    <div><strong class="text-primary font-bold text-sm block">Push Alerts (Web)</strong><span
+                            class="text-xs text-secondary">Get notified of trending spikes</span></div>
+                    <label class="toggle-switch"><input type="checkbox" checked><span
+                            class="slider round"></span></label>
+                </div>
+                <div class="flex items-center justify-between p-2 mb-2">
+                    <div><strong class="text-primary font-bold text-sm block">Email Analytics Summary</strong><span
+                            class="text-xs text-secondary">Weekly viral progress report</span></div>
+                    <label class="toggle-switch"><input type="checkbox"><span class="slider round"></span></label>
+                </div>
+            </div>
+
+            <div class="mb-6" id="billingSection">
+                <h4 class="text-xs text-gold uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle">
+                    Plan & Billing</h4>
+                <div id="billingStatePro" class="hidden">
+                    <div class="glass-card p-4 rounded-md mb-2 bg-card-dark border-accent">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="pro-badge mb-1">PRO ACTIVE</div>
+                                <div class="text-xs text-secondary" id="planRenewalText">Renews on May 7, 2026</div>
+                            </div>
+                            <div class="text-sm font-bold">$9.99/mo</div>
+                        </div>
+                        <p class="text-xs text-muted mb-3">Cancellations take effect at the end of your billing cycle.
+                            No partial refunds.</p>
+                        <button class="btn-text w-full text-red justify-center mt-2" id="cancelSubBtn"
+                            style="border: 1px solid rgba(239, 71, 111, 0.2)">
+                            <i data-lucide="x-circle"></i> Cancel Subscription
+                        </button>
+                    </div>
+                </div>
+                <div id="billingStateStandard">
+                    <div class="glass-card p-4 rounded-md mb-2 bg-card-dark border-subtle">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <strong class="text-primary font-bold text-sm block">Standard Plan</strong>
+                                <span class="text-xs text-secondary">Free usage limits active</span>
+                            </div>
+                            <button class="btn-text text-gold" onclick="document.getElementById('navAiChat').click()">
+                                Go Pro <i data-lucide="chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4
+                    class="text-xs text-red uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle border-red">
+                    Danger Zone</h4>
+                <div class="glass-card p-4 rounded-md mb-2 bg-card-dark border-subtle">
+                    <strong class="text-primary font-bold mb-1 block">Clear Local Data</strong>
+                    <p class="text-xs text-secondary mb-3">Wipes all tracked hooks, scraped trends, and calendar events
+                        from browser storage.</p>
+                    <button class="btn-secondary w-full text-sm" id="clearDataBtn"><i data-lucide="trash-2"></i> Clear
+                        Storage</button>
+                </div>
+
+                <div class="glass-card p-4 rounded-md border-red mt-3 bg-card-dark">
+                    <strong class="text-red font-bold mb-1 block">Delete Account</strong>
+                    <p class="text-xs text-secondary mb-3">Permanently delete your profile and pro subscription info.
+                    </p>
+                    <button class="btn-primary w-full text-sm bg-red border-none" style="box-shadow:none;"
+                        id="delAccountBtn"><i data-lucide="alert-circle"></i> Delete Everything</button>
+                </div>
+            </div>
+
+            <div class="legal-links flex justify-center gap-4 mb-4 mt-2">
+                <a href="#" class="text-xs text-muted">Privacy Policy</a>
+                <a href="#" class="text-xs text-muted">Terms of Service</a>
+                <a href="#" class="text-xs text-muted">Support</a>
+            </div>
+            <p class="text-center text-xs text-muted mt-2 border-top border-subtle pt-4">ViralReels AI App Version 1.0
+                [Stable]</p>
+        </div>
+    </div>
+
+    <!-- Onboarding HUD Overlay -->
+    <div id="onboardingOverlay" class="onboarding-overlay hidden">
+        <div class="onboarding-card">
+            <div id="onboardingContent">
+                <div class="flex justify-center mb-4">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                        style="width: 64px; height: 64px; filter: drop-shadow(0 0 8px rgba(168,85,247,0.5));">
+                        <defs>
+                            <linearGradient id="neonGradOnboard" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#a855f7" />
+                                <stop offset="50%" stop-color="#ec4899" />
+                                <stop offset="100%" stop-color="#eab308" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" stroke="#2a2a35"
+                            stroke-width="2" />
+                        <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradOnboard)" />
+                        <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradOnboard)" />
+                        <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradOnboard)" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold mb-2">Welcome to ViralReels!</h2>
+                <p class="text-sm text-secondary mb-6">Your V1 command center is ready. Let's take a 30-second tour of
+                    your new viral arsenal.</p>
+                <button class="btn-primary w-full" id="onboardingNextBtn">Start Tour</button>
+                <button class="btn-text w-full mt-2 text-muted text-xs" id="onboardingSkipBtn">Skip for now</button>
+            </div>
+            <div class="onboarding-step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Shell -->
+    <div id="appContainer" class="app-layout hidden">
+
+        <!-- Fixed Top Bar -->
+        <header class="top-bar">
+            <div class="brand">
+                <!-- Tiny Top Bar Neon SVG Logo -->
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                    style="width: 26px; height: 26px; flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(168,85,247,0.4));">
+                    <defs>
+                        <linearGradient id="neonGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#a855f7" />
+                            <stop offset="50%" stop-color="#ec4899" />
+                            <stop offset="100%" stop-color="#eab308" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" />
+                    <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGrad)" />
+                    <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGrad)" />
+                    <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGrad)" />
+                </svg>
+                <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
+            </div>
+            <div class="flex gap-2">
+                <button class="btn-text header-btn" id="aboutBtn"><i data-lucide="info"></i> <span>About</span></button>
+                <button class="btn-text header-btn" id="settingsBtn"><i data-lucide="settings"></i>
+                    <span>Settings</span></button>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content Area -->
+        <main class="content-area">
+
+            <!-- 1. ANALYZE (FULL WIDTH FLUSH) -->
+            <section id="view-analyze" class="tab-view active-view scroll-container flush-container pb-heavy">
+                <div class="tab-header pt-4 content-padding">
+                    <div class="flex items-center justify-between gap-4 mb-2">
+                        <h2 class="text-xl font-bold">Analyzer Pro</h2>
+                        <button class="btn-export" id="exportAnalyzeBtn"><i data-lucide="download"></i> CSV</button>
+                    </div>
+                    <p class="text-sm text-secondary">Predict viral readiness and track your exact historical hit rates.
+                    </p>
+                    <div id="usage-badge-analyze" class="usage-badge mt-2"></div>
+                </div>
+
+                <div class="pill-tabs mb-4 sticky-pill interactive-glow mx-auto mt-4" style="max-width:300px;">
+                    <button class="pill active" data-subtab="sub-analyze-scout">AI Predictor</button>
+                    <button class="pill premium-pill" style="position:relative;" data-subtab="sub-analyze-metrics">
+                        Analytics <i data-lucide="crown" class="crown-badge"
+                            style="position:absolute; top:4px; right:6px; width:10px; color:var(--accent-gold);"></i>
+                    </button>
+                </div>
+
+                <!-- SCOUT IDEA SUB-TAB -->
+                <div id="sub-analyze-scout" class="item-list-container active-subtab w-full">
+                    <!-- Made card flush with screen edges -->
+                    <form id="analyzerForm" class="glass-card interactive-glow flush-card mb-6 mt-2">
+                        <div class="form-group"><label>Video Idea / Topic</label><textarea id="ideaInput" rows="3"
+                                required></textarea></div>
+                        <div class="form-group"><label>Caption (Optional)</label><input type="text" id="captionInput"
+                                class="text-input"></div>
+                        <div class="form-group"><label>Hashtags (Optional)</label><input type="text" id="hashtagInput"
+                                class="text-input"></div>
+                        <div class="form-row">
+                            <div class="form-group half-width"><label>Platform</label>
+                                <div class="custom-select-wrapper">
+                                    <select id="platformSelect">
+                                        <option value="all" selected>All Platforms</option>
+                                        <option value="tiktok">TikTok</option>
+                                        <option value="reels">IG Reels</option>
+                                        <option value="shorts">YT Shorts</option>
+                                    </select><i data-lucide="chevron-down" class="select-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group half-width"><label>Est. Length</label><input type="text"
+                                    id="lengthInput" class="text-input" placeholder="e.g. 15s"></div>
+                        </div>
+                        <button type="submit" class="btn-primary w-full" id="analyzeSubmitBtn"><i
+                                data-lucide="sparkles"></i><span>Generate Analysis</span>
+                            <div class="loader hidden"></div>
+                        </button>
+                    </form>
+
+                    <div id="resultsDashboard"
+                        class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4">
+                        <h3 class="font-bold text-lg mb-2">Viral Readiness</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card standout-card primary-stat"><span class="stat-label">Viral
+                                    Score</span>
+                                <div class="score-container mt-2">
+                                    <div class="score-circle"><span class="score-value" id="resViralScore">0</span>
+                                    </div>
+                                </div>
+                                <p class="stat-desc mt-2" id="resScoreText">Analyzing...</p>
+                            </div>
+                            <div class="stat-mini-grid">
+                                <div class="stat-card bg-card-dark p-3 rounded-md border-subtle"><span
+                                        class="stat-label block mb-2">Hook Strength</span>
+                                    <div class="stat-bar-container">
+                                        <div class="stat-bar" id="resHookBar" style="width: 0%;"></div>
+                                    </div><span class="stat-value-small mt-1 block" id="resHookRating">--/10</span>
+                                </div>
+                                <div class="stat-card bg-card-dark p-3 rounded-md border-subtle"><span
+                                        class="stat-label block mb-2">Est. Retention</span>
+                                    <div class="stat-bar-container">
+                                        <div class="stat-bar" id="resRetentionBar" style="width: 0%;"></div>
+                                    </div><span class="stat-value-small mt-1 block" id="resRetentionPerc">--%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="insights-section mt-4 mb-2">
+                            <h4 class="font-bold flex items-center gap-2 mb-2"><svg viewBox="0 0 64 64"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    style="width: 18px; height: 18px; border-radius: 4px; flex-shrink:0;">
+                                    <rect width="64" height="64" rx="10" fill="white" />
+                                    <rect x="10" y="36" width="12" height="18" rx="3" fill="#111" />
+                                    <rect x="26" y="24" width="12" height="30" rx="3" fill="#111" />
+                                    <rect x="42" y="12" width="12" height="42" rx="3" fill="#111" />
+                                </svg> Actionable Adjustments</h4>
+                            <ul class="tips-list" id="resTipsList"></ul>
+                        </div>
+
+                        <div class="form-group mt-6 border-top border-subtle pt-4"><label
+                                class="text-accent flex items-center gap-2"><i data-lucide="trending-up"
+                                    style="width:14px; height:14px;"></i> Log to Analytics Database</label>
+                            <p class="text-xs text-secondary mt-1 mb-2">Save this idea's predicted score, then input the
+                                real views later to track your hit rate accuracy!</p><button
+                                class="btn-secondary w-full border-accent text-accent" id="btnLogAnalytics"><i
+                                    data-lucide="bar-chart-2"></i> Log Prediction</button>
+                        </div>
+                        <button class="btn-secondary w-full mt-2 border-subtle" id="saveIdeaBtn"><i
+                                data-lucide="bookmark"></i> Save to Calendar Today</button>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS METRICS SUB-TAB -->
+                <div id="sub-analyze-metrics" class="item-list-container hidden w-full content-padding">
+                    <div class="glass-card mb-4 interactive-glow mt-2 border-accent text-center bg-card-dark">
+                        <i data-lucide="activity" class="text-gold lg-icon mx-auto mb-2"></i>
+                        <h3 class="font-bold">Real-World Validations</h3>
+                        <p class="text-xs text-secondary mt-1">Cross-reference your Video AI scores with the absolute
+                            real views you achieved to reveal the true matrix.</p>
+                    </div>
+
+                    <div id="analyticsList" class="flex-col gap-3 mt-4">
+                        <div id="analyticsEmpty" class="empty-state bg-card-dark rounded-md"><i data-lucide="slash"
+                                class="lg-icon mb-2"></i>
+                            <h4>No Data Logged</h4>
+                            <p class="text-xs">Run a video idea through the Scout, then click "Log Prediction" to drop
+                                it here.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. HOOKS -->
+            <section id="view-hooks" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Hook Engine</h2>
+                    <p>Bespoke viral hooks and standard tag layouts.</p>
+                    <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
+                </div>
+                <form id="customHookForm" class="interactive-glow glass-card mt-4 mb-4 flex gap-2 w-full p-2">
+                    <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
+                        class="w-full flex-grow text-input"
+                        style="border:none; background:transparent; box-shadow:none;" required>
+                    <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
+                            data-lucide="zap"></i></button>
+                </form>
+                <div id="hooksGeneratorsEmpty" class="empty-state glass-card mt-2"><i data-lucide="pen-tool"
+                        class="lg-icon mb-2"></i>
+                    <h3>Type a Topic</h3>
+                    <p>Enter any topic above to generate bespoke viral hooks and captions.</p>
+                </div>
+                <div id="hooksGeneratorsContent" class="hidden mt-2">
+                    <div class="pill-tabs mb-4 sticky-pill interactive-glow"><button class="pill active"
+                            data-subtab="hooks-list">Hooks</button><button class="pill"
+                            data-subtab="captions-list">Captions</button></div>
+                    <div id="sub-hooks-list" class="item-list-container active-subtab"></div>
+                    <div id="sub-captions-list" class="item-list-container hidden"></div>
+                </div>
+            </section>
+
+            <!-- 3. TRACKER -->
+            <section id="view-tracker" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="flex items-center justify-between gap-4">
+                    <h2>Hook Tracker</h2>
+                    <button class="btn-export" id="exportTrackerBtn"><i data-lucide="download"></i> CSV</button>
+                </div>
+                <p>Hooks you've saved to your vault.</p>
+                <div id="trackerEmpty" class="empty-state glass-card mt-4"><i data-lucide="archive"
+                        class="lg-icon mb-2"></i>
+                    <h3>No Tracked Hooks</h3>
+                    <p>Save hooks from the Generator to store them here.</p>
+                </div>
+                <div id="trackerList" class="tracker-list mt-4 flex-col gap-2"></div>
+            </section>
+
+            <!-- 4. CALENDAR VIEW (FULL WIDTH FLUSH) -->
+            <section id="view-calendar" class="tab-view hidden scroll-container flush-container pb-heavy">
+                <div class="tab-header pt-4 pb-2 content-padding">
+                    <h2>Content Calendar</h2>
+                </div>
+                <div class="glass-card mt-2 mb-8 cal-container cal-bg-gradient interactive-glow flush-card"
+                    style="padding-top:1rem; padding-bottom:1.5rem;">
+                    <div class="cal-header flex justify-between items-center mb-4">
+                        <button class="icon-button glow-hover" id="prevMonthBtn"><i
+                                data-lucide="chevron-left"></i></button>
+                        <h3 id="calMonthDisplay" class="font-bold text-xl gradient-text">Month 2026</h3>
+                        <button class="icon-button glow-hover" id="nextMonthBtn"><i
+                                data-lucide="chevron-right"></i></button>
+                    </div>
+                    <div class="cal-weekdays mb-2">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="cal-grid" id="calendarGrid"></div>
+                </div>
+            </section>
+
+            <!-- 5. CAPTIONS -->
+            <section id="view-captions" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Caption Gen</h2>
+                    <p>AI captions tuned for maximum algorithm reach.</p>
+                    <div id="usage-badge-captions" class="usage-badge mt-2"></div>
+                </div>
+                <form id="dedCapForm" class="glass-card interactive-glow mt-4 mb-4">
+                    <div class="form-group"><label>Topic / Concept</label><input type="text" id="dedCapInput"
+                            class="text-input bg-card-dark" placeholder="e.g. Budget traveling" required></div>
+                    <div class="form-group"><label>Tone / Genre (Optional)</label>
+                        <div class="custom-select-wrapper">
+                            <select id="dedCapStyle" class="bg-card-dark">
+                                <option value="mixed">Mixed/Any Tone</option>
+                                <option value="conversational">Conversational</option>
+                                <option value="funny">Funny / Humorous</option>
+                                <option value="serious">Serious / Authoritative</option>
+                                <option value="controversial">Controversial/Shock</option>
+                                <option value="educational">Educational/Value</option>
+                                <option value="storytime">Storytime</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary w-full" id="dedCapBtn"><i data-lucide="pen-tool"></i>
+                        Generate Captions</button>
+                </form>
+                <div id="dedCapOutput" class="item-list-container hidden"></div>
+            </section>
+
+            <!-- 6. TAGS -->
+            <section id="view-tags" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Hashtag Gen</h2>
+                    <p>Stop guessing. Type a broad niche string to instantly manifest 10-15 hyper-relevant trending &
+                        niche hashtags to boost your SEO visibility.</p>
+                </div>
+                <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
+                    <input type="text" id="dedTagsInput" class="text-input w-full flex-grow"
+                        style="border:none; background:transparent; box-shadow:none;" placeholder="Enter broad niche..."
+                        required>
+                    <button type="submit" class="btn-primary"><i data-lucide="hash"></i></button>
+                </form>
+                <div id="dedTagsOutput" class="glass-card hidden glow-box interactive-glow">
+                    <h4 class="mb-3 text-sm text-accent font-bold uppercase tracking-wide neon-text"><i
+                            data-lucide="fire" style="display:inline; width:14px; margin-bottom:-2px;"></i> Broad
+                        Trending Links</h4>
+                    <div id="tagsTrending" class="hashtag-grid mb-6"></div>
+                    <h4 class="mb-3 text-sm text-cyan font-bold uppercase tracking-wide neon-cyan"><i
+                            data-lucide="target" style="display:inline; width:14px; margin-bottom:-2px;"></i>
+                        Hyper-Niche Tags</h4>
+                    <div id="tagsNiche" class="hashtag-grid"></div>
+                </div>
+            </section>
+
+            <!-- 7. CHECKLIST VIEW (FULL WIDTH FLUSH) -->
+            <section id="view-checklist" class="tab-view hidden scroll-container flush-container pb-heavy">
+                <div class="tab-header pt-4 content-padding">
+                    <h2>Total Checklist</h2>
+                    <p>Clear 100% before publishing.</p>
+                </div>
+                <div class="glass-card interactive-glow flush-card mb-6 mt-4 p-4">
+                    <div class="flex justify-between items-center mb-4 sticky-score z-10 sticky-bg"
+                        style="padding:8px 0; border-bottom:var(--glass-border);">
+                        <span class="font-bold">Readiness Score</span><span id="checklistScore"
+                            class="gradient-text font-bold text-xl">0%</span>
+                        <div class="stat-bar-container w-full absolute" style="bottom:-3px; left:0;">
+                            <div class="stat-bar" id="checklistScoreBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="checklist-items" id="checklistItems">
+                        <!-- Hook -->
+                        <div class="check-category mt-2"><span class="cat-label text-red">Hook</span></div>
+                        <label class="check-item check-red bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Does the first second grab attention?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Start with movement or a weird angle so
+                                    they stop scrolling.</span></div>
+                        </label>
+                        <label class="check-item check-red bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is your first sentence a strong hook?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Make a bold claim or ask a direct question
+                                    right away.</span></div>
+                        </label>
+                        <label class="check-item check-red bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is the hook written on the screen?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Put your hook in big text immediately so
+                                    people reading on mute stay.</span></div>
+                        </label>
+                        <!-- Audio -->
+                        <div class="check-category mt-4"><span class="cat-label text-purple">Audio</span></div>
+                        <label class="check-item check-purple bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is your voice clear?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Make sure we can hear you clearly without
+                                    echo or wind noise.</span></div>
+                        </label>
+                        <label class="check-item check-purple bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is the music too loud?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Keep background music under 15% volume so
+                                    it doesn't drown you out.</span></div>
+                        </label>
+                        <label class="check-item check-purple bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Are you using a trending sound?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Add a popular audio track natively in the
+                                    app and turn its volume down.</span></div>
+                        </label>
+                        <!-- Caption -->
+                        <div class="check-category mt-4"><span class="cat-label text-blue">Caption</span></div>
+                        <label class="check-item check-blue bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Does the first line make them want to read?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Give them a reason to click 'Read More'.
+                                    It helps watch time!</span></div>
+                        </label>
+                        <label class="check-item check-blue bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is the caption easy to read?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Use empty spaces and emojis. Don't make it
+                                    a giant wall of text.</span></div>
+                        </label>
+                        <label class="check-item check-blue bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Did you ask a question?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Ask something specific at the very end to
+                                    drive comments.</span></div>
+                        </label>
+                        <!-- Tags -->
+                        <div class="check-category mt-4"><span class="cat-label text-orange">Hashtags</span></div>
+                        <label class="check-item check-orange bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="5"><span class="check-box"></span>
+                            <div class="check-content"><strong>Are you using niche tags?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Use 3-5 specific tags about your topic so
+                                    the algorithm knows who to show it to.</span></div>
+                        </label>
+                        <label class="check-item check-orange bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="4"><span class="check-box"></span>
+                            <div class="check-content"><strong>Did you include broad tags?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Include 1-2 broad tags like #fyp or your
+                                    industry name.</span></div>
+                        </label>
+                        <!-- Retention -->
+                        <div class="check-category mt-4"><span class="cat-label text-yellow">Retention</span></div>
+                        <label class="check-item check-yellow bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Did you cut out the dead space?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Trim all breathing and long pauses. Keep
+                                    it insanely punchy.</span></div>
+                        </label>
+                        <label class="check-item check-yellow bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Does the screen change often?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Zoom in, change angles, or throw an image
+                                    on screen every 3 seconds.</span></div>
+                        </label>
+                        <label class="check-item check-yellow bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Did you deliver on your hook?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Actually answer the question you posed at
+                                    the beginning before they swipe.</span></div>
+                        </label>
+                        <!-- Engagement -->
+                        <div class="check-category mt-4"><span class="cat-label text-cyan">Engagement</span></div>
+                        <label class="check-item check-cyan bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Did you tell them what to do?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Tell them exactly what to do (e.g., 'Save
+                                    this for later').</span></div>
+                        </label>
+                        <label class="check-item check-cyan bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is there a reason to comment?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Say something slightly controversial or
+                                    explicitly ask for their opinion.</span></div>
+                        </label>
+                        <!-- Visuals -->
+                        <div class="check-category mt-4"><span class="cat-label text-green">Visuals</span></div>
+                        <label class="check-item check-green bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="7"><span class="check-box"></span>
+                            <div class="check-content"><strong>Are you in good lighting?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Face a window or use a ring light so the
+                                    video doesn't look cheap and blurry.</span></div>
+                        </label>
+                        <label class="check-item check-green bg-card-dark"><input type="checkbox" class="task-check"
+                                data-weight="6"><span class="check-box"></span>
+                            <div class="check-content"><strong>Is your text in the safe zone?</strong><span
+                                    class="text-xs text-secondary mt-1 block">Make sure TikTok and IG like/share buttons
+                                    aren't covering up your captions.</span></div>
+                        </label>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <div class="mt-6 pt-4 border-top border-subtle">
+                        <button id="resetChecklistBtn"
+                            class="btn-secondary w-full flex items-center justify-center gap-2"
+                            style="border-color: rgba(255,255,255,0.1);">
+                            <i data-lucide="refresh-cw"></i>
+                            Start Fresh
+                        </button>
+                        <p class="text-center text-xs text-muted mt-2">Uncheck all items and reset your score to 0%</p>
+                    </div>
+                </div>
+            </section>
+            <section id="view-trends" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Trends Radar</h2>
+                    <p>Input a niche to discover 5-star formats.</p>
+                    <div id="usage-badge-trends" class="usage-badge mt-2"></div>
+                </div>
+                <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 w-full p-2">
+                    <input type="text" id="trendsInput" placeholder="e.g. Finance..."
+                        class="w-full flex-grow text-input"
+                        style="border:none; background:transparent; box-shadow:none;" required>
+                    <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
+                            data-lucide="trending-up"></i></button>
+                </form>
+                <div id="trendsEmpty" class="empty-state glass-card mt-2"><i data-lucide="bar-chart"
+                        class="lg-icon mb-2"></i>
+                    <h3>No Topic Searched</h3>
+                    <p>Type a topic or niche in the search bar above. The AI will output 5 highly actionable, rated
+                        video formats to swipe for your niche.</p>
+                </div>
+                <div id="trendsOutput" class="hidden flex-col gap-4 w-full"></div>
+            </section>
+
+            <!-- 9. REWRITE -->
+            <section id="view-rewrite" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Script Rewriter</h2>
+                    <p>Paste your boring script. Get viral output.</p>
+                    <div id="usage-badge-rewrite" class="usage-badge mt-2"></div>
+                </div>
+                <form id="rewriteForm" class="glass-card interactive-glow mt-4 mb-4 border-accent">
+                    <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
+                        rows="6" class="w-full text-input mb-4 bg-card-dark" required></textarea>
+                    <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite
+                        Script</button>
+                </form>
+                <div id="rewriteOutput" class="hidden glass-card interactive-glow glow-box"></div>
+            </section>
+
+            <!-- 10. SAVED (Rewrites) -->
+            <section id="view-saved" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4">
+                    <h2>Saved Rewrites</h2>
+                    <p>Your library of optimized scripts.</p>
+                </div>
+                <div id="savedEmpty" class="empty-state glass-card mt-4"><i data-lucide="save" class="lg-icon mb-2"></i>
+                    <h3>No Saved Scripts</h3>
+                    <p>Use the Rewrite engine to save templates here.</p>
+                </div>
+                <div id="savedList" class="flex-col gap-2 mt-4"></div>
+            </section>
+
+            <!-- 11. VIDEO AI (PRO) -->
+            <section id="view-videoai" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4 pb-2">
+                    <h2>Video AI <i data-lucide="crown" class="text-accent" style="display:inline; width:20px;"></i>
+                    </h2>
+                    <p>Upload files for deep algorithmic scanning.</p>
+                </div>
+
+                <div id="videoAiUploadState">
+                    <div class="glass-card mt-4 mb-4 upload-card interactive-glow text-center border-accent">
+                        <input type="file" id="videoFileInput" accept="video/*" class="hidden">
+                        <div class="form-group mock-upload" id="mockUploadBtn"
+                            style="min-height: 150px; display:flex; padding-top: 2rem; cursor:pointer;">
+                            <div class="upload-zone w-full flex-col">
+                                <i data-lucide="upload-cloud"
+                                    style="width:40px; height:40px; margin: 0 auto; color:var(--accent-blue-light)"></i>
+                                <span class="font-bold mt-2 text-primary">Tap to Select Video File</span>
+                                <span class="text-xs text-secondary mt-1">MP4, MOV, WEBM (Max 300MB)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="videoAiResultState" class="hidden">
+                    <div class="video-preview-box interactive-glow">
+                        <div class="scan-line" id="videoScanLine"></div>
+                        <div class="detection-grid">
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                        </div>
+                        <div id="videoAiLoadingOverlay" class="scan-overlay">
+                            <div class="loader mb-2" style="width:30px; height:30px;"></div>
+                            <span class="text-xs font-bold uppercase tracking-wide">Deep Scanning...</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex-col gap-2">
+                        <div class="pro-stat-row"><span class="pro-label">Aesthetic Brilliance</span><span
+                                class="pro-value" id="resVidAesthetic">Calculating...</span></div>
+                        <div class="pro-stat-row"><span class="pro-label">Color Vibrancy</span><span class="pro-value"
+                                id="resVidColor">Detecting...</span></div>
+                        <div class="pro-stat-row"><span class="pro-label">Native Resolution</span><span
+                                class="pro-value" id="resVidResolution">--</span></div>
+                        <div class="pro-stat-row"><span class="pro-label">Exact Duration</span><span class="pro-value"
+                                id="resVidDuration">--</span></div>
+                    </div>
+
+                    <button class="btn-secondary w-full mt-4" id="restartVideoAiBtn"><i data-lucide="refresh-cw"></i>
+                        Scan New Video</button>
+                </div>
+            </section>
+
+            <!-- 12. AI CHAT (PRO) -->
+            <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%;">
+                <div class="tab-header pt-4 content-padding border-bottom pb-4">
+                    <h2 class="flex items-center gap-2">AI Consultant <i data-lucide="sparkles" class="text-purple"></i>
+                    </h2>
+                    <p>Ask anything about your strategy, hooks, or the algorithm.</p>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-bubble bubble-ai">
+                            Hello! I'm your ViralReels AI consultant. How can I help you dominate the algorithm today?
+                        </div>
+                    </div>
+                    <form class="chat-input-area" id="chatForm">
+                        <input type="text" class="chat-input text-input" id="chatInput"
+                            placeholder="Message your consultant..." required>
+                        <button type="submit" class="btn-primary"
+                            style="padding: 10px; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;"><i
+                                data-lucide="send"></i></button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 12-Icon Bottom Navigation -->
+        <nav class="bottom-nav">
+            <!-- Row 1 -->
+            <button class="nav-item active" id="navAnalyze" data-tab="analyze" aria-label="Analyze View"><i
+                    data-lucide="bar-chart-2"></i><span>Analyze</span></button>
+            <button class="nav-item" id="navHooks" data-tab="hooks" aria-label="Hooks Engine"><i
+                    data-lucide="magnet"></i><span>Hooks</span></button>
+            <button class="nav-item" id="navTracker" data-tab="tracker" aria-label="Hook Tracker"><i
+                    data-lucide="archive"></i><span>Tracker</span></button>
+            <button class="nav-item" id="navCalendar" data-tab="calendar" aria-label="Content Calendar"><i
+                    data-lucide="calendar"></i><span>Calendar</span></button>
+            <button class="nav-item" id="navCaptions" data-tab="captions" aria-label="Captions Generator"><i
+                    data-lucide="type"></i><span>Captions</span></button>
+            <button class="nav-item" id="navTags" data-tab="tags" aria-label="Hashtag Generator"><i
+                    data-lucide="hash"></i><span>Tags</span></button>
+
+            <!-- Row 2 -->
+            <button class="nav-item" id="navChecklist" data-tab="checklist" aria-label="Pre-publish Checklist"><i
+                    data-lucide="check-square"></i><span>Checklist</span></button>
+            <button class="nav-item" id="navTrends" data-tab="trends" aria-label="Trends Radar"><i
+                    data-lucide="trending-up"></i><span>Trends</span></button>
+            <button class="nav-item" id="navRewrite" data-tab="rewrite" aria-label="Script Rewriter"><i
+                    data-lucide="file-text"></i><span>Rewrite</span></button>
+            <button class="nav-item" id="navSaved" data-tab="saved" aria-label="Saved Vault"><i
+                    data-lucide="save"></i><span>Saved</span></button>
+
+            <button class="nav-item premium-nav-item" id="navVideoAI" data-tab="videoai"
+                aria-label="Pro Video AI Scanning">
+                <i data-lucide="video"></i><span>Video AI</span><i data-lucide="crown" class="crown-badge"></i>
+            </button>
+            <button class="nav-item premium-nav-item" id="navAiChat" data-tab="chat"
+                aria-label="Pro AI Consultant Chat">
+                <i data-lucide="sparkles"></i><span>AI Chat</span><i data-lucide="crown" class="crown-badge"></i>
+            </button>
+        </nav>
+
+        <!-- Add Event Modal -->
+        <div id="calendarEventModal" class="fullscreen-overlay z-paywall hidden">
+            <div class="glass-card text-left pb-4 interactive-glow"
+                style="background:var(--bg-card); width:100%; max-width:400px; animation: scaleUp 0.2s;">
+                <button class="close-btn modal-closer" id="closeCalEventBtn"><i data-lucide="x"></i></button>
+                <h3 class="font-bold text-lg mb-4 text-accent" id="eventModalDateText">Save Idea</h3>
+                <label class="text-xs font-bold text-muted uppercase tracking-wide">Video Title</label>
+                <input type="text" id="eventTitleInput" class="text-input bg-card-dark w-full mb-4 mt-1"
+                    placeholder="e.g. Budget Vlog Ep.1" required>
+
+                <label class="text-xs font-bold text-muted uppercase tracking-wide">Details & Script</label>
+                <textarea id="eventDescInput" class="text-input bg-card-dark w-full mb-6 mt-1"
+                    placeholder="Add specific notes, hooks, or links..." rows="4"></textarea>
+
+                <button class="btn-primary w-full" id="saveEventBtn">Save to Schedule</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Third-Party Integrations for Monetization & Persistence -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
