@@ -420,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         consumeUse('analyze');
+        btn.disabled = true;
         btn.querySelector('span').innerText = "Analyzing Context...";
         btn.querySelector('i').classList.add('hidden');
         btn.querySelector('.loader').classList.remove('hidden');
@@ -497,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         consumeUse('hooks');
+        btn.disabled = true;
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
@@ -516,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err);
             showToast("Server error. Check your backend connection.");
         } finally {
+            btn.disabled = false;
             lucide.createIcons(); btn.innerHTML = '<i data-lucide="zap"></i>';
         }
     });
@@ -688,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         consumeUse('trends');
+        btn.disabled = true;
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
@@ -718,6 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err);
             showToast("Server error. Check your backend connection.");
         } finally {
+            btn.disabled = false;
             lucide.createIcons();
             btn.innerHTML = '<i data-lucide="trending-up"></i>';
         }
@@ -735,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         consumeUse('rewrite');
+        btn.disabled = true;
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
         try {
@@ -757,6 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(e);
             showToast("Server error. Check AI connection.");
         } finally {
+            btn.disabled = false;
             btn.innerHTML = '<i data-lucide="file-text"></i> Rewrite Script';
         }
     });
@@ -873,6 +880,9 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
+                chatInput.disabled = true;
+                chatSubmit.disabled = true;
+
                 const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
                 const personaTone = document.getElementById('personaTone').value;
 
@@ -889,6 +899,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(e);
                 aiDiv.textContent = "I'm offline right now. Check your server connection.";
             } finally {
+                chatInput.disabled = false;
+                chatSubmit.disabled = false;
+                chatInput.focus();
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         });
@@ -1180,6 +1193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<div class="loader"></div>';
+                btn.disabled = true;
                 try {
                     const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
                     const res = await fetch('https://viralreels-ai.onrender.com/api/checkout', {
@@ -1193,11 +1207,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         showToast("Checkout failed. Try again.");
                         btn.innerHTML = originalText;
+                        btn.disabled = false;
                     }
                 } catch (err) {
                     console.error(err);
                     showToast("Server error. Cannot reach Stripe.");
                     btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
             }
         });
