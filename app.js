@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
             
-            const res = await fetch('/api/analyze', {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idea, platform, length, isPro })
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('/api/generate-hooks', {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-hooks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: inputStr, isPro })
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('/api/trends', {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/trends', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche: val, isPro })
@@ -738,7 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
         try {
-            const res = await fetch('/api/rewrite', {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/rewrite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ script: val, isPro })
@@ -876,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetch('/api/chat', {
+                const res = await fetch('https://viralreels-ai.onrender.com/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = '<div class="loader"></div>';
                 try {
                     const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
-                    const res = await fetch('/api/checkout', {
+                    const res = await fetch('https://viralreels-ai.onrender.com/api/checkout', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: bodyData
