@@ -114,7 +114,7 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 /* V1 Guard Buffer: Reduced visually but structurally unbreakable within Flex */
 .pb-heavy { padding-bottom: 120px !important; margin-bottom: 0; } 
 
-.flex { display: flex; } .items-center { align-items: center; } .items-start { align-items: flex-start; } .justify-between { justify-content: space-between; }
+.flex { display: flex; } .items-center { align-items: center; } .items-start { align-items: flex-start; } .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
 .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .font-bold { font-weight: 700; }
 .text-sm { font-size: 0.85rem; } .text-xs { font-size: 0.75rem; } .text-md { font-size: 1rem; }
 .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.5rem; } .text-2xl { font-size: 2rem; }
