@@ -261,7 +261,7 @@ Return JSON with: 'trends' (array of 6 objects each containing: 'title' (string)
 
 // Endpoint 6: Stripe Checkout Session Generator
 app.post('/api/checkout', async (req, res) => {
-    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://viralreels-ai.netlify.app';
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://nazih175.github.io/viralreels-backend';
     const { uid } = req.body;
     try {
         const session = await stripe.checkout.sessions.create({
