@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
     let persona = JSON.parse(localStorage.getItem('vr_persona')) || { niche: 'tech', tone: 50 };
     let currentAnalyzeData = null;
+    let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
     let calDate = new Date();
 
     // =============================================
@@ -411,16 +412,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 1. ANALYZE VIEW --
     document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const idea = document.getElementById('ideaInput').value;
+        const idea = document.getElementById('ideaInput').value.trim();
+        const platform = document.getElementById('platformSelect')?.value || 'all';
+        const length = document.getElementById('lengthInput')?.value || '15s';
         const btn = document.getElementById('analyzeSubmitBtn');
+
+        // --- DUPLICATE CHECK ---
+        const currentInputKey = `${idea}-${platform}-${length}`;
+        if (lastUsedInputs.analyze === currentInputKey) {
+            showToast("Change the input to generate a new analysis!");
+            return;
+        }
 
         // --- USAGE GATE ---
         if (getRemainingUses('analyze') <= 0) {
             showLimitBlock(document.getElementById('sub-analyze-scout'), 'analyze');
             return;
         }
+
+        btn.disabled = true; // LOCK IMMEDIATELY
         consumeUse('analyze');
-        btn.disabled = true;
+        lastUsedInputs.analyze = currentInputKey; // Mark as used
+        
         btn.querySelector('span').innerText = "Analyzing Context...";
         btn.querySelector('i').classList.add('hidden');
         btn.querySelector('.loader').classList.remove('hidden');
@@ -490,16 +503,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 2. HOOKS VIEW (Upgraded GPT Style) --
     document.getElementById('customHookForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const inputStr = document.getElementById('customHookInput').value;
+        const inputStr = document.getElementById('customHookInput').value.trim();
         const btn = e.target.querySelector('button');
+
+        // --- DUPLICATE CHECK ---
+        if (lastUsedInputs.hooks === inputStr) {
+            showToast("Modify the topic for new hooks!");
+            return;
+        }
 
         // --- USAGE GATE ---
         if (getRemainingUses('hooks') <= 0) {
             showLimitBlock(document.getElementById('view-hooks'), 'hooks');
             return;
         }
+
+        btn.disabled = true; // LOCK
         consumeUse('hooks');
-        btn.disabled = true;
+        lastUsedInputs.hooks = inputStr;
+        
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
@@ -608,34 +630,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 5. CAPTIONS VIEW (GPT Overhaul) --
     document.getElementById('dedCapForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const topic = document.getElementById('dedCapInput').value;
+        const topic = document.getElementById('dedCapInput').value.trim();
         const style = document.getElementById('dedCapStyle').value;
         const btn = document.getElementById('dedCapBtn');
+
+        // --- DUPLICATE CHECK ---
+        const currentKey = `${topic}-${style}`;
+        if (lastUsedInputs.captions === currentKey) {
+            showToast("Try another topic or style!");
+            return;
+        }
 
         // --- USAGE GATE ---
         if (getRemainingUses('captions') <= 0) {
             showLimitBlock(document.getElementById('view-captions'), 'captions');
             return;
         }
+
+        btn.disabled = true; // LOCK
         consumeUse('captions');
+        lastUsedInputs.captions = currentKey;
+        
         btn.innerHTML = '<div class="loader"></div>';
 
-        setTimeout(() => {
-            const out = document.getElementById('dedCapOutput');
-            out.innerHTML = [1, 2, 3, 4, 5].map(i => {
-                let txt = "";
-                if (style === 'controversial') txt = `Unpopular opinion about ${topic}. Most "experts" are lying to you just to sell courses. But hear me out... 👇\n\nIf you disagree, prove me entirely wrong in the comments! #Debate #${topic.replace(/\s+/g, '')}`;
-                else if (style === 'educational') txt = `3 Things you absolutely didn't know about ${topic}. \n\nNumber 2 literally changed my entire workflow forever 📚 Bookmark this video before you lose it!\n\n#Learning #Tech #${topic.replace(/\s+/g, '')}tips`;
-                else if (style === 'storytime') txt = `I cannot believe this actually happened when I blindly tried out ${topic}. \n\nStorytime Below... 💀👇 (Wait for the twist)\n\n#Story #Viral`;
-                else if (style === 'funny') txt = `Me pretending I know literally anything about ${topic} just to survive the day 😭💀 \n\nSend this to that one friend who relates way too hard.\n\n#Comedy #Relatable`;
-                else if (style === 'serious') txt = `The reality of ${topic} is heavily misunderstood by the mainstream. In this breakdown, I analyze the core mechanical changes driving this shift. Let me know your thoughts on this ecosystem 👇\n\n#Growth #${topic.replace(/\s+/g, '')}`;
-                else txt = `The unfiltered truth about ${topic}. Did you expect this format to actually work? \n\nSound off below! 👇\n\n#fyp #${topic.replace(/\s+/g, '')}`;
-                return toItemCard(txt, null);
-            }).join('');
-            out.classList.remove('hidden');
+        try { // Using try-catch for consistency
+            setTimeout(() => {
+                const out = document.getElementById('dedCapOutput');
+                out.innerHTML = [1, 2, 3, 4, 5].map(i => {
+                    let txt = "";
+                    if (style === 'controversial') txt = `Unpopular opinion about ${topic}. Most "experts" are lying to you just to sell courses. But hear me out... 👇\n\nIf you disagree, prove me entirely wrong in the comments! #Debate #${topic.replace(/\s+/g, '')}`;
+                    else if (style === 'educational') txt = `3 Things you absolutely didn't know about ${topic}. \n\nNumber 2 literally changed my entire workflow forever 📚 Bookmark this video before you lose it!\n\n#Learning #Tech #${topic.replace(/\s+/g, '')}tips`;
+                    else if (style === 'storytime') txt = `I cannot believe this actually happened when I blindly tried out ${topic}. \n\nStorytime Below... 💀👇 (Wait for the twist)\n\n#Story #Viral`;
+                    else if (style === 'funny') txt = `Me pretending I know literally anything about ${topic} just to survive the day 😭💀 \n\nSend this to that one friend who relates way too hard.\n\n#Comedy #Relatable`;
+                    else if (style === 'serious') txt = `The reality of ${topic} is heavily misunderstood by the mainstream. In this breakdown, I analyze the core mechanical changes driving this shift. Let me know your thoughts on this ecosystem 👇\n\n#Growth #${topic.replace(/\s+/g, '')}`;
+                    else txt = `The unfiltered truth about ${topic}. Did you expect this format to actually work? \n\nSound off below! 👇\n\n#fyp #${topic.replace(/\s+/g, '')}`;
+                    return toItemCard(txt, null);
+                }).join('');
+                out.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
+                lucide.createIcons();
+            }, 1500);
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
             btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
-            lucide.createIcons();
-        }, 1500);
+        }
     });
 
     // -- 6. TAGS VIEW --
@@ -683,16 +723,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 8. TRENDS VIEW (Exactly 5 Trends, Detailed Copilot output) --
     document.getElementById('trendsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const val = document.getElementById('trendsInput').value;
+        const val = document.getElementById('trendsInput').value.trim();
         const btn = e.target.querySelector('button');
+
+        // --- DUPLICATE CHECK ---
+        if (lastUsedInputs.trends === val) {
+            showToast("Change your niche to see new trends!");
+            return;
+        }
 
         // --- USAGE GATE ---
         if (getRemainingUses('trends') <= 0) {
             showLimitBlock(document.getElementById('view-trends'), 'trends');
             return;
         }
+
+        btn.disabled = true; // LOCK
         consumeUse('trends');
-        btn.disabled = true;
+        lastUsedInputs.trends = val;
+        
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
@@ -732,16 +781,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 9. REWRITE VIEW (GPT Expanded Multi-paragraph Engine) --
     document.getElementById('rewriteForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const val = document.getElementById('rewriteInput').value;
+        const val = document.getElementById('rewriteInput').value.trim();
         const btn = e.target.querySelector('button');
+
+        // --- DUPLICATE CHECK ---
+        if (lastUsedInputs.rewrite === val) {
+            showToast("Change the script before rewriting!");
+            return;
+        }
 
         // --- USAGE GATE ---
         if (getRemainingUses('rewrite') <= 0) {
             showLimitBlock(document.getElementById('view-rewrite'), 'rewrite');
             return;
         }
+
+        btn.disabled = true; // LOCK
         consumeUse('rewrite');
-        btn.disabled = true;
+        lastUsedInputs.rewrite = val;
+        
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
         try {
