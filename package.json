@@ -1,0 +1,17 @@
+{
+  "name": "viralreels-ai-backend",
+  "version": "1.0.0",
+  "description": "V1 Backend for ViralReels AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.47.1",
+    "stripe": "^22.0.0"
+  }
+}
