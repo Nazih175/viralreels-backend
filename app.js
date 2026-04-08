@@ -2,7 +2,26 @@
  * ViralReels AI - App Logic (V1 Usage Engine)
  */
 
+// Service Worker Registration (PWA)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW setup failed', err)));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Premium Splash Screen Auto-Fade
+    const splash = document.getElementById('splashScreen');
+    if (splash) setTimeout(() => { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }, 1500);
+
+    // Cookie Consent Logic
+    const cookieBanner = document.getElementById('cookieBanner');
+    if (cookieBanner && !localStorage.getItem('vr_cookies_accepted')) {
+        setTimeout(() => cookieBanner.classList.remove('hidden'), 2000);
+        document.getElementById('acceptCookiesBtn').addEventListener('click', () => {
+            localStorage.setItem('vr_cookies_accepted', 'true');
+            cookieBanner.classList.add('hidden');
+        });
+    }
+
     lucide.createIcons();
 
     // -- State & Storage --
@@ -254,12 +273,22 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Local storage wiped.");
         }
     });
-    document.getElementById('delAccountBtn').addEventListener('click', () => {
-        alert("Account deletion requested. Support team will process this shortly.");
-        localStorage.clear();
-        if (confirm("DANGER! This will permanently delete your ViralReels profile and subscription access. Proceed?")) {
-            localStorage.clear();
-            location.reload();
+    document.getElementById('delAccountBtn').addEventListener('click', async () => {
+        if (confirm("DANGER! This will permanently wipe your ViralReels profile, saved hooks, and cancel any active subscription. This cannot be undone. Proceed?")) {
+            try {
+                if (firebase.auth().currentUser) {
+                    await firebase.auth().currentUser.delete();
+                }
+                localStorage.clear();
+                alert("Account and data completely deleted.");
+                location.reload();
+            } catch (error) {
+                if (error.code === 'auth/requires-recent-login') {
+                    alert("For security reasons, you must log out and log back in before deleting your account.");
+                } else {
+                    alert("Error deleting account: " + error.message);
+                }
+            }
         }
     });
 

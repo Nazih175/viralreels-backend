@@ -360,3 +360,12 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 /* Export Buttons */
 .btn-export { background: rgba(0, 245, 212, 0.1); color: var(--accent-cyan); border: 1px solid rgba(0, 245, 212, 0.2); padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; }
 .btn-export:hover { background: var(--accent-cyan); color: #000; }
+
+/* Splash Screen */
+.splash-screen { position: fixed; inset: 0; background: #0a0a0f; z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease-out, visibility 0.5s; }
+.splash-logo { width: 80px; height: 80px; filter: drop-shadow(0 0 15px rgba(168,85,247,0.5)); animation: splashPulse 1.5s infinite alternate; }
+@keyframes splashPulse { from { transform: scale(0.9); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 25px rgba(168,85,247,0.8)); } }
+
+/* Cookie Banner */
+.cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 15, 23, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(157, 78, 221, 0.3); z-index: 50000; padding: 12px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+.cookie-content { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }

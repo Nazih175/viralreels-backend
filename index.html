@@ -54,6 +54,23 @@
 
 <body class="dark-theme no-scroll">
 
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="splash-logo">
+            <defs>
+                <linearGradient id="neonGradSplash" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#a855f7" />
+                    <stop offset="50%" stop-color="#ec4899" />
+                    <stop offset="100%" stop-color="#eab308" />
+                </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" />
+            <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradSplash)" />
+            <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradSplash)" />
+            <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradSplash)" />
+        </svg>
+    </div>
+
     <!-- Auth Overlay (Reverted/Standardized) -->
     <div id="authOverlay" class="fullscreen-overlay z-auth">
         <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border);">
@@ -1135,6 +1152,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
     <script src="app.js"></script>
+
+    <!-- Cookie Banner -->
+    <div id="cookieBanner" class="cookie-banner hidden">
+        <div class="cookie-content">
+            <p class="text-xs text-secondary mb-0">We use technical cookies to save settings and authenticate your session. <a href="privacy.html" class="text-accent" target="_blank">Learn more</a>.</p>
+            <button id="acceptCookiesBtn" class="btn-primary header-btn" style="padding: 6px 16px; margin-left:12px; flex-shrink: 0;">Accept</button>
+        </div>
+    </div>
 </body>
 
 </html>
