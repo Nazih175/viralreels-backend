@@ -467,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err);
             showToast("Server error. Check your backend connection.");
         } finally {
+            btn.disabled = false;
             btn.querySelector('span').innerText = "Generate Analysis";
             btn.querySelector('i').classList.remove('hidden');
             btn.querySelector('.loader').classList.add('hidden');
