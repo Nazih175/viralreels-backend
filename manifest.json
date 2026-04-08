@@ -1,9 +1,11 @@
 {
   "name": "ViralReels AI",
   "short_name": "ViralReels",
+  "id": "viralreels-ai-pwa",
   "description": "The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers.",
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
   "categories": ["productivity", "social"],
@@ -18,7 +20,35 @@
       "src": "assets/apple-touch-icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot_mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Accurate UI Dashboard and Analysis"
+    },
+    {
+      "src": "assets/screenshot_desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Full Creator Workspace"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Analyze Concept",
+      "url": "/#view-analyze",
+      "icons": [{ "src": "assets/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Chat Consultant",
+      "url": "/#view-chat",
+      "icons": [{ "src": "assets/favicon.png", "sizes": "192x192" }]
     }
   ]
 }

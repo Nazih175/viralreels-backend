@@ -1155,6 +1155,19 @@
 
     <script src="app.js"></script>
 
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Determine the base path (for GitHub Pages compatibility)
+                const scope = window.location.pathname.includes('/viralreels-backend/') ? '/viralreels-backend/' : '/';
+                navigator.serviceWorker.register('service-worker.js', { scope: scope })
+                    .then(reg => console.log('SW Registered with scope:', reg.scope))
+                    .catch(err => console.error('SW Registration failed:', err));
+            });
+        }
+    </script>
+
     <!-- Cookie Banner -->
     <div id="cookieBanner" class="cookie-banner hidden">
         <div class="cookie-content">

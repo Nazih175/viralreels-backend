@@ -1,10 +1,12 @@
-const CACHE_NAME = 'viralreels-v1';
+const CACHE_NAME = 'viralreels-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './manifest.json',
+  './assets/logo.svg',
+  './assets/favicon.png'
 ];
 
 self.addEventListener('install', event => {
