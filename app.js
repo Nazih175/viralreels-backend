@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
             
-            const res = await fetch('https://viralreels-ai.onrender.com/api/analyze', {
+            const res = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idea, platform, length })
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-hooks', {
+            const res = await fetch('/api/generate-hooks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: inputStr })
@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/trends', {
+            const res = await fetch('/api/trends', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche: val })
@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/rewrite', {
+            const res = await fetch('/api/rewrite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ script: val })
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetch('https://viralreels-ai.onrender.com/api/chat', {
+                const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone } })
@@ -1117,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<div class="loader"></div>';
                 try {
-                    const res = await fetch('https://viralreels-ai.onrender.com/api/checkout', {
+                    const res = await fetch('/api/checkout', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     });

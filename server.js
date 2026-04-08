@@ -12,6 +12,34 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Middleware
 app.use(cors());
+
+// Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
+app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    let event;
+
+    if (!endpointSecret) {
+        console.warn('⚠️ Webhook Secret missing. Ignoring signature verification for testing.');
+        event = JSON.parse(req.body.toString());
+    } else {
+        try {
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        } catch (err) {
+            console.error(`Webhook Error: ${err.message}`);
+            return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
+    }
+
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        console.log(`✅ Payment received! Session ID: ${session.id}`);
+        // TODO: Database logic -> Update user's Supabase/Firebase record to PRO
+    }
+
+    res.status(200).send();
+});
+
 app.use(express.json());
 
 // Health Check
@@ -183,20 +211,6 @@ app.post('/api/checkout', async (req, res) => {
         console.error("Stripe Checkout Error:", e.message);
         res.status(500).json({ error: "Failed to initialize checkout." });
     }
-});
-
-// Endpoint 7: Stripe Webhook Listener
-app.post('/api/webhook', (req, res) => {
-    // Note: In production, use express.raw() to verify Stripe's cryptographic signature
-    const event = req.body;
-    
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        console.log(`✅ Payment received! Session ID: ${session.id}`);
-        // TODO: Database logic -> Update user's Supabase/Firebase record to PRO
-    }
-
-    res.status(200).send();
 });
 
 // Start Server
