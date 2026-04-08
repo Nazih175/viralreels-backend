@@ -84,7 +84,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/analyze', async (req, res) => {
     try {
         const { idea, platform, length, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
 
         const freePrompt = `You are a short-form video algorithm expert. Analyze the video idea for its viral potential on social media. Return JSON with: 'score' (integer 0-100 viral potential), 'hookStrength' (integer 0-10), 'retention' (integer 0-100 estimated % retention), and 'tips' (array of 3 actionable strings to improve the video).`;
 
@@ -117,7 +117,7 @@ Return JSON strictly with: 'score' (integer 0-100), 'hookStrength' (integer 0-10
 app.post('/api/generate-hooks', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
 
         const freePrompt = `You are a viral copywriter. Generate 4 compelling video hooks and 2 captions for the given topic. Return JSON with: 'hooks' (array of 4 strings) and 'captions' (array of 2 strings).`;
 
@@ -153,7 +153,7 @@ Generate 6 hooks (one per framework) and 3 platform-optimized captions (one for 
 app.post('/api/rewrite', async (req, res) => {
     try {
         const { script, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
 
         const freePrompt = `You are a short-form scriptwriter. Rewrite the user's script into an engaging viral 60-second video format with clear [Hook], [Context], [Value], and [CTA] sections.`;
 
@@ -192,7 +192,7 @@ Also add a line at the bottom labeled [CAPTION SUGGESTION] with a TikTok-optimiz
 app.post('/api/chat', async (req, res) => {
     try {
         const { message, persona, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
         const niche = persona?.niche || 'general';
         const tone = persona?.tone || 50;
         let toneDesc = tone < 30 ? 'Soft, empathetic, and deeply relatable.' : tone > 70 ? 'High-energy, aggressive, and brutally direct.' : 'Balanced, professional, and clear.';
@@ -229,7 +229,7 @@ Rules you must follow:
 app.post('/api/trends', async (req, res) => {
     try {
         const { niche, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
 
         const freePrompt = `Identify 3 to 5 trending video formats or concepts for the given niche. Return JSON with: 'trends' (array of objects each with 'title', 'rep' (integer 3-5 rating), and 'desc' (short description)).`;
 

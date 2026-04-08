@@ -427,6 +427,17 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('resRetentionPerc').innerText = `${data.retention}%`;
             document.getElementById('resTipsList').innerHTML = (data.tips || []).map(t => `<li class="tip-item text-xs">${t}</li>`).join('');
 
+            // Pro-only Elite Insight callout
+            const insightEl = document.getElementById('resProInsight');
+            if (insightEl) {
+                if (isPro && data.insight) {
+                    insightEl.classList.remove('hidden');
+                    insightEl.innerHTML = `<div style="margin-top:12px; padding:10px 14px; background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(236,72,153,0.08)); border:1px solid rgba(168,85,247,0.3); border-radius:10px; display:flex; gap:8px; align-items:flex-start;"><span style="font-size:1rem;flex-shrink:0;">⚡</span><div><p class="text-xs font-bold text-accent mb-1" style="letter-spacing:0.5px;">ELITE INSIGHT</p><p class="text-xs text-secondary" style="line-height:1.5;">${data.insight}</p></div></div>`;
+                } else {
+                    insightEl.classList.add('hidden');
+                }
+            }
+
         } catch (err) {
             console.error(err);
             showToast("Server error. Check your backend connection.");
