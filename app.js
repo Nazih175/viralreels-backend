@@ -4,7 +4,28 @@
 
 // Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW setup failed', err)));
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').then(reg => {
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New version available! Force reload.
+                        console.log("New version detected, refreshing...");
+                        window.location.reload();
+                    }
+                };
+            };
+        }).catch(err => console.log('SW setup failed', err));
+    });
+
+    // Handle the 'controllerchange' event (triggered by skipWaiting)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
