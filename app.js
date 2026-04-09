@@ -323,38 +323,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabViews = document.querySelectorAll('.tab-view');
 
     navItems.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const targetId = btn.getAttribute('data-tab');
             if ((targetId === 'videoai' || targetId === 'chat') && !isPro) {
                 paywallOverlay.classList.remove('hidden');
                 return;
             }
+
+            // Identify current active view for exit animation
+            const currentView = document.querySelector('.tab-view.active-view');
+            const targetView = document.getElementById(`view-${targetId}`);
+
+            if (!targetView || (currentView && currentView.id === `view-${targetId}`)) return;
+
+            // 1. Exit Animation for Current View
+            if (currentView) {
+                currentView.classList.add('view-exit');
+                // Wait for exit animation (200ms)
+                await new Promise(r => setTimeout(r, 180));
+            }
+
+            // 2. Clear all state
             navItems.forEach(b => b.classList.remove('active'));
             tabViews.forEach(v => {
-                v.classList.remove('active-view');
+                v.classList.remove('active-view', 'view-animate', 'view-exit');
                 v.classList.add('hidden');
             });
+
+            // 3. Show Target View with Enter Animation
             btn.classList.add('active');
-            lucide.createIcons();
-            const viewTarget = document.getElementById(`view-${targetId}`);
-            if (viewTarget) {
-                viewTarget.classList.remove('hidden');
-                viewTarget.classList.add('active-view');
-                
-                // --- POP-IN ANIMATION ---
-                // Skip animation for checklist to prevent transform conflicts with sticky positioning
-                if (targetId !== 'checklist') {
-                    viewTarget.classList.remove('view-animate');
-                    void viewTarget.offsetWidth; // Force reflow
-                    viewTarget.classList.add('view-animate');
-                    setTimeout(() => {
-                        viewTarget.classList.remove('view-animate');
-                    }, 400);
-                } else {
-                    viewTarget.classList.remove('view-animate');
-                }
-                // ------------------------
+            targetView.classList.remove('hidden');
+            targetView.classList.add('active-view');
+            
+            // --- POP-IN ANIMATION ---
+            // Skip animation for checklist to prevent transform conflicts with sticky positioning if still needed
+            // Actually, with the exit/enter split, we can try applying it safely or keep the skip
+            if (targetId !== 'checklist') {
+                targetView.classList.add('view-animate');
+                setTimeout(() => targetView.classList.remove('view-animate'), 400);
             }
+            // ------------------------
+
+            lucide.createIcons();
 
             // Re-render blocks
             if (targetId === 'calendar') renderCalendar();

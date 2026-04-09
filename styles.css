@@ -211,7 +211,7 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .scroll-container::-webkit-scrollbar { width: 4px; }
 .scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 .tab-view { flex: 1; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; display: none; padding: 0 1.5rem; }
-.active-view { display: block; animation: fadeIn 0.3s; }
+.active-view { display: block; }
 
 .tab-view::-webkit-scrollbar { width: 4px; } 
 .tab-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -221,9 +221,7 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .flush-container .content-padding { padding-left: 1.5rem; padding-right: 1.5rem; }
 .flush-card { margin-left: 0 !important; margin-right: 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
 
-.tab-header h2 { font-size: 1.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
 .tab-header p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.4; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 /* 12-Icon Nav Matrix */
 .bottom-nav {
@@ -389,12 +387,21 @@ button:disabled i, button:disabled span {
 
 /* Performance & Polish Animations */
 @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.96) translateY(5px); }
+    0% { opacity: 0; transform: scale(0.96) translateY(10px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes popOut {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.98) translateY(-10px); }
 }
 
 .view-animate {
     animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.view-exit {
+    animation: popOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 @keyframes scaleUp {
