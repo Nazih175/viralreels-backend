@@ -47,7 +47,7 @@
     <meta http-equiv="Expires" content="0">
     
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="styles.css?v=v2.1">
+    <link rel="stylesheet" href="styles.css?v=v2.2">
 
     <!-- App Store / Play Store Readiness Meta -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -793,14 +793,20 @@
                     <button type="submit" class="btn-primary"><i data-lucide="hash"></i></button>
                 </form>
                 <div id="dedTagsOutput" class="glass-card hidden glow-box interactive-glow">
-                    <h4 class="mb-3 text-sm text-accent font-bold uppercase tracking-wide neon-text"><i
-                            data-lucide="fire" style="display:inline; width:14px; margin-bottom:-2px;"></i> Broad
-                        Trending Links</h4>
+                    <h4 class="mb-3 text-sm font-bold uppercase tracking-wide neon-text" style="color:var(--accent-red)"><i
+                            data-lucide="fire" style="display:inline; width:14px; margin-bottom:-2px;"></i> Viral
+                        Trending Tags</h4>
                     <div id="tagsTrending" class="hashtag-grid mb-6"></div>
-                    <h4 class="mb-3 text-sm text-cyan font-bold uppercase tracking-wide neon-cyan"><i
+
+                    <h4 class="mb-3 text-sm font-bold uppercase tracking-wide neon-cyan" style="color:var(--accent-cyan)"><i
                             data-lucide="target" style="display:inline; width:14px; margin-bottom:-2px;"></i>
                         Hyper-Niche Tags</h4>
-                    <div id="tagsNiche" class="hashtag-grid"></div>
+                    <div id="tagsNiche" class="hashtag-grid mb-6"></div>
+
+                    <h4 class="mb-3 text-sm font-bold uppercase tracking-wide" style="color:var(--accent-gold)"><i
+                            data-lucide="sparkles" style="display:inline; width:14px; margin-bottom:-2px;"></i>
+                        AI Recommended</h4>
+                    <div id="tagsRecommended" class="hashtag-grid"></div>
                 </div>
             </section>
 
@@ -1157,7 +1163,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=v2.1"></script>
+    <script src="app.js?v=v2.2"></script>
 
     <!-- PWA Service Worker Registration -->
     <script>

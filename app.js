@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("ViralReels AI System: V2.1 Turbo Active");
+    console.log("ViralReels AI System: V2.2 Turbo Active");
     // Premium Splash Screen Auto-Fade
     const splash = document.getElementById('splashScreen');
     if (splash) setTimeout(() => { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }, 1500);
@@ -690,14 +690,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- 6. TAGS VIEW --
     document.getElementById('dedTagsForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const base = document.getElementById('dedTagsInput').value.replace(/[^a-zA-Z0-9]/g, '');
+        const base = document.getElementById('dedTagsInput').value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const btn = e.target.querySelector('button');
         btn.innerHTML = '<div class="loader"></div>';
         setTimeout(() => {
             document.getElementById('dedTagsOutput').classList.remove('hidden');
-            document.getElementById('tagsTrending').innerHTML = ['#fyp', '#viral', '#trending', `#${base}Trend`].map(t => `<div class="hashtag"><i data-lucide="trending-up" style="width:12px;color:white"></i>${t}</div>`).join('');
-            document.getElementById('tagsNiche').innerHTML = [`#${base}Hacks`, `#${base}Tips`, `#${base}Creator`, `#${base}Life`, `#${base}Secrets`].map(t => `<div class="hashtag"><i data-lucide="target" style="width:12px;color:var(--accent-blue-light)"></i><span class="tag-niche">${t}</span></div>`).join('');
-            lucide.createIcons(); btn.innerHTML = '<i data-lucide="hash"></i>';
+            
+            // 1. Trending (Viral Momentum)
+            document.getElementById('tagsTrending').innerHTML = ['#fyp', '#viral', '#trending', `#${base}viral`].map(t => 
+                `<div class="hashtag tag-trending"><i data-lucide="fire" style="width:12px;"></i>${t}</div>`
+            ).join('');
+
+            // 2. Hyper-Niche (Targeted SEO)
+            document.getElementById('tagsNiche').innerHTML = [`#${base}hacks`, `#${base}tips`, `#${base}creator`].map(t => 
+                `<div class="hashtag tag-niche"><i data-lucide="target" style="width:12px;"></i>${t}</div>`
+            ).join('');
+
+            // 3. Recommended (AI Power Picks)
+            document.getElementById('tagsRecommended').innerHTML = [`#${base}secrets`, `#${base}life`, `#learnonreels`].map(t => 
+                `<div class="hashtag tag-recommended"><i data-lucide="sparkles" style="width:12px;"></i>${t}</div>`
+            ).join('');
+
+            lucide.createIcons(); 
+            btn.innerHTML = '<i data-lucide="hash"></i>';
         }, 1100);
     });
 

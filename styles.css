@@ -128,6 +128,7 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 
 /* Overlays & Modals */
 .fullscreen-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; padding: 1.5rem; z-index: var(--z-paywall); }
+.fullscreen-overlay:not(.hidden) .glass-card { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; }
 .z-auth { z-index: var(--z-auth) !important; } .z-paywall { z-index: var(--z-paywall); }
 .glass-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; }
 
@@ -268,7 +269,9 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 /* Grid Outputs (Tags & Trends) - Unified Generic Lists */
 .hashtag-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .hashtag { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: var(--border-radius-sm); font-size: 0.85rem; font-weight: 600; color: white; display:flex; align-items:center; gap:6px; }
-.tag-niche { color: var(--accent-blue-light); }
+.tag-niche { color: var(--accent-cyan) !important; border-color: rgba(0, 245, 212, 0.3) !important; }
+.tag-trending { color: var(--accent-red) !important; border-color: rgba(239, 71, 111, 0.3) !important; }
+.tag-recommended { color: var(--accent-gold) !important; border-color: rgba(255, 183, 3, 0.3) !important; }
 .trend-card { background: var(--bg-card-dark); border: var(--border-subtle); padding: 1.25rem; border-radius: var(--border-radius-md); }
 .stars-container { display: flex; gap: 2px; color: var(--accent-gold); } .stars-container i { width: 14px; height: 14px; fill: var(--accent-gold); } .stars-container i.empty { fill: rgba(255,255,255,0.1); color: rgba(255,255,255,0.1); }
 
@@ -397,4 +400,13 @@ button:disabled i, button:disabled span {
 @keyframes scaleUp {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+.sticky-score {
+    position: sticky !important;
+    top: 0;
+    background: var(--bg-card) !important;
+    padding: 12px 0 !important;
+    z-index: 100;
+    margin-top: -4px;
 }
