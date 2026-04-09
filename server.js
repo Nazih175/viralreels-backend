@@ -84,7 +84,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/analyze', async (req, res) => {
     try {
         const { idea, platform, length, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
         const freePrompt = `Short-form video expert. Analyze viral potential. Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings).`;
         const proPrompt = `Elite video analyst for TikTok/Reels/Shorts. Apply platform algorithm rules (hook, retention, engagement). Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 specific), 'insight' (1 powerful sentence).`;
@@ -110,7 +110,7 @@ app.post('/api/analyze', async (req, res) => {
 app.post('/api/generate-hooks', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
         const freePrompt = `Viral copywriter. 4 hooks & 2 captions. Return JSON: 'hooks' (array), 'captions' (array).`;
         const proPrompt = `Elite strategist. 6 hooks (Pattern Interrupt, Curiosity, Identity, Social Proof, Provocation, Transformation) & 3 captions (TikTok, Reels, Shorts). Return JSON: 'hooks' (6 strings with [Framework]), 'captions' (3 strings with [Platform]).`;
@@ -136,7 +136,7 @@ app.post('/api/generate-hooks', async (req, res) => {
 app.post('/api/generate-captions', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
         const systemPrompt = `You are an elite short-form copywriter. Generate exactly 5 unique caption variations for the topic: "${topic}". 
         Each variation MUST follow these specific tones/styles:
@@ -169,7 +169,7 @@ app.post('/api/generate-captions', async (req, res) => {
 app.post('/api/generate-tags', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
         const freePrompt = `Short-form SEO expert. Generate 3 categories of hashtags for topic: "${topic}". 
         1. Viral (Trending) - 5 tags.
@@ -204,10 +204,16 @@ app.post('/api/generate-tags', async (req, res) => {
 app.post('/api/rewrite', async (req, res) => {
     try {
         const { script, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `Viral scriptwriter. Rewrite into [Hook], [Context], [Value], [CTA].`;
-        const proPrompt = `Elite director. Rewrite using viral architecture: [HOOK], [TENSION], [VALUE], [RETENTION BRIDGE], [CTA]. Add [CAPTION SUGGESTION] at the end.`;
+        const freePrompt = `Viral scriptwriter. Rewrite the user's script into a high-engagement short-form video script. Structure: [Hook], [Context], [Value], [CTA]. Make it punchy and genuine.`;
+        const proPrompt = `Elite short-form director. Rewrite using high-retention architecture:
+        1. [THE HOOK]: Visual + Verbal pattern interrupt (0-2s).
+        2. [TENSION]: Identify the problem/need (2-5s).
+        3. [VALUE]: The unique solution or "aha" moment.
+        4. [RETENTION BRIDGE]: High-speed pacing for mid-video drop-off.
+        5. [LOOP CTA]: A call to action designed to loop the viewer.
+        Add [CAPTION SUGGESTION] and [ELITE FILMING TIP] at the end. Make it feel rich and professional.`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -229,7 +235,7 @@ app.post('/api/rewrite', async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         const { message, persona, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
         const niche = persona?.niche || 'general';
         const tone = persona?.tone || 50;
         let toneDesc = tone < 30 ? 'Soft, empathetic, and deeply relatable.' : tone > 70 ? 'High-energy, aggressive, and brutally direct.' : 'Balanced, professional, and clear.';
@@ -257,10 +263,10 @@ app.post('/api/chat', async (req, res) => {
 app.post('/api/trends', async (req, res) => {
     try {
         const { niche, isPro } = req.body;
-        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `Trend analyst. Identify 3-5 trending formats for ${niche}. Return JSON: 'trends' (array).`;
-        const proPrompt = `Elite trend strategist. Identify 6 trends for ${niche}. Include momentum, platform, concept, and psychology. Return JSON: 'trends' (array).`;
+        const freePrompt = `Trend analyst. Identify 3-5 trending formats for ${niche}. Return JSON: 'trends' (array of objects with 'title', 'desc', 'rep' where rep is 1-5 rating).`;
+        const proPrompt = `Elite trend strategist. Identify 6 trends for ${niche}. Include momentum, platform, concept, and psychology. Return JSON: 'trends' (array of objects with 'title', 'desc', 'rep' where rep is 1-5 rating).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -285,7 +291,7 @@ app.post('/api/checkout', async (req, res) => {
     const { uid } = req.body;
     try {
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+            automatic_payment_methods: { enabled: true },
             client_reference_id: uid || null,
             line_items: [{
                 price_data: {
