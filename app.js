@@ -342,13 +342,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewTarget.classList.add('active-view');
                 
                 // --- POP-IN ANIMATION ---
-                viewTarget.classList.remove('view-animate');
-                void viewTarget.offsetWidth; // Force reflow
-                viewTarget.classList.add('view-animate');
-                // Cleanup animation class after completion to prevent sticky positioning issues (transforms break sticky)
-                setTimeout(() => {
+                // Skip animation for checklist to prevent transform conflicts with sticky positioning
+                if (targetId !== 'checklist') {
                     viewTarget.classList.remove('view-animate');
-                }, 400);
+                    void viewTarget.offsetWidth; // Force reflow
+                    viewTarget.classList.add('view-animate');
+                    setTimeout(() => {
+                        viewTarget.classList.remove('view-animate');
+                    }, 400);
+                } else {
+                    viewTarget.classList.remove('view-animate');
+                }
                 // ------------------------
             }
 
