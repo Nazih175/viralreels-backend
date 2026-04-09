@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("ViralReels AI System: V2.0 Turbo Active");
+    console.log("ViralReels AI System: V2.1 Turbo Active");
     // Premium Splash Screen Auto-Fade
     const splash = document.getElementById('splashScreen');
     if (splash) setTimeout(() => { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }, 1500);
@@ -256,6 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal.classList.remove('hidden');
         updateBillingUI();
     });
+    document.getElementById('settingsGoProBtn').addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+        paywallOverlay.classList.remove('hidden');
+    });
     document.querySelectorAll('.modal-closer').forEach(btn => {
         btn.addEventListener('click', (e) => e.currentTarget.closest('.fullscreen-overlay').classList.add('hidden'));
     });
@@ -336,6 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (viewTarget) {
                 viewTarget.classList.remove('hidden');
                 viewTarget.classList.add('active-view');
+                
+                // --- POP-IN ANIMATION ---
+                viewTarget.classList.remove('view-animate');
+                void viewTarget.offsetWidth; // Force reflow
+                viewTarget.classList.add('view-animate');
+                // ------------------------
             }
 
             // Re-render blocks
@@ -629,7 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -- 5. CAPTIONS VIEW (GPT Overhaul) --
-    document.getElementById('dedCapForm').addEventListener('submit', (e) => {
+    document.getElementById('dedCapForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const topic = document.getElementById('dedCapInput').value.trim();
         const style = document.getElementById('dedCapStyle').value;
@@ -654,28 +664,26 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btn.innerHTML = '<div class="loader"></div>';
 
-        try { // Using try-catch for consistency
-            setTimeout(() => {
-                const out = document.getElementById('dedCapOutput');
-                out.innerHTML = [1, 2, 3, 4, 5].map(i => {
-                    let txt = "";
-                    if (style === 'controversial') txt = `Unpopular opinion about ${topic}. Most "experts" are lying to you just to sell courses. But hear me out... 👇\n\nIf you disagree, prove me entirely wrong in the comments! #Debate #${topic.replace(/\s+/g, '')}`;
-                    else if (style === 'educational') txt = `3 Things you absolutely didn't know about ${topic}. \n\nNumber 2 literally changed my entire workflow forever 📚 Bookmark this video before you lose it!\n\n#Learning #Tech #${topic.replace(/\s+/g, '')}tips`;
-                    else if (style === 'storytime') txt = `I cannot believe this actually happened when I blindly tried out ${topic}. \n\nStorytime Below... 💀👇 (Wait for the twist)\n\n#Story #Viral`;
-                    else if (style === 'funny') txt = `Me pretending I know literally anything about ${topic} just to survive the day 😭💀 \n\nSend this to that one friend who relates way too hard.\n\n#Comedy #Relatable`;
-                    else if (style === 'serious') txt = `The reality of ${topic} is heavily misunderstood by the mainstream. In this breakdown, I analyze the core mechanical changes driving this shift. Let me know your thoughts on this ecosystem 👇\n\n#Growth #${topic.replace(/\s+/g, '')}`;
-                    else txt = `The unfiltered truth about ${topic}. Did you expect this format to actually work? \n\nSound off below! 👇\n\n#fyp #${topic.replace(/\s+/g, '')}`;
-                    return toItemCard(txt, null);
-                }).join('');
-                out.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
-                lucide.createIcons();
-            }, 1500);
+        try {
+            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-captions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, isPro })
+            });
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+            const captions = data.captions || [];
+
+            const out = document.getElementById('dedCapOutput');
+            out.innerHTML = captions.map(txt => toItemCard(txt, null)).join('');
+            out.classList.remove('hidden');
         } catch (e) {
             console.error(e);
+            showToast("Caption generation failed.");
+        } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
+            lucide.createIcons();
         }
     });
 

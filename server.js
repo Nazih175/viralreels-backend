@@ -132,6 +132,39 @@ app.post('/api/generate-hooks', async (req, res) => {
     }
 });
 
+// Endpoint 2.5: Dedicated Unique Captions Generator
+app.post('/api/generate-captions', async (req, res) => {
+    try {
+        const { topic, isPro } = req.body;
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+
+        const systemPrompt = `You are an elite short-form copywriter. Generate exactly 5 unique caption variations for the topic: "${topic}". 
+        Each variation MUST follow these specific tones/styles:
+        1. [HYPED] - High energy, extreme emojis, curiosity-driven.
+        2. [SERIOUS] - Professional, authority-based, legacy feel, NO emojis.
+        3. [SHORT] - Maximum 2 sentences, punchy, high-impact.
+        4. [EDUCATIONAL] - Value-first, formatted with bullet points or steps.
+        5. [STORYTIME] - First-person perspective, "I" statements, relatable.
+        
+        Return JSON object with a 'captions' array of 5 strings.`;
+
+        const completion = await openai.chat.completions.create({
+            model,
+            response_format: { type: 'json_object' },
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Topic: ${topic}` }
+            ],
+            max_tokens: 1000
+        });
+
+        res.json(JSON.parse(completion.choices[0].message.content));
+    } catch (e) {
+        console.error('Captions Error:', e.message);
+        res.status(500).json({ error: 'Failed to generate captions.' });
+    }
+});
+
 // Endpoint 3: Script Rewriter
 app.post('/api/rewrite', async (req, res) => {
     try {
