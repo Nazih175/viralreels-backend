@@ -811,7 +811,16 @@
             </section>
 
             <!-- 7. CHECKLIST VIEW (FULL WIDTH FLUSH) -->
-            <section id="view-checklist" class="tab-view hidden scroll-container flush-container pb-heavy">
+            <section id="view-checklist" class="tab-view hidden scroll-container flush-container pb-heavy" style="position:relative;">
+                
+                <!-- Refreshing Pop-in Overlay -->
+                <div id="checklistRefreshing" class="refresh-pop-in hidden">
+                    <div class="refresh-content">
+                        <i data-lucide="refresh-cw" class="spin-icon"></i>
+                        <span>Refreshing...</span>
+                    </div>
+                </div>
+
                 <div class="tab-header pt-4 content-padding sticky-score" style="margin-bottom: 0; border-bottom: var(--glass-border);">
                     <div class="flex justify-between items-center w-full">
                         <div>

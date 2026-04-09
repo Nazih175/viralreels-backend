@@ -28,6 +28,8 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Middleware
 app.use(cors());
+app.use(express.json());
+app.use(express.static('./'));
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
 app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
@@ -72,8 +74,6 @@ app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => 
 
     res.status(200).send();
 });
-
-app.use(express.json());
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -162,6 +162,41 @@ app.post('/api/generate-captions', async (req, res) => {
     } catch (e) {
         console.error('Captions Error:', e.message);
         res.status(500).json({ error: 'Failed to generate captions.' });
+    }
+});
+
+// Endpoint 2.6: Hashtag Generator
+app.post('/api/generate-tags', async (req, res) => {
+    try {
+        const { topic, isPro } = req.body;
+        const model = isPro ? 'gpt-4.1' : 'gpt-4.1-mini';
+
+        const freePrompt = `Short-form SEO expert. Generate 3 categories of hashtags for topic: "${topic}". 
+        1. Viral (Trending) - 5 tags.
+        2. Hyper-Niche (Targeted) - 5 tags.
+        3. AI Recommended - 5 tags.
+        Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
+
+        const proPrompt = `Elite virality strategist. Generate 3 depth-first categories of hashtags for topic: "${topic}". 
+        1. Viral Momentum (Max reach) - 8 tags.
+        2. Hyper-Niche SEO (Targeted) - 8 tags.
+        3. AI Power Picks (Elite combinations) - 8 tags.
+        Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
+
+        const completion = await openai.chat.completions.create({
+            model,
+            response_format: { type: 'json_object' },
+            messages: [
+                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'user', content: `Topic: ${topic}` }
+            ],
+            max_tokens: 600
+        });
+
+        res.json(JSON.parse(completion.choices[0].message.content));
+    } catch (e) {
+        console.error('Tags Error:', e.message);
+        res.status(500).json({ error: 'Failed to generate hashtags.' });
     }
 });
 

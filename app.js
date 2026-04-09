@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAnalyzeData = null;
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
     let calDate = new Date();
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000/api' 
+        : 'https://viralreels-ai.onrender.com/api';
 
     // =============================================
     // == USAGE LIMIT ENGINE ==
@@ -481,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
             
-            const res = await fetch('https://viralreels-ai.onrender.com/api/analyze', {
+            const res = await fetch(`${API_BASE}/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idea, platform, length, isPro })
@@ -562,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-hooks', {
+            const res = await fetch(`${API_BASE}/generate-hooks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: inputStr, isPro })
@@ -692,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/generate-captions', {
+            const res = await fetch(`${API_BASE}/generate-captions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic, isPro })
@@ -715,51 +718,68 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -- 6. TAGS VIEW --
-    document.getElementById('dedTagsForm').addEventListener('submit', (e) => {
+    document.getElementById('dedTagsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const base = document.getElementById('dedTagsInput').value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const topic = document.getElementById('dedTagsInput').value.trim();
         const btn = e.target.querySelector('button');
+
+        // --- DUPLICATE CHECK ---
+        if (lastUsedInputs.tags === topic) {
+            showToast("Try a different niche for new tags!");
+            return;
+        }
+
+        btn.disabled = true; // LOCK
         btn.innerHTML = '<div class="loader"></div>';
-        btn.disabled = true;
+        lastUsedInputs.tags = topic;
 
-        setTimeout(() => {
-            try {
-                const output = document.getElementById('dedTagsOutput');
-                if (output) output.classList.remove('hidden');
-                
-                // 1. Trending (Viral Momentum)
-                const trendingEl = document.getElementById('tagsTrending');
-                if (trendingEl) {
-                    trendingEl.innerHTML = ['#fyp', '#viral', '#trending', `#${base}viral`, '#trendingreels', '#reels'].map(t => 
-                        `<div class="hashtag tag-trending" onclick="copyHash('${t}', this)"><i data-lucide="fire"></i>${t}</div>`
-                    ).join('');
-                }
+        try {
+            const res = await fetch(`${API_BASE}/generate-tags`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, isPro })
+            });
 
-                // 2. Hyper-Niche (Targeted SEO)
-                const nicheEl = document.getElementById('tagsNiche');
-                if (nicheEl) {
-                    nicheEl.innerHTML = [`#${base}hacks`, `#${base}tips`, `#${base}creator`, `#${base}community`, `#${base}market`].map(t => 
-                        `<div class="hashtag tag-niche" onclick="copyHash('${t}', this)"><i data-lucide="target"></i>${t}</div>`
-                    ).join('');
-                }
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
 
-                // 3. Recommended (AI Power Picks)
-                const recEl = document.getElementById('tagsRecommended');
-                if (recEl) {
-                    recEl.innerHTML = [`#${base}secrets`, `#${base}life`, `#learnonreels`, '#creatorhacks', '#viralgrowth'].map(t => 
-                        `<div class="hashtag tag-recommended" onclick="copyHash('${t}', this)"><i data-lucide="sparkles"></i>${t}</div>`
-                    ).join('');
-                }
+            const output = document.getElementById('dedTagsOutput');
+            if (output) output.classList.remove('hidden');
 
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Tags Error:", err);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i data-lucide="hash"></i> Generate Tags';
-                lucide.createIcons();
+            // 1. Trending (Viral Momentum)
+            const trendingEl = document.getElementById('tagsTrending');
+            if (trendingEl && data.viral) {
+                trendingEl.innerHTML = data.viral.map(t =>
+                    `<div class="hashtag tag-trending" onclick="copyHash('${t}', this)"><i data-lucide="fire"></i>${t}</div>`
+                ).join('');
             }
-        }, 1100);
+
+            // 2. Hyper-Niche (Targeted SEO)
+            const nicheEl = document.getElementById('tagsNiche');
+            if (nicheEl && data.niche) {
+                nicheEl.innerHTML = data.niche.map(t =>
+                    `<div class="hashtag tag-niche" onclick="copyHash('${t}', this)"><i data-lucide="target"></i>${t}</div>`
+                ).join('');
+            }
+
+            // 3. Recommended (AI Power Picks)
+            const recEl = document.getElementById('tagsRecommended');
+            if (recEl && data.recommended) {
+                recEl.innerHTML = data.recommended.map(t =>
+                    `<div class="hashtag tag-recommended" onclick="copyHash('${t}', this)"><i data-lucide="sparkles"></i>${t}</div>`
+                ).join('');
+            }
+
+            showToast("Elite tags generated!");
+            lucide.createIcons();
+        } catch (err) {
+            console.error("Tags Error:", err);
+            showToast("Failed to generate tags. Check connection.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="hash"></i> Generate Tags';
+            lucide.createIcons();
+        }
     });
 
     // -- 7. CHECKLIST VIEW --
@@ -780,6 +800,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Reset Checklist --
     document.getElementById('resetChecklistBtn').addEventListener('click', () => {
+        const popIn = document.getElementById('checklistRefreshing');
+        if (popIn) {
+            popIn.classList.remove('hidden');
+            // Re-trigger animation if already in DOM
+            popIn.style.animation = 'none';
+            popIn.offsetHeight; /* trigger reflow */
+            popIn.style.animation = null;
+        }
+
+        // Reset State
         checks.forEach(c => c.checked = false);
         scoreText.innerText = '0%';
         scoreBar.style.width = '0%';
@@ -787,7 +817,19 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreText.style.background = 'var(--gradient-primary)';
         scoreText.style.webkitBackgroundClip = 'text';
         scoreText.style.webkitTextFillColor = 'transparent';
+
+        // Redirect to top
+        const scrollContainer = document.getElementById('view-checklist');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         lucide.createIcons();
+
+        // Short faded hide (match CSS 1.5s animation)
+        setTimeout(() => {
+            if (popIn) popIn.classList.add('hidden');
+        }, 1500);
     });
 
     // -- 8. TRENDS VIEW (Exactly 5 Trends, Detailed Copilot output) --
@@ -815,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/trends', {
+            const res = await fetch(`${API_BASE}/trends`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche: val, isPro })
@@ -873,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
         try {
-            const res = await fetch('https://viralreels-ai.onrender.com/api/rewrite', {
+            const res = await fetch(`${API_BASE}/rewrite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ script: val, isPro })
@@ -989,6 +1031,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chatInput');
 
     if (chatForm) {
+        const chatSubmit = chatForm.querySelector('button');
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const msg = chatInput.value.trim();
@@ -1016,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetch('https://viralreels-ai.onrender.com/api/chat', {
+                const res = await fetch(`${API_BASE}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
@@ -1326,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = true;
                 try {
                     const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
-                    const res = await fetch('https://viralreels-ai.onrender.com/api/checkout', {
+                    const res = await fetch(`${API_BASE}/checkout`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: bodyData
