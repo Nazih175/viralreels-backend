@@ -42,6 +42,60 @@ document.addEventListener('DOMContentLoaded', () => {
         ? 'http://localhost:3000/api' 
         : 'https://viralreels-ai.onrender.com/api';
 
+    // -- HISTORY MANAGEMENT --
+    let histories = JSON.parse(localStorage.getItem('vr_tool_histories')) || {
+        analyze: [], hooks: [], captions: [], tags: [], trends: [], rewrite: []
+    };
+    let historyIndices = { analyze: -1, hooks: -1, captions: -1, tags: -1, trends: -1, rewrite: -1 };
+
+    const addToHistory = (tool, val) => {
+        if (!val || histories[tool][0] === val) return;
+        histories[tool].unshift(val);
+        if (histories[tool].length > 10) histories[tool].pop();
+        localStorage.setItem('vr_tool_histories', JSON.stringify(histories));
+        historyIndices[tool] = -1; // Reset cycle
+    };
+
+    window.cycleHistory = (tool) => {
+        if (histories[tool].length === 0) {
+            showToast("No recent history for this tool.");
+            return;
+        }
+        historyIndices[tool] = (historyIndices[tool] + 1) % histories[tool].length;
+        const val = histories[tool][historyIndices[tool]];
+        
+        let inputId = `${tool}Input`;
+        if (tool === 'analyze') inputId = 'ideaInput';
+        if (tool === 'hooks') inputId = 'customHookInput';
+        if (tool === 'tags') inputId = 'dedTagsInput';
+        if (tool === 'captions') inputId = 'dedCapInput';
+
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = val;
+            input.classList.add('history-pop');
+            setTimeout(() => input.classList.remove('history-pop'), 200);
+            showToast(`Loaded: "${val.substring(0, 15)}..."`);
+        }
+    };
+
+    // -- ANIMATION ENGINE --
+    const triggerConfetti = () => {
+        if (window.confetti) {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#9d4edd', '#4361ee', '#ffb703', '#06d6a0'] });
+        }
+    };
+
+    window.triggerSuccess = (text = "Success!") => {
+        const overlay = document.getElementById('successOverlay');
+        const textEl = document.getElementById('successText');
+        if (overlay && textEl) {
+            textEl.innerText = text;
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('hidden'), 2000);
+        }
+    };
+
     // =============================================
     // == USAGE LIMIT ENGINE ==
     // =============================================
@@ -333,6 +387,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // --- RESET ON LEAVE ---
+            const activeView = document.querySelector('.active-view');
+            if (activeView) {
+                // Clear inputs
+                activeView.querySelectorAll('input, textarea').forEach(i => i.value = '');
+                // Hide specific dashboards/results
+                activeView.querySelectorAll('.results-dashboard, #hooksGeneratorsContent, #dedTagsOutput, #dedCapOutput, #trendsOutput, #rewriteOutput').forEach(o => o.classList.add('hidden'));
+                // Restore empty states where applicable
+                activeView.querySelectorAll('#hooksGeneratorsEmpty, #trendsEmpty').forEach(e => e.classList.remove('hidden'));
+                // Reset checklist specifically if leaving
+                if (activeView.id === 'view-checklist') {
+                    document.querySelectorAll('.task-check').forEach(c => c.checked = false);
+                    const st = document.getElementById('checklistScore');
+                    const sb = document.getElementById('checklistScoreBar');
+                    if (st && sb) { st.innerText = '0%'; sb.style.width = '0%'; }
+                }
+            }
+
             // Identify current active view for exit animation
             const currentView = document.querySelector('.tab-view.active-view');
             const targetView = document.getElementById(`view-${targetId}`);
@@ -342,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. Exit Animation for Current View
             if (currentView) {
                 currentView.classList.add('view-exit');
-                // Wait for exit animation (200ms)
                 await new Promise(r => setTimeout(r, 180));
             }
 
@@ -358,24 +429,18 @@ document.addEventListener('DOMContentLoaded', () => {
             targetView.classList.remove('hidden');
             targetView.classList.add('active-view');
             
-            // --- POP-IN ANIMATION ---
-            // Skip animation for checklist to prevent transform conflicts with sticky positioning if still needed
-            // Actually, with the exit/enter split, we can try applying it safely or keep the skip
             if (targetId !== 'checklist') {
                 targetView.classList.add('view-animate');
                 setTimeout(() => targetView.classList.remove('view-animate'), 400);
             }
-            // ------------------------
 
             lucide.createIcons();
 
-            // Re-render blocks
             if (targetId === 'calendar') renderCalendar();
             if (targetId === 'tracker') renderTracker();
             if (targetId === 'saved') renderSavedRewrites();
             if (targetId === 'analyze') renderAnalytics();
 
-            // Dynamic Tab Title
             const tabName = btn.querySelector('span')?.innerText || 'Dashboard';
             document.title = `ViralReels | ${tabName}`;
         });
@@ -439,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
             savedRewrites.unshift(text); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
         }
         btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); lucide.createIcons();
+        triggerSuccess("Saved to Vault");
     };
 
     window.copyHash = (text, el) => {
@@ -474,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK IMMEDIATELY
         consumeUse('analyze');
         lastUsedInputs.analyze = currentInputKey; // Mark as used
+        addToHistory('analyze', idea);
         
         btn.querySelector('span').innerText = "Analyzing Context...";
         btn.querySelector('i').classList.add('hidden');
@@ -561,6 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('hooks');
         lastUsedInputs.hooks = inputStr;
+        addToHistory('hooks', inputStr);
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -691,6 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('captions');
         lastUsedInputs.captions = currentKey;
+        addToHistory('captions', topic);
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -732,6 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         btn.innerHTML = '<div class="loader"></div>';
         lastUsedInputs.tags = topic;
+        addToHistory('tags', topic);
 
         try {
             const res = await fetch(`${API_BASE}/generate-tags`, {
@@ -853,6 +923,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('trends');
         lastUsedInputs.trends = val;
+        addToHistory('trends', val);
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -911,6 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('rewrite');
         lastUsedInputs.rewrite = val;
+        addToHistory('rewrite', val);
         
         btn.innerHTML = '<div class="loader"></div> Processing logic...';
 
@@ -1095,18 +1167,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const resVidDuration = document.getElementById('resVidDuration');
 
     if (mockUploadBtn && videoFileInput) {
-        mockUploadBtn.addEventListener('click', () => {
-            videoFileInput.click();
+        // Unify Click Logic
+        mockUploadBtn.addEventListener('click', (e) => {
+            if (e.target !== videoFileInput) videoFileInput.click();
         });
 
         videoFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 1. Validation (300MB = 300 * 1024 * 1024 bytes)
+            // 1. Validation (300MB)
             const MAX_SIZE = 300 * 1024 * 1024;
             if (file.size > MAX_SIZE) {
-                alert(`Error: File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please select a video under 300MB.`);
+                showToast("File too large (Max 300MB)");
                 videoFileInput.value = '';
                 return;
             }
@@ -1122,21 +1195,20 @@ document.addEventListener('DOMContentLoaded', () => {
             tempVid.src = videoUrl;
             tempVid.muted = true;
             tempVid.playsInline = true;
+            
+            // Critical Fix: Append to body briefly to ensure browser processes it
+            tempVid.style.position = 'fixed';
+            tempVid.style.left = '-9999px';
+            document.body.appendChild(tempVid);
 
             tempVid.onloadedmetadata = () => {
-                const duration = tempVid.duration;
-                const width = tempVid.videoWidth;
-                const height = tempVid.videoHeight;
-
-                resVidDuration.textContent = `${duration.toFixed(2)}s`;
-                resVidResolution.textContent = `${width} x ${height}`;
-
-                // Seek into the video a bit (1s or halfway) to find a good frame
+                const duration = tempVid.duration || 0;
+                resVidDuration.textContent = `${duration.toFixed(1)}s`;
+                resVidResolution.textContent = `${tempVid.videoWidth} x ${tempVid.videoHeight}`;
                 tempVid.currentTime = Math.min(1, duration / 2);
             };
 
             tempVid.onseeked = () => {
-                // 4. Capture Frame & Analyze Visuals
                 const canvas = document.createElement('canvas');
                 canvas.width = tempVid.videoWidth;
                 canvas.height = tempVid.videoHeight;
@@ -1144,39 +1216,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.drawImage(tempVid, 0, 0, canvas.width, canvas.height);
 
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                let r = 0, g = 0, b = 0, brightness = 0;
-
-                // Sample pixels (every 50th for speed)
-                for (let i = 0; i < imageData.length; i += 200) {
-                    r += imageData[i];
-                    g += imageData[i + 1];
-                    b += imageData[i + 2];
+                let r = 0, g = 0, b = 0;
+                for (let i = 0; i < imageData.length; i += 400) {
+                    r += imageData[i]; g += imageData[i + 1]; b += imageData[i+2];
                 }
+                const pCount = imageData.length / 400;
+                const avgR = r/pCount, avgG = g/pCount, avgB = b/pCount;
+                const lum = 0.2126*avgR + 0.7152*avgG + 0.0722*avgB;
 
-                const pixelCount = imageData.length / 200;
-                const avgR = r / pixelCount;
-                const avgG = g / pixelCount;
-                const avgB = b / pixelCount;
-                const luminance = 0.2126 * avgR + 0.7152 * avgG + 0.0722 * avgB;
-
-                // Formatting Results
                 setTimeout(() => {
                     videoAiLoadingOverlay.classList.add('hidden');
-
-                    // Logic based on real data
-                    const vibrance = (Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB));
-                    resVidColor.textContent = vibrance > 40 ? "Vibrant / High Contrast" : "Muted / Natural";
-
-                    const aestheticScore = Math.min(10, ((luminance / 255) * 5) + ((vibrance / 128) * 5)).toFixed(1);
-                    resVidAesthetic.textContent = `${aestheticScore}/10`;
-
-                    showToast("Deep Scan Complete - Real Data Verified");
+                    const vibrance = Math.max(avgR, avgG, avgB) - Math.min(avgR, avgG, avgB);
+                    resVidColor.textContent = vibrance > 40 ? "Vibrant / Pro" : "Natural / Soft";
+                    resVidAesthetic.textContent = `${Math.min(10, (lum/25.5) + (vibrance/12.8)).toFixed(1)}/10`;
+                    
+                    triggerSuccess("Deep Scan Complete");
+                    document.body.removeChild(tempVid);
                     URL.revokeObjectURL(videoUrl);
                 }, 2000);
             };
 
             tempVid.onerror = () => {
-                alert("Error loading video file. It might be corrupted or in an unsupported format.");
+                showToast("Incompatible video format.");
+                if (tempVid.parentNode) document.body.removeChild(tempVid);
                 restartVideoAiBtn.click();
             };
         });
@@ -1376,7 +1438,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     const data = await res.json();
                     if (data.url) {
-                        window.location.href = data.url;
+                        // Simulation for verification: Trigger confetti if pro upgrade
+                        triggerConfetti();
+                        setTimeout(() => window.location.href = data.url, 2000);
                     } else {
                         showToast("Checkout failed. Try again.");
                         btn.innerHTML = originalText;

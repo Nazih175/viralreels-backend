@@ -47,6 +47,7 @@
     <meta http-equiv="Expires" content="0">
     
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="styles.css?v=v3.0">
 
     <!-- App Store / Play Store Readiness Meta -->
@@ -580,8 +581,15 @@
                 <div id="sub-analyze-scout" class="item-list-container active-subtab w-full">
                     <!-- Made card flush with screen edges -->
                     <form id="analyzerForm" class="glass-card interactive-glow flush-card mb-6 mt-2">
-                        <div class="form-group"><label>Video Idea / Topic</label><textarea id="ideaInput" rows="3"
-                                required></textarea></div>
+                        <div class="form-group flex gap-2 items-end">
+                            <div class="flex-grow">
+                                <label>Video Idea / Topic</label>
+                                <textarea id="ideaInput" rows="3" required></textarea>
+                            </div>
+                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('analyze')" title="Recent Ideas">
+                                <i data-lucide="history"></i>
+                            </button>
+                        </div>
                         <div class="form-group"><label>Caption (Optional)</label><input type="text" id="captionInput"
                                 class="text-input"></div>
                         <div class="form-group"><label>Hashtags (Optional)</label><input type="text" id="hashtagInput"
@@ -693,6 +701,9 @@
                     <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
                 </div>
                 <form id="customHookForm" class="interactive-glow glass-card mt-4 mb-4 flex gap-2 w-full p-2">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
+                        <i data-lucide="history"></i>
+                    </button>
                     <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
                         class="w-full flex-grow text-input"
                         style="border:none; background:transparent; box-shadow:none;" required>
@@ -757,8 +768,16 @@
                     <div id="usage-badge-captions" class="usage-badge mt-2"></div>
                 </div>
                 <form id="dedCapForm" class="glass-card interactive-glow mt-4 mb-4">
-                    <div class="form-group"><label>Topic / Concept</label><input type="text" id="dedCapInput"
-                            class="text-input bg-card-dark" placeholder="e.g. Budget traveling" required></div>
+                    <div class="form-group">
+                        <div class="flex justify-between items-center mb-1">
+                            <label>Topic / Concept</label>
+                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('captions')" title="Recent Captions">
+                                <i data-lucide="history"></i>
+                            </button>
+                        </div>
+                        <input type="text" id="dedCapInput"
+                            class="text-input bg-card-dark" placeholder="e.g. Budget traveling" required>
+                    </div>
                     <div class="form-group"><label>Tone / Genre (Optional)</label>
                         <div class="custom-select-wrapper">
                             <select id="dedCapStyle" class="bg-card-dark">
@@ -787,6 +806,9 @@
                         niche hashtags to boost your SEO visibility.</p>
                 </div>
                 <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches">
+                        <i data-lucide="history"></i>
+                    </button>
                     <input type="text" id="dedTagsInput" class="text-input w-full flex-grow"
                         style="border:none; background:transparent; box-shadow:none;" placeholder="Enter broad niche..."
                         required>
@@ -981,6 +1003,9 @@
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
                 <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 w-full p-2">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
+                        <i data-lucide="history"></i>
+                    </button>
                     <input type="text" id="trendsInput" placeholder="e.g. Finance..."
                         class="w-full flex-grow text-input"
                         style="border:none; background:transparent; box-shadow:none;" required>
@@ -1003,7 +1028,10 @@
                     <p>Paste your boring script. Get viral output.</p>
                     <div id="usage-badge-rewrite" class="usage-badge mt-2"></div>
                 </div>
-                <form id="rewriteForm" class="glass-card interactive-glow mt-4 mb-4 border-accent">
+                <form id="rewriteForm" class="glass-card interactive-glow mt-4 mb-4 border-accent" style="position:relative;">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('rewrite')" title="Recent Scripts" style="position:absolute; top:12px; right:12px; z-index:10;">
+                        <i data-lucide="history"></i>
+                    </button>
                     <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
                         rows="6" class="w-full text-input mb-4 bg-card-dark" required></textarea>
                     <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite
@@ -1167,6 +1195,16 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Success Animation Overlay -->
+    <div id="successOverlay" class="success-overlay hidden">
+        <div class="success-pop">
+            <div class="success-icon-wrap">
+                <i data-lucide="check-circle" class="success-icon"></i>
+            </div>
+            <span id="successText">Action Complete!</span>
+        </div>
     </div>
 
     <!-- Third-Party Integrations for Monetization & Persistence -->
