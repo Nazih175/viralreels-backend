@@ -345,6 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewTarget.classList.remove('view-animate');
                 void viewTarget.offsetWidth; // Force reflow
                 viewTarget.classList.add('view-animate');
+                // Cleanup animation class after completion to prevent sticky positioning issues (transforms break sticky)
+                setTimeout(() => {
+                    viewTarget.classList.remove('view-animate');
+                }, 400);
                 // ------------------------
             }
 

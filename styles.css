@@ -405,8 +405,13 @@ button:disabled i, button:disabled span {
 .sticky-score {
     position: sticky !important;
     top: 0;
-    background: var(--bg-card) !important;
-    padding: 12px 0 !important;
+    background: var(--bg-dark) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 100;
-    margin-top: -4px;
+    padding-bottom: 12px !important;
+}
+
+body.light-theme .sticky-score {
+    background: rgba(255, 255, 255, 0.95) !important;
 }
