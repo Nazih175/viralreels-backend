@@ -346,24 +346,43 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => e.currentTarget.closest('.fullscreen-overlay').classList.add('hidden'));
     });
 
-    document.getElementById('upgradeBtn').addEventListener('click', function () {
+    document.getElementById('upgradeBtn').addEventListener('click', async function (e) {
+        e.preventDefault();
+        const originalContent = this.innerHTML;
         this.innerHTML = '<div class="loader" style="border-top-color:black;"></div>';
-        setTimeout(() => {
-            this.innerHTML = '<i data-lucide="check-circle"></i> Upgraded!';
-            this.style.background = 'var(--accent-green)';
-            isPro = true;
-            isSubCancelled = false;
-            localStorage.setItem('vr_pro_status', 'true');
-            localStorage.setItem('vr_sub_cancelled', 'false');
-            lucide.createIcons();
+        this.disabled = true;
+
+        try {
+            const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
+            const res = await fetch(`${API_BASE}/checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: bodyData
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                throw new Error("Checkout failed");
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("Redirect failed. Using backup upgrade.");
+            // Backup simulation if API fails during local testing
             setTimeout(() => {
-                paywallOverlay.classList.add('hidden');
-                showToast("Welcome to ViralReels Pro!");
-                // Auto-navigate to Chat to show it off
-                document.getElementById('navAiChat').click();
+                isPro = true;
+                localStorage.setItem('vr_pro_status', 'true');
+                window.location.reload();
             }, 1000);
-        }, 1500);
+        }
     });
+
+    const paywallActionBtn = document.getElementById('paywallActionBtn');
+    if (paywallActionBtn) {
+        paywallActionBtn.addEventListener('click', () => {
+            document.getElementById('upgradeBtn').click();
+        });
+    }
 
     // -- Settings Logic --
     document.getElementById('themeToggle').addEventListener('change', (e) => {
@@ -805,7 +824,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const captions = data.captions || [];
 
             const out = document.getElementById('dedCapOutput');
-            out.innerHTML = captions.map(txt => toItemCard(txt, null)).join('');
+            out.innerHTML = (captions || []).map(txt => {
+                const html = toItemCard(txt, null);
+                return html.replace('class="item-card glass-card', 'class="item-card glass-card result-appear');
+            }).join('');
             out.classList.remove('hidden');
         } catch (e) {
             console.error(e);
@@ -905,13 +927,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Reset Checklist --
     document.getElementById('resetChecklistBtn').addEventListener('click', () => {
+        if (!confirm("Start your checklist from scratch? Your current progress will be lost.")) return;
+        
         const popIn = document.getElementById('checklistRefreshing');
         if (popIn) {
             popIn.classList.remove('hidden');
             // Re-trigger animation if already in DOM
             popIn.style.animation = 'none';
             popIn.offsetHeight; /* trigger reflow */
-            popIn.style.animation = null;
+            popIn.style.animation = 'refreshPopAnim 1.5s forwards ease-in-out';
         }
 
         // Reset State
@@ -976,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
             out.innerHTML = (data.trends || []).map(t => {
                 const stars = Array(5).fill('').map((_, i) => `<i data-lucide="star" class="${i >= t.rep ? 'empty' : ''}"></i>`).join('');
                 return `
-                <div class="trend-card border-subtle">
+                <div class="trend-card border-subtle result-appear animate-fade-in-up">
                     <div class="flex justify-between items-start mb-2">
                         <strong class="text-md text-primary font-bold" style="padding-right: 1rem;">${t.title}</strong>
                         <div class="stars-container flex-shrink-0">${stars}</div>
@@ -1037,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('rewriteOutput').innerHTML = `
                 <h4 class="font-bold text-accent mb-3 flex items-center gap-2"><i data-lucide="bot"></i> Viral AI Rewrite</h4>
-                <div class="p-4 bg-card-dark" style="border-radius:8px; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05);">${rewritten}</div>
+                <div class="p-4 bg-card-dark result-appear" style="border-radius:8px; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05);">${rewritten}</div>
                 <div class="item-actions mt-4"><button class="action-btn" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'rewrite', this)"><i data-lucide="archive"></i> Save AI Template</button></div>
             `;
             document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
@@ -1058,7 +1082,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
             empty.classList.add('hidden');
             list.innerHTML = savedRewrites.map((r, i) => `
-                <div class="item-card relative">
+                <div class="item-card relative result-appear">
                     <div class="text-xs text-muted mb-3 font-bold uppercase"><i data-lucide="file-text" style="width:12px;display:inline"></i> Saved AI Rewrite ${i + 1}</div>
                     <p class="item-text text-sm" style="white-space:pre-wrap; line-height:1.5;">${r}</p>
                     <button class="icon-button absolute" style="top:12px; right:12px;" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
@@ -1086,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         analyticsData.slice().reverse().forEach((log) => {
             const el = document.createElement('div');
-            el.className = 'glass-card p-3 rounded-md border-subtle bg-card-dark interactive-glow mb-2';
+            el.className = 'glass-card p-3 rounded-md border-subtle bg-card-dark interactive-glow mb-2 result-appear';
 
             let viewInputStr = log.actualViews > 0
                 ? `<span class="text-xs font-bold text-green w-full block mt-2 p-2" style="background:rgba(6,214,160,0.1); border-radius:6px; border:1px solid rgba(6,214,160,0.3);"><i data-lucide="eye" style="display:inline; width:12px;"></i> Verified: ${log.actualViews.toLocaleString()} Views</span>`
@@ -1140,6 +1164,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chatForm');
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
+    const chatLogsList = document.getElementById('chatLogsList');
+    let chatHistory = JSON.parse(localStorage.getItem('vr_chat_history') || '[]');
+
+    function saveChatLog(userMsg, aiMsg) {
+        const log = {
+            id: Date.now().toString(),
+            date: new Date().toLocaleString(),
+            userMsg,
+            aiMsg
+        };
+        chatHistory.unshift(log);
+        if (chatHistory.length > 20) chatHistory.pop();
+        localStorage.setItem('vr_chat_history', JSON.stringify(chatHistory));
+        renderChatLogs();
+    }
+
+    function renderChatLogs() {
+        if (!chatLogsList) return;
+        if (chatHistory.length === 0) {
+            chatLogsList.innerHTML = `
+                <div class="empty-state glass-card py-10">
+                    <i data-lucide="history" class="lg-icon mb-2 opacity-20"></i>
+                    <p class="text-xs text-muted">No past logs found.</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        chatLogsList.innerHTML = chatHistory.map(log => `
+            <div class="glass-card result-appear border-subtle mb-3 p-3" style="cursor:pointer;" onclick="window.viewChatLog('${log.id}')">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-accent uppercase">${log.date}</span>
+                    <i data-lucide="chevron-right" style="width:14px; height:14px; opacity:0.5;"></i>
+                </div>
+                <p class="text-xs text-primary font-medium line-clamp-1">"${log.userMsg}"</p>
+                <p class="text-xs text-muted line-clamp-1 mt-1">${log.aiMsg.substring(0, 40)}...</p>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    window.viewChatLog = (id) => {
+        const log = chatHistory.find(l => l.id === id);
+        if (!log) return;
+        
+        // Populate chat messages and switch tab
+        chatMessages.innerHTML = `
+            <div class="chat-bubble bubble-user result-appear">${log.userMsg}</div>
+            <div class="chat-bubble bubble-ai result-appear">${log.aiMsg}</div>
+        `;
+        document.querySelector('[data-subtab="sub-chat-live"]').click();
+        lucide.createIcons();
+    };
+
+    document.getElementById('clearChatLogsBtn')?.addEventListener('click', () => {
+        if (confirm("Delete all past conversations?")) {
+            chatHistory = [];
+            localStorage.setItem('vr_chat_history', '[]');
+            renderChatLogs();
+            showToast("History cleared.");
+        }
+    });
+
+    // Initial render
+    renderChatLogs();
 
     if (chatForm) {
         const chatSubmit = chatForm.querySelector('button');
@@ -1148,25 +1238,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const msg = chatInput.value.trim();
             if (!msg) return;
 
-            // User Message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'chat-bubble bubble-user';
-            userDiv.textContent = msg;
-            chatMessages.appendChild(userDiv);
+            // Add user bubble
+            const uEl = document.createElement('div');
+            uEl.className = 'chat-bubble bubble-user result-appear';
+            uEl.textContent = msg;
+            chatMessages.appendChild(uEl);
             chatInput.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+
+            chatSubmit.disabled = true;
+            chatSubmit.innerHTML = '<div class="loader"></div>';
 
             // AI thinking
             const aiDiv = document.createElement('div');
-            aiDiv.className = 'chat-bubble bubble-ai';
+            aiDiv.className = 'chat-bubble bubble-ai result-appear';
             aiDiv.innerHTML = '<div class="loader" style="width:12px; height:12px;"></div>';
             chatMessages.appendChild(aiDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                chatInput.disabled = true;
-                chatSubmit.disabled = true;
-
                 const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
                 const personaTone = document.getElementById('personaTone').value;
 
@@ -1177,16 +1267,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
-
-                aiDiv.textContent = data.reply;
+                
+                aiDiv.textContent = data.reply || "Strategic advisor offline.";
+                if (data.reply) saveChatLog(msg, data.reply);
             } catch(e) {
                 console.error(e);
                 aiDiv.textContent = "I'm offline right now. Check your server connection.";
             } finally {
-                chatInput.disabled = false;
                 chatSubmit.disabled = false;
+                chatSubmit.innerHTML = '<i data-lucide="send"></i>';
                 chatInput.focus();
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+                lucide.createIcons();
             }
         });
     }

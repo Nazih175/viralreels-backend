@@ -152,16 +152,18 @@ app.post('/api/generate-captions', async (req, res) => {
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: systemPrompt },
+                { role: 'system', content: systemPrompt + " Return JSON object with 'captions' array." },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 1000
         });
 
-        res.json(JSON.parse(completion.choices[0].message.content));
+        const parsed = JSON.parse(completion.choices[0].message.content);
+        if (!parsed.captions) throw new Error("Invalid Format");
+        res.json(parsed);
     } catch (e) {
         console.error('Captions Error:', e.message);
-        res.status(500).json({ error: 'Failed to generate captions.' });
+        res.status(500).json({ error: 'Generation failed. Try a simpler topic.' });
     }
 });
 
@@ -187,16 +189,18 @@ app.post('/api/generate-tags', async (req, res) => {
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'system', content: (isPro ? proPrompt : freePrompt) + " CRITICAL: Return JSON { 'viral': [], 'niche': [], 'recommended': [] }" },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 600
         });
 
-        res.json(JSON.parse(completion.choices[0].message.content));
+        const parsed = JSON.parse(completion.choices[0].message.content);
+        if (!parsed.viral || !parsed.niche) throw new Error("Invalid Schema");
+        res.json(parsed);
     } catch (e) {
         console.error('Tags Error:', e.message);
-        res.status(500).json({ error: 'Failed to generate hashtags.' });
+        res.status(500).json({ error: 'Hashtag engine stalled. Check topic.' });
     }
 });
 

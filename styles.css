@@ -223,12 +223,13 @@ button { cursor: pointer; outline: none; border: none; font-family: 'Inter'; }
 .pill.active { background: var(--bg-card); color: var(--text-primary); border: var(--glass-border); box-shadow: var(--shadow-soft); }
 
 /* Inputs */
-.text-input, textarea, select { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
+.text-input, textarea, select { background: var(--bg-card-dark); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; -webkit-appearance: none; appearance: none; }
+select option { background: var(--bg-card-dark); color: var(--text-primary); }
 .text-input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 0 2px rgba(157, 78, 221, 0.2); }
 textarea { resize: none; } .text-input::placeholder, textarea::placeholder { color: var(--text-muted); }
 .custom-select-wrapper { position: relative; }
-.custom-select-wrapper select { appearance: none; -webkit-appearance: none; padding-right: 36px; }
-.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-muted); width: 16px; height: 16px; }
+.custom-select-wrapper select { padding-right: 36px; }
+.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-muted); width: 14px; height: 14px; opacity: 0.6; }
 
 /* APP LAYOUT - FLEX SCROLL ENGINES (V1 Structural Rewrite for Safar/Chrome support) */
 .app-layout { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 600px; margin: 0 auto; background: var(--bg-dark); }
@@ -357,20 +358,24 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
     font-weight: 700;
     font-size: 1.1rem;
     letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-primary);
 }
-
-.spin-icon {
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes fadeInOutRefresh {
+@keyframes refreshPopAnim {
     0% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
     20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -60%) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); }
 }
+
+/* New Result Entrance Animation */
+.result-appear { animation: resultAppear 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes resultAppear {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .trend-card { background: var(--bg-card-dark); border: var(--border-subtle); padding: 1.25rem; border-radius: var(--border-radius-md); }
 .stars-container { display: flex; gap: 2px; color: var(--accent-gold); } .stars-container i { width: 14px; height: 14px; fill: var(--accent-gold); } .stars-container i.empty { fill: rgba(255,255,255,0.1); color: rgba(255,255,255,0.1); }
 

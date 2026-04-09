@@ -1121,25 +1121,47 @@
 
             <!-- 12. AI CHAT (PRO) -->
             <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%;">
-                <div class="tab-header pt-4 content-padding border-bottom pb-4">
-                    <h2 class="flex items-center gap-2">AI Consultant <i data-lucide="sparkles" class="text-purple"></i>
-                    </h2>
-                    <p>Ask anything about your strategy, hooks, or the algorithm.</p>
+                <div class="tab-header pt-4 content-padding border-bottom pb-2">
+                    <h2 class="flex items-center gap-2">AI Consultant <i data-lucide="sparkles" class="text-purple"></i></h2>
+                    <p>Strategic advisor active. History saved locally.</p>
                 </div>
 
-                <div class="chat-container">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="chat-bubble bubble-ai">
-                            Hello! I'm your ViralReels AI consultant. How can I help you dominate the algorithm today?
+                <div class="pill-tabs mb-2 sticky-pill interactive-glow mx-auto mt-2" style="max-width:240px;">
+                    <button class="pill active" data-subtab="sub-chat-live">Live Chat</button>
+                    <button class="pill" data-subtab="sub-chat-logs">History</button>
+                </div>
+
+                <!-- LIVE CHAT SUB-TAB -->
+                <div id="sub-chat-live" class="item-list-container active-subtab" style="display:flex; flex-direction:column; height: calc(100% - 140px);">
+
+                    <div class="chat-container" style="flex:1;">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-bubble bubble-ai">
+                                Hello! I'm your ViralReels AI consultant. How can I help you dominate the algorithm today?
+                            </div>
+                        </div>
+                        <form class="chat-input-area" id="chatForm">
+                            <input type="text" class="chat-input text-input" id="chatInput"
+                                placeholder="Message your consultant..." required>
+                            <button type="submit" class="btn-primary"
+                                style="padding: 10px; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;"><i
+                                    data-lucide="send"></i></button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- LOGS SUB-TAB -->
+                <div id="sub-chat-logs" class="item-list-container hidden content-padding pt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-sm uppercase tracking-wide text-muted">Past Conversations</h3>
+                        <button class="btn-text text-red text-xs" id="clearChatLogsBtn"><i data-lucide="trash-2"></i> Clear All</button>
+                    </div>
+                    <div id="chatLogsList" class="flex flex-col gap-3">
+                        <div class="empty-state glass-card py-10">
+                            <i data-lucide="history" class="lg-icon mb-2 opacity-20"></i>
+                            <p class="text-xs text-muted">No past logs found.</p>
                         </div>
                     </div>
-                    <form class="chat-input-area" id="chatForm">
-                        <input type="text" class="chat-input text-input" id="chatInput"
-                            placeholder="Message your consultant..." required>
-                        <button type="submit" class="btn-primary"
-                            style="padding: 10px; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;"><i
-                                data-lucide="send"></i></button>
-                    </form>
                 </div>
             </section>
 
