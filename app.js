@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("ViralReels AI System: V2.2 Turbo Active");
+    console.log("ViralReels AI System: V3.0 Global Optimization Active");
     // Premium Splash Screen Auto-Fade
     const splash = document.getElementById('splashScreen');
     if (splash) setTimeout(() => { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }, 1500);
