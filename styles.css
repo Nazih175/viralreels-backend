@@ -177,9 +177,37 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* Buttons */
 button { cursor: pointer; outline: none; border: none; font-family: 'Inter'; }
 .btn-primary, .btn-secondary { padding: 14px 20px; border-radius: var(--border-radius-md); font-weight: 600; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 8px; transition: transform 0.2s, box-shadow 0.2s; }
-.btn-primary { background: var(--gradient-primary); color: white; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4); }
+.btn-primary { 
+    background: var(--gradient-primary); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:not(:disabled)::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: btnShimmer 3s infinite;
+}
+
+@keyframes btnShimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
 .pulse-btn { animation: pulse 2s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 183, 3, 0.5); } 70% { box-shadow: 0 0 0 15px rgba(255, 183, 3, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 183, 3, 0); } }
+@keyframes pulse { 
+    0% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.4); } 
+    70% { box-shadow: 0 0 0 10px rgba(157, 78, 221, 0); } 
+    100% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0); } 
+}
 
 .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: var(--glass-border); }
 .btn-primary:active, .btn-secondary:active { transform: scale(0.96); }
@@ -379,10 +407,23 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .usage-badge.critical { background: rgba(239,71,111,0.1); border-color: rgba(239,71,111,0.3); color: var(--text-danger); }
 .usage-badge.empty { background: rgba(239,71,111,0.08); border-color: rgba(239,71,111,0.2); color: var(--text-danger); }
 
-.limit-block-card { background: var(--bg-card); border: 1px solid rgba(239,71,111,0.25); border-radius: var(--border-radius-lg); padding: 1.5rem; text-align: center; animation: scaleUp 0.25s ease; margin-top: 1rem; }
-.limit-block-card .limit-icon { width: 48px; height: 48px; background: rgba(239,71,111,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
-.limit-block-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 1.25rem; }
-.btn-watch-ad { background: linear-gradient(135deg, #f5a623, #f7971e); color: black; font-weight: 700; padding: 12px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: transform 0.2s, box-shadow 0.2s; }
+.limit-block-card { 
+    background: var(--bg-card); 
+    border: 1px solid rgba(239,71,111,0.25); 
+    border-radius: var(--border-radius-lg); 
+    padding: 2rem 1.5rem; 
+    text-align: center; 
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    margin-top: 1rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+.limit-block-card h3 {
+    font-family: 'Outfit';
+    letter-spacing: -0.5px;
+}
+.limit-block-card .limit-icon { width: 56px; height: 56px; background: rgba(239,71,111,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; border: 1px solid rgba(239,71,111,0.2); }
+.limit-block-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 1.5rem; }
+.btn-watch-ad { background: var(--gradient-premium); color: black; font-weight: 800; padding: 14px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(255, 183, 3, 0.2); }
 .btn-watch-ad:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(245,166,35,0.4); }
 
 /* Toast Notification */

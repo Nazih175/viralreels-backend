@@ -225,10 +225,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const showToast = (msg) => {
         const t = document.createElement('div');
         t.className = 'toast';
-        t.innerHTML = `<i data-lucide="check-circle" style="width:16px;"></i> ${msg}`;
+        t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
         document.body.appendChild(t);
         lucide.createIcons();
-        setTimeout(() => t.remove(), 3000);
+        setTimeout(() => {
+            t.style.opacity = '0';
+            t.style.transform = 'translate(-50%, 20px)';
+            setTimeout(() => t.remove(), 300);
+        }, 3000);
     };
 
     // -- AD MODAL ENGINE (REWARD VIDEO ADS) --
@@ -586,12 +590,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.error(err);
-            showToast("Server error. Check your backend connection.");
+            showToast("Analyzer unavailable. Check connection.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<span>Generate Analysis</span><i data-lucide="arrow-right"></i><div class="loader hidden"></div>';
             lucide.createIcons();
-            document.getElementById('resultsDashboard').classList.remove('hidden');
+            const resDash = document.getElementById('resultsDashboard');
+            resDash.classList.remove('hidden');
+            resDash.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
 
@@ -647,11 +653,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
         } catch (err) {
             console.error(err);
-            showToast("Server error. Check your backend connection.");
+            showToast("Hook engine offline. Try later.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="zap"></i> Generate Hooks';
             lucide.createIcons();
+            const hooksContent = document.getElementById('hooksGeneratorsContent');
+            if (!hooksContent.classList.contains('hidden')) {
+                hooksContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 
@@ -844,11 +854,15 @@ document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
         } catch (err) {
             console.error("Tags Error:", err);
-            showToast("Failed to generate tags. Check connection.");
+            showToast("Hashtag server error.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="hash"></i> Generate Tags';
             lucide.createIcons();
+            const out = document.getElementById('dedTagsOutput');
+            if (out && !out.classList.contains('hidden')) {
+                out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 
@@ -953,11 +967,15 @@ document.addEventListener('DOMContentLoaded', () => {
             out.classList.remove('hidden');
         } catch (err) {
             console.error(err);
-            showToast("Server error. Check your backend connection.");
+            showToast("Trends radar offline.");
         } finally {
             btn.disabled = false;
-            lucide.createIcons();
             btn.innerHTML = '<i data-lucide="trending-up"></i>';
+            lucide.createIcons();
+            const out = document.getElementById('trendsOutput');
+            if (out && !out.classList.contains('hidden')) {
+                out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 

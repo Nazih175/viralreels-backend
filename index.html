@@ -668,8 +668,9 @@
                                 class="btn-secondary w-full border-accent text-accent" id="btnLogAnalytics"><i
                                     data-lucide="bar-chart-2"></i> Log Prediction</button>
                         </div>
-                        <button class="btn-secondary w-full mt-2 border-subtle" id="saveIdeaBtn"><i
-                                data-lucide="bookmark"></i> Save to Calendar Today</button>
+                        <button class="btn-secondary w-full mt-2 border-subtle" id="saveIdeaBtn" aria-label="Save this idea to your calendar">
+                            <i data-lucide="bookmark"></i> Save to Calendar Today
+                        </button>
                     </div>
                 </div>
 
@@ -710,10 +711,13 @@
                     <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
                             data-lucide="zap"></i></button>
                 </form>
-                <div id="hooksGeneratorsEmpty" class="empty-state glass-card mt-2"><i data-lucide="pen-tool"
-                        class="lg-icon mb-2"></i>
-                    <h3>Type a Topic</h3>
-                    <p>Enter any topic above to generate bespoke viral hooks and captions.</p>
+                <div id="hooksGeneratorsEmpty" class="empty-state glass-card mt-2">
+                    <i data-lucide="pen-tool" class="lg-icon mb-2" style="color:var(--accent-purple); opacity:0.5;"></i>
+                    <h3>Type a Topic Above</h3>
+                    <p class="text-xs text-muted mb-4">The AI will generate viral hooks and platform-tuned captions.</p>
+                    <div class="tip-pill" style="background:rgba(157, 78, 221, 0.1); padding:8px 12px; border-radius:12px; border:1px dashed rgba(157, 78, 221, 0.3); font-size:11px; color:var(--accent-purple);">
+                        <strong>💡 Quick Tip:</strong> Try topics like "Daily Routine" or "3 Mindset Hacks"
+                    </div>
                 </div>
                 <div id="hooksGeneratorsContent" class="hidden mt-2">
                     <div class="pill-tabs mb-4 sticky-pill interactive-glow"><button class="pill active"
@@ -806,7 +810,7 @@
                         niche hashtags to boost your SEO visibility.</p>
                 </div>
                 <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches" aria-label="View recent tag searches">
                         <i data-lucide="history"></i>
                     </button>
                     <input type="text" id="dedTagsInput" class="text-input w-full flex-grow"
@@ -999,11 +1003,11 @@
             <section id="view-trends" class="tab-view hidden scroll-container content-padding pb-heavy">
                 <div class="tab-header pt-4">
                     <h2>Trends Radar</h2>
-                    <p>Input a niche to discover 5-star formats.</p>
+                    <p>Input a niche to discover high-momentum content formats.</p>
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
                 <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 w-full p-2">
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends" aria-label="View recent trending niches">
                         <i data-lucide="history"></i>
                     </button>
                     <input type="text" id="trendsInput" placeholder="e.g. Finance..."
@@ -1025,11 +1029,11 @@
             <section id="view-rewrite" class="tab-view hidden scroll-container content-padding pb-heavy">
                 <div class="tab-header pt-4">
                     <h2>Script Rewriter</h2>
-                    <p>Paste your boring script. Get viral output.</p>
+                    <p>Paste your boring script. Get instant viral-ready output.</p>
                     <div id="usage-badge-rewrite" class="usage-badge mt-2"></div>
                 </div>
                 <form id="rewriteForm" class="glass-card interactive-glow mt-4 mb-4 border-accent" style="position:relative;">
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('rewrite')" title="Recent Scripts" style="position:absolute; top:12px; right:12px; z-index:10;">
+                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('rewrite')" title="Recent Scripts" style="position:absolute; top:12px; right:12px; z-index:10;" aria-label="View recent script rewrites">
                         <i data-lucide="history"></i>
                     </button>
                     <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
