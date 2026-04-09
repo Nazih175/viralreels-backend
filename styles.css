@@ -266,10 +266,38 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 
 /* Grid Outputs (Tags & Trends) - Unified Generic Lists */
 .hashtag-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.hashtag { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: var(--border-radius-sm); font-size: 0.85rem; font-weight: 600; color: white; display:flex; align-items:center; gap:6px; }
-.tag-niche { color: var(--accent-cyan) !important; border-color: rgba(0, 245, 212, 0.3) !important; }
-.tag-trending { color: var(--accent-red) !important; border-color: rgba(239, 71, 111, 0.3) !important; }
-.tag-recommended { color: var(--accent-gold) !important; border-color: rgba(255, 183, 3, 0.3) !important; }
+.hashtag {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 8px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.hashtag:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hashtag:active { transform: scale(0.95); }
+
+.tag-trending { color: #ff4d6d !important; border-color: rgba(255, 77, 109, 0.3) !important; }
+.tag-trending:hover { background: rgba(255, 77, 109, 0.1); border-color: #ff4d6d; }
+
+.tag-niche { color: #00f5d4 !important; border-color: rgba(0, 245, 212, 0.3) !important; }
+.tag-niche:hover { background: rgba(0, 245, 212, 0.1); border-color: #00f5d4; }
+
+.tag-recommended { color: #fee440 !important; border-color: rgba(254, 228, 64, 0.3) !important; }
+.tag-recommended:hover { background: rgba(254, 228, 64, 0.1); border-color: #fee440; }
 .trend-card { background: var(--bg-card-dark); border: var(--border-subtle); padding: 1.25rem; border-radius: var(--border-radius-md); }
 .stars-container { display: flex; gap: 2px; color: var(--accent-gold); } .stars-container i { width: 14px; height: 14px; fill: var(--accent-gold); } .stars-container i.empty { fill: rgba(255,255,255,0.1); color: rgba(255,255,255,0.1); }
 

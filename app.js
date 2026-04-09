@@ -438,6 +438,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); lucide.createIcons();
     };
 
+    window.copyHash = (text, el) => {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`Copied: ${text}`);
+            const oldHtml = el.innerHTML;
+            el.innerHTML = '<i data-lucide="check" style="width:12px;"></i> Copied';
+            setTimeout(() => { el.innerHTML = oldHtml; lucide.createIcons(); }, 1500);
+        });
+    };
+
     // -- 1. ANALYZE VIEW --
     document.getElementById('analyzerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -510,9 +519,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast("Server error. Check your backend connection.");
         } finally {
             btn.disabled = false;
-            btn.querySelector('span').innerText = "Generate Analysis";
-            btn.querySelector('i').classList.remove('hidden');
-            btn.querySelector('.loader').classList.add('hidden');
+            btn.innerHTML = '<span>Generate Analysis</span><i data-lucide="arrow-right"></i><div class="loader hidden"></div>';
+            lucide.createIcons();
             document.getElementById('resultsDashboard').classList.remove('hidden');
         }
     });
@@ -571,7 +579,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast("Server error. Check your backend connection.");
         } finally {
             btn.disabled = false;
-            lucide.createIcons(); btn.innerHTML = '<i data-lucide="zap"></i>';
+            btn.innerHTML = '<i data-lucide="zap"></i> Generate Hooks';
+            lucide.createIcons();
         }
     });
 
@@ -711,26 +720,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const base = document.getElementById('dedTagsInput').value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const btn = e.target.querySelector('button');
         btn.innerHTML = '<div class="loader"></div>';
+        btn.disabled = true;
+
         setTimeout(() => {
-            document.getElementById('dedTagsOutput').classList.remove('hidden');
-            
-            // 1. Trending (Viral Momentum)
-            document.getElementById('tagsTrending').innerHTML = ['#fyp', '#viral', '#trending', `#${base}viral`].map(t => 
-                `<div class="hashtag tag-trending"><i data-lucide="fire" style="width:12px;"></i>${t}</div>`
-            ).join('');
+            try {
+                const output = document.getElementById('dedTagsOutput');
+                if (output) output.classList.remove('hidden');
+                
+                // 1. Trending (Viral Momentum)
+                const trendingEl = document.getElementById('tagsTrending');
+                if (trendingEl) {
+                    trendingEl.innerHTML = ['#fyp', '#viral', '#trending', `#${base}viral`, '#trendingreels', '#reels'].map(t => 
+                        `<div class="hashtag tag-trending" onclick="copyHash('${t}', this)"><i data-lucide="fire"></i>${t}</div>`
+                    ).join('');
+                }
 
-            // 2. Hyper-Niche (Targeted SEO)
-            document.getElementById('tagsNiche').innerHTML = [`#${base}hacks`, `#${base}tips`, `#${base}creator`].map(t => 
-                `<div class="hashtag tag-niche"><i data-lucide="target" style="width:12px;"></i>${t}</div>`
-            ).join('');
+                // 2. Hyper-Niche (Targeted SEO)
+                const nicheEl = document.getElementById('tagsNiche');
+                if (nicheEl) {
+                    nicheEl.innerHTML = [`#${base}hacks`, `#${base}tips`, `#${base}creator`, `#${base}community`, `#${base}market`].map(t => 
+                        `<div class="hashtag tag-niche" onclick="copyHash('${t}', this)"><i data-lucide="target"></i>${t}</div>`
+                    ).join('');
+                }
 
-            // 3. Recommended (AI Power Picks)
-            document.getElementById('tagsRecommended').innerHTML = [`#${base}secrets`, `#${base}life`, `#learnonreels`].map(t => 
-                `<div class="hashtag tag-recommended"><i data-lucide="sparkles" style="width:12px;"></i>${t}</div>`
-            ).join('');
+                // 3. Recommended (AI Power Picks)
+                const recEl = document.getElementById('tagsRecommended');
+                if (recEl) {
+                    recEl.innerHTML = [`#${base}secrets`, `#${base}life`, `#learnonreels`, '#creatorhacks', '#viralgrowth'].map(t => 
+                        `<div class="hashtag tag-recommended" onclick="copyHash('${t}', this)"><i data-lucide="sparkles"></i>${t}</div>`
+                    ).join('');
+                }
 
-            lucide.createIcons(); 
-            btn.innerHTML = '<i data-lucide="hash"></i>';
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Tags Error:", err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="hash"></i> Generate Tags';
+                lucide.createIcons();
+            }
         }, 1100);
     });
 
@@ -866,6 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="file-text"></i> Rewrite Script';
+            lucide.createIcons();
         }
     });
 
