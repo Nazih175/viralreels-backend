@@ -1,11 +1,12 @@
 /**
- * ViralReels AI - App Logic (V1 Usage Engine)
+ * ViralReels AI - App Logic (V3.1-PWA Pro Active)
  */
 
 // Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
+            console.log("ViralReels AI System: V3.1-PWA Pro Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
@@ -29,7 +30,7 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("ViralReels AI System: V3.0 Global Optimization Active");
+    console.log("ViralReels AI System: V3.1 Global Optimization Active");
     // Premium Splash Screen Auto-Fade
     const splash = document.getElementById('splashScreen');
     if (splash) setTimeout(() => { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }, 1500);
@@ -873,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const trendingEl = document.getElementById('tagsTrending');
             if (trendingEl && data.viral) {
                 trendingEl.innerHTML = data.viral.map(t =>
-                    `<div class="hashtag tag-trending" onclick="copyHash('${t}', this)"><i data-lucide="fire"></i>${t}</div>`
+                    `<div class="hashtag tag-trending" onclick="copyHash('${t}', this)"><i data-lucide="flame"></i>${t}</div>`
                 ).join('');
             }
 

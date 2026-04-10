@@ -239,21 +239,30 @@ app.post('/api/rewrite', async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         const { message, persona, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        // Model: Using gpt-4o-mini for ultra-fast "Ask Studio" style responses
+        const model = 'gpt-4o-mini';
         const niche = persona?.niche || 'general';
-        const tone = persona?.tone || 50;
-        let toneDesc = tone < 30 ? 'Soft, empathetic, and deeply relatable.' : tone > 70 ? 'High-energy, aggressive, and brutally direct.' : 'Balanced, professional, and clear.';
+        const toneValue = persona?.tone || 50;
+        let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
 
-        const freePrompt = `Growth consultant. Niche: ${niche}, Tone: ${toneDesc}. Actionable algorithm advice. Concise.`;
-        const proPrompt = `Elite advisor ($10k/mo level). Niche: ${niche}, Tone: ${toneDesc}. Reference TikTok/Reels/Shorts mechanics (retention, shares, velocity). Under 5 sentences.`;
+        const systemPrompt = `You are an elite Viral Strategist (Ask Studio persona) for ALL short-form platforms (Reels, TikTok, Shorts).
+Niche: ${niche}. Tone: ${toneDesc}.
+
+CORE DIRECTIVES:
+1. NO AI FLUFF: Do not say "Certainly", "I'd be happy to", or "As an AI". No "Hello" or greetings unless it's a very short "Hey".
+2. FRESH START: Treat every message as a separate problem. Do not bring up past context or search terms unless the user explicitly asks about them. Focus 100% on the metric/idea they just sent.
+3. DATA-FIRST: Focus on Hook strength (0-2s), Visual Pattern Interrupts, and Retention Gaps.
+4. CROSS-PLATFORM: If relevant, mention how the strategy differs between TikTok (trend-based) and Reels/Shorts (interest-based).
+5. CONCISE: Max 4-5 punchy sentences. Be a teammate, not a bot.`;
 
         const completion = await openai.chat.completions.create({
             model,
             messages: [
-                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'system', content: systemPrompt },
                 { role: 'user', content: message }
             ],
-            max_tokens: 300
+            max_tokens: 400,
+            temperature: 0.8
         });
 
         res.json({ reply: completion.choices[0].message.content });

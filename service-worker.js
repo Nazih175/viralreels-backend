@@ -1,4 +1,4 @@
-const CACHE_NAME = 'viralreels-v3.1';
+const CACHE_NAME = 'viralreels-v3.1-pwa-pro';
 const urlsToCache = [
   './',
   './index.html',
@@ -6,14 +6,15 @@ const urlsToCache = [
   './app.js',
   './manifest.json',
   './assets/logo.svg',
-  './assets/favicon.png'
+  './assets/favicon.png',
+  './assets/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+      .then(cache => cache.addAll(urlsToCache).catch(err => console.warn('PWA Cache skip individual file error', err)))
   );
 });
 
@@ -32,14 +33,18 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network-first strategy for index.html to ensure updates are detected
+  // Navigation Fallback Strategy
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      fetch(event.request)
+        .catch(() => {
+          return caches.match('./index.html') || caches.match('./');
+        })
     );
     return;
   }
   
+  // Cache-first for assets (CSS, JS, Images)
   event.respondWith(
     caches.match(event.request)
       .then(response => {
