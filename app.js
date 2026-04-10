@@ -59,6 +59,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let persona = JSON.parse(localStorage.getItem('vr_persona')) || { niche: '', tone: 50 };
     let currentAnalyzeData = null;
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
+ 
+    // -- DOM Elements (Explicit Declarations for UI Reliability) --
+    const verifyOverlay = document.getElementById('verifyOverlay');
+    const emailLoginBtn = document.getElementById('emailLoginBtn');
+    const authBaseActions = document.getElementById('authBaseActions');
+    const emailLoginForm = document.getElementById('emailLoginForm');
+    const backToMethodsBtn = document.getElementById('backToMethodsBtn');
+    const authOverlay = document.getElementById('authOverlay');
+    const appContainer = document.getElementById('appContainer');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatLogsList = document.getElementById('chatLogsList');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatSubmit = document.getElementById('chatSubmit');
+    const nicheInput = document.getElementById('nicheInput');
+    const appViews = document.querySelectorAll('.app-view');
+    const navButtons = document.querySelectorAll('.nav-btn');
 
     // -- Custom Modal System --
     const modalOverlay = document.getElementById('vrModalOverlay');
@@ -282,14 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clipboard helper
     window.copyToClipboard = (text, btn) => {
         navigator.clipboard.writeText(text).then(() => {
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="check" style="width:14px; color:var(--accent-green);"></i>';
+            if (btn) {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" style="width:14px; color:var(--accent-green);"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    lucide.createIcons();
+                }, 2000);
+            }
             showToast("Copied to clipboard!");
             lucide.createIcons();
-            setTimeout(() => {
-                btn.innerHTML = original;
-                lucide.createIcons();
-            }, 2000);
         }).catch(err => {
             console.error('Failed to copy: ', err);
             showToast("Copy failed.");
@@ -768,15 +789,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const empty = document.getElementById('trackerEmpty');
         if (savedHooks.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
             empty.classList.add('hidden');
-            list.innerHTML = savedHooks.map((h, i) => {
+
+            const sortVal = document.getElementById('sortTrackerSelect')?.value || 'newest';
+            let displayHooks = [...savedHooks]; // Normal is newest first (unshifted)
+
+            if (sortVal === 'oldest') displayHooks.reverse();
+            else if (sortVal === 'alpha') displayHooks.sort();
+            else if (sortVal === 'viral') {
+                displayHooks.sort((a, b) => {
+                    const aViral = analyticsData.some(an => an.idea.includes(a.substring(0, 10)) && an.actualViews > 0);
+                    const bViral = analyticsData.some(an => an.idea.includes(b.substring(0, 10)) && an.actualViews > 0);
+                    return bViral - aViral;
+                });
+            }
+
+            list.innerHTML = displayHooks.map((h) => {
+                const originalIndex = savedHooks.indexOf(h);
                 const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
                 return `
                 <div class="item-card flex-col border-subtle bg-card-dark interactive-glow result-appear">
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] bg-accent/20 text-accent font-bold px-2 py-0.5 rounded">HOOK #${savedHooks.length - i}</span>
+                            <span class="text-[10px] bg-accent/20 text-accent font-bold px-2 py-0.5 rounded">HOOK REF: ${h.substring(0, 6)}...</span>
                         </div>
-                        <button class="icon-button flex-shrink-0" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                        <button class="icon-button flex-shrink-0" onclick="deleteHook(${originalIndex})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
                     <p class="item-text mb-4 w-full text-sm" style="line-height:1.6; white-space:pre-wrap;">${h}</p>
                     <div class="flex justify-between items-center pt-3 border-top border-subtle">
@@ -785,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
                         </div>` : `
                         <div class="text-[10px] text-muted uppercase tracking-wider">Unverified Prediction</div>`}
-                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${h.replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy</button>
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${h.replace(/'/g, "\\'")}', this)"><i data-lucide="copy" style="width:10px;"></i> Copy</button>
                     </div>
                 </div>
                 `;
@@ -794,11 +830,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    document.getElementById('sortTrackerSelect')?.addEventListener('change', renderTracker);
+
     // -- CSV EXPORT / IMPORT --
-    document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
+    document.getElementById('exportTrackerBtn')?.addEventListener('click', () => {
         if (savedHooks.length === 0) return showToast("No hooks to export.");
-        const csvContent = "data:text/csv;charset=utf-8,Timestamp,Hook Text\n" 
-            + savedHooks.map(h => `${Date.now()},"${h.replace(/"/g, '""')}"`).join("\n");
+        const csvContent = "data:text/csv;charset=utf-8,Timestamp,Status,Hook Text\n" 
+            + savedHooks.map(h => {
+                const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
+                const status = isVerified ? "Verified Viral" : "Unverified Prediction";
+                return `${Date.now()},${status},"${h.replace(/"/g, '""')}"`;
+            }).join("\n");
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -1199,21 +1241,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const empty = document.getElementById('savedEmpty');
         if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
             empty.classList.add('hidden');
-            list.innerHTML = savedRewrites.map((r, i) => `
+
+            const sortVal = document.getElementById('sortSavedSelect')?.value || 'newest';
+            let displayRewrites = [...savedRewrites];
+
+            if (sortVal === 'oldest') displayRewrites.reverse();
+            else if (sortVal === 'alpha') displayRewrites.sort();
+
+            list.innerHTML = displayRewrites.map((r) => {
+                const originalIndex = savedRewrites.indexOf(r);
+                return `
                 <div class="item-card border-subtle bg-card-dark interactive-glow result-appear">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] bg-purple/20 text-purple font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
-                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                        <span class="text-[10px] bg-purple/20 text-purple font-bold px-2 py-0.5 rounded uppercase">SCRIPT REF: ${r.substring(0, 6)}...</span>
+                        <button class="icon-button" onclick="deleteRewrite(${originalIndex})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
                     <p class="item-text text-sm mb-4" style="white-space:pre-wrap; line-height:1.6;">${r}</p>
                     <div class="flex justify-end pt-3 border-top border-subtle">
-                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
             lucide.createIcons();
         }
     };
+    document.getElementById('sortSavedSelect')?.addEventListener('change', renderSavedRewrites);
     document.getElementById('clearSavedBtn')?.addEventListener('click', () => {
         window.vrConfirm("Clear Vault", "Are you sure you want to delete all saved scripts?", () => {
             savedRewrites = []; localStorage.setItem('viralreels_saved_rewrites', '[]'); renderSavedRewrites();
@@ -1652,13 +1705,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const exportTrackerBtn = document.getElementById('exportTrackerBtn');
-    if (exportTrackerBtn) {
-        exportTrackerBtn.addEventListener('click', () => {
-            const data = savedHooks.map(h => ({ hook: h }));
-            downloadCSV(data, "viralreels_hooks.csv");
-        });
-    }
+    // Redundant export listener removed (handled in Tracker section)
 
     if (cancelSubBtn) {
         cancelSubBtn.addEventListener('click', () => {
@@ -1907,4 +1954,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-});
+});});

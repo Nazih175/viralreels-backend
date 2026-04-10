@@ -725,9 +725,20 @@
 
             <!-- 3. TRACKER -->
             <section id="view-tracker" class="tab-view hidden scroll-container content-padding pb-heavy">
-                <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center justify-between gap-4 mb-2">
                     <h2>Hook Tracker</h2>
-                    <button class="btn-export" id="exportTrackerBtn"><i data-lucide="download"></i> CSV</button>
+                    <div class="flex gap-2">
+                        <div class="custom-select-wrapper" style="width: 120px;">
+                            <select id="sortTrackerSelect" class="text-xs bg-card-dark" style="padding: 6px;">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="viral">Viral First</option>
+                                <option value="alpha">A-Z</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon" style="width:12px;"></i>
+                        </div>
+                        <button class="btn-export" id="exportTrackerBtn"><i data-lucide="download"></i> CSV</button>
+                    </div>
                 </div>
                 <p>Hooks you've saved to your vault.</p>
                 <div id="trackerEmpty" class="empty-state glass-card mt-4"><i data-lucide="archive"
@@ -1048,7 +1059,17 @@
                 <div class="tab-header pt-4">
                     <div class="flex justify-between items-center mb-2">
                         <h2>Saved Rewrites</h2>
-                        <button class="btn-text text-red" style="font-size:0.7rem;" id="clearSavedBtn"><i data-lucide="trash-2" style="width:12px;"></i> Clear Vault</button>
+                        <div class="flex gap-2 items-center">
+                            <div class="custom-select-wrapper" style="width: 110px;">
+                                <select id="sortSavedSelect" class="text-xs bg-card-dark" style="padding: 6px;">
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="alpha">A-Z</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="select-icon" style="width:12px;"></i>
+                            </div>
+                            <button class="btn-text text-red" style="font-size:0.7rem;" id="clearSavedBtn"><i data-lucide="trash-2" style="width:12px;"></i> Clear Vault</button>
+                        </div>
                     </div>
                     <p>Your library of optimized scripts.</p>
                 </div>

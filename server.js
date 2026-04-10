@@ -32,6 +32,14 @@ app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
 app.use(express.static('./'));
 
+// Explicit Asset Handling (Override for Query Strings)
+app.get('/app.js', (req, res) => {
+    res.sendFile(__dirname + '/app.js');
+});
+app.get('/styles.css', (req, res) => {
+    res.sendFile(__dirname + '/styles.css');
+});
+
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
 app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -87,11 +95,13 @@ app.post('/api/analyze', async (req, res) => {
         const { idea, platform, length, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `ViralReels AI Analyst. Apply Attention and Retention principles. Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings focusing on opening/flow).`;
-        const proPrompt = `Elite ViralReels AI Strategist. 
-        Principles: Attention First, Retention Opt, Emotional Impact, Value Delivery, Engagement Triggers. 
-        Analyze idea for ${platform}. 
-        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 specific actionable improvements), 'insight' (1 high-impact psychological unlock).`;
+        const basePrinciples = `ViralReels AI Expert. Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+
+        const freePrompt = `${basePrinciples} Analyze for ${platform}. Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings).`;
+        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
+        Deep Analysis for ${platform} (${length}). 
+        Analyze psychology, pacing, and visual triggers.
+        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 elite improvements), 'insight' (1 high-impact psychological unlock).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -116,11 +126,13 @@ app.post('/api/generate-hooks', async (req, res) => {
         const { topic, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `ViralReels AI Hook Engine. Attention First. 4 hooks & 2 captions. Return JSON: 'hooks' (array), 'captions' (array).`;
-        const proPrompt = `Elite ViralReels AI Strategist. 
-        Generate 6 hooks & 3 captions optimized for: Attention First, Emotional Impact, and Value Delivery. 
-        Hooks must use frameworks: Pattern Interrupt, Curiosity, Identity, Social Proof, Provocation, Transformation. 
-        Return JSON: 'hooks' (6 strings with [Framework]), 'captions' (3 strings with [Platform]).`;
+        const basePrinciples = `ViralReels AI Hook Engine. Expert Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+
+        const freePrompt = `${basePrinciples} Generate 4 elite hooks & 2 captions. Return JSON: 'hooks' (array), 'captions' (array).`;
+        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
+        Generate 6 world-class hooks & 3 captions.
+        Frameworks: Pattern Interrupt, Curiosity Gap, Identity, Social Proof, Provocation, Transformation.
+        Return JSON: 'hooks' (6 strings with [Framework] prefix), 'captions' (3 strings with [Platform] prefix).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -145,17 +157,17 @@ app.post('/api/generate-captions', async (req, res) => {
         const { topic, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const systemPrompt = `You are the ViralReels AI Caption Engine. Generate 5 variations for: "${topic}". 
+        const systemPrompt = `ViralReels AI Caption Engine. Expert Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.
+        Generate 5 variations for: "${topic}". 
         Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME].
-        Principles: Attention First, Retention (remove fluff), Emotional Impact. 
-        RULES: No profanity. Use emojis for Hyped/Educational. 
-        Return JSON object with a 'captions' array of 5 strings.`;
+        RULES: No AI fluff. Use emojis. No profanity. 
+        Return JSON: 'captions' (array of 5 strings).`;
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: systemPrompt + " Return JSON object with 'captions' array." },
+                { role: 'system', content: systemPrompt },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 1000
@@ -176,24 +188,21 @@ app.post('/api/generate-tags', async (req, res) => {
         const { topic, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `ViralReels AI SEO Expert. 3 categories of hashtags for: "${topic}". 
-        1. Viral (Attention) - 5 tags.
-        2. Niche (Clarity) - 5 tags.
-        3. Recommended - 5 tags.
-        Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
+        const basePrinciples = `ViralReels AI SEO Expert. Principles: 1. Attention First 2. Clarity 3. Engagement 4. Platform Awareness 5. Adaptability.`;
 
-        const proPrompt = `Elite ViralReels AI Virality Strategist. 3 depth-first categories for: "${topic}". 
-        Focus: Discovery and Engagement signals.
+        const freePrompt = `${basePrinciples} 3 categories for: "${topic}". 1. Viral (Attention) 2. Niche (Clarity) 3. Recommended. Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
+        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
+        3 depth-first categories for: "${topic}". Focus on reach velocity and discovery signals.
         1. Viral Momentum (Max reach) - 8 tags.
         2. Hyper-Niche SEO (Targeted) - 8 tags.
-        3. AI Power Picks (High engagement) - 8 tags.
+        3. AI Power Picks (Engagement) - 8 tags.
         Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: (isPro ? proPrompt : freePrompt) + " CRITICAL: Return JSON { 'viral': [], 'niche': [], 'recommended': [] }" },
+                { role: 'system', content: (isPro ? proPrompt : freePrompt) },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 600
@@ -214,14 +223,17 @@ app.post('/api/rewrite', async (req, res) => {
         const { script, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `ViralReels AI Scriptwriter. Rewrite for Clarity and Retention. Structure: [Hook], [Context], [Value], [CTA].`;
-        const proPrompt = `Elite ViralReels AI Director. Rewrite using High-Retention Expert Architecture:
+        const basePrinciples = `ViralReels AI Director. Expert Principles: 1. Attention First (Pattern Interrupt) 2. Clarity 3. Retention (Remove Fluff) 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+
+        const freePrompt = `${basePrinciples} Rewrite for Clarity and Retention. Structure: [Hook], [Context], [Value], [CTA].`;
+        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
+        Rewrite using High-Retention Expert Architecture:
         1. [THE HOOK]: Attention First - Visual + Verbal pattern interrupt (0-2s).
         2. [EMOTIONAL TENSION]: Identify the gap/need (2-5s).
-        3. [VALUE DELIVERY]: Logical floor and logical flow.
+        3. [VALUE DELIVERY]: Logical floor and flow.
         4. [RETENTION BRIDGE]: High-speed pacing for mid-video drop-off.
-        5. [LOOP / ENGAGEMENT CTA]: Logic designed to spark discussion and shares.
-        Add [ELITE FILMING TIP] for psychological retention.`;
+        5. [LOOP / ENGAGEMENT CTA]: Spark discussion and shares.
+        Include [ELITE FILMING TIP] for psychological retention at the end.`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -243,28 +255,27 @@ app.post('/api/rewrite', async (req, res) => {
 app.post('/api/chat', async (req, res) => {
     try {
         const { message, persona, isPro } = req.body;
-        // Model: Using gpt-4o-mini for ultra-fast "Ask Studio" style responses
         const model = 'gpt-4o-mini';
         const niche = persona?.niche || 'general';
         const toneValue = persona?.tone || 50;
         let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
 
         const systemPrompt = `You are an elite expert in short-form video growth (ViralReels AI Consultant).
-Task: Maximize attention, retention, and engagement across TikTok, Reels, and Shorts.
+Task: Maximize attention, retention, and engagement.
 
-CORE PRINCIPLES:
-1. ATTENTION FIRST: Hooks must spark instant curiosity/intrigue.
+CORE PRINCIPLES (The 10-Principle Framework):
+1. ATTENTION FIRST: Hooks must spark instant curiosity.
 2. CLARITY: Direct, impactful, and easy to understand.
-3. RETENTION: Structure to keep viewers watching; remove flat moments.
+3. RETENTION: Structure to remove flat moments.
 4. EMOTIONAL IMPACT: Trigger curiosity, tension, or relatability.
 5. VALUE: Deliver high entertainment, information, or insight.
-6. FLOW: Logical progression and strong transitions.
-7. ENGAGEMENT: Naturally spark reactions and discussions.
-8. PLATFORM AWARENESS: Optimize for watch time and replay signals.
-9. ADAPTABILITY: Tailor advice to the specific niche: ${niche}.
-10. ACTIONABLE: Identify what works and offer better alternatives.
+6. FLOW: Logical progression and transitions.
+7. ENGAGEMENT: Spark reactions and discussions.
+8. PLATFORM AWARENESS: Optimize for watch time signals.
+9. ADAPTABILITY: Tailor advice to the niche: ${niche}.
+10. ACTIONABLE: Offer specific better alternatives.
 
-STRICT RULES: No AI fluff. No profanity. Tone: ${toneDesc}. Max 5 sentences.`;
+STRICT RULES: No AI fluff. Tone: ${toneDesc}. Max 5 sentences.`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -279,7 +290,7 @@ STRICT RULES: No AI fluff. No profanity. Tone: ${toneDesc}. Max 5 sentences.`;
         res.json({ reply: completion.choices[0].message.content });
     } catch (e) {
         console.error('Chat Error:', e.message);
-        res.status(500).json({ error: 'Consultant is offline. Disconnect or try again.' });
+        res.status(500).json({ error: 'Consultant is offline. Try again.' });
     }
 });
 
@@ -289,10 +300,12 @@ app.post('/api/trends', async (req, res) => {
         const { niche, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const freePrompt = `ViralReels AI Trend Analyst. Identify 3-5 trending formats for ${niche} focusing on Attention and Clarity. Return JSON: 'trends' (array of objects with 'title', 'desc', 'rep' where rep is 1-5 rating).`;
-        const proPrompt = `Elite ViralReels AI Trend Strategist. Identify 6 high-momentum trends for ${niche}. 
-        Focus: Attention First and Engagement Triggers. Include platform psychology. 
-        Return JSON: 'trends' (array of objects with 'title', 'desc', 'rep' where rep is 1-5 rating).`;
+        const basePrinciples = `ViralReels AI Trend Strategist. Principles: 1. Attention First 2. Clarity 3. Retention 4. Engagement Triggers 5. Platform Psychology.`;
+
+        const freePrompt = `${basePrinciples} Identify 4 trending formats for ${niche}. Return JSON: 'trends' (array: {title, desc, rep (1-5 rating)}).`;
+        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
+        Identify 6 high-momentum trends for ${niche}. Focus on reach velocity.
+        Return JSON: 'trends' (array: {title, desc, rep (1-5 rating)}).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -310,6 +323,7 @@ app.post('/api/trends', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch trends.' });
     }
 });
+
 
 // Endpoint 6: Stripe Checkout Session Generator
 app.post('/api/checkout', async (req, res) => {
