@@ -622,6 +622,35 @@ body.light-theme .sticky-score {
     box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
 }
 
+/* New: Flexible link-style history button that allows text */
+.tool-history-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(var(--accent-purple-rgb), 0.08);
+    border: 1px solid rgba(var(--accent-purple-rgb), 0.15);
+    border-radius: 6px;
+    color: var(--accent-purple);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.tool-history-link:hover {
+    background: rgba(var(--accent-purple-rgb), 0.15);
+    border-color: var(--accent-purple);
+    box-shadow: 0 4px 12px rgba(157, 78, 221, 0.1);
+}
+
+.tool-history-link i {
+    width: 14px;
+    height: 14px;
+}
+
 .tool-history-btn i {
     width: 16px;
     height: 16px;

@@ -56,9 +56,49 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPro = localStorage.getItem('vr_pro_status') === 'true';
     let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
     let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
-    let persona = JSON.parse(localStorage.getItem('vr_persona')) || { niche: 'tech', tone: 50 };
+    let persona = JSON.parse(localStorage.getItem('vr_persona')) || { niche: '', tone: 50 };
     let currentAnalyzeData = null;
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
+
+    // -- Custom Modal System --
+    const modalOverlay = document.getElementById('vrModalOverlay');
+    const modalTitle = document.getElementById('vrModalTitle');
+    const modalText = document.getElementById('vrModalText');
+    const modalConfirm = document.getElementById('vrModalConfirm');
+    const modalCancel = document.getElementById('vrModalCancel');
+
+    window.vrConfirm = (title, msg, onConfirm) => {
+        modalTitle.innerText = title;
+        modalText.innerText = msg;
+        modalCancel.classList.remove('hidden');
+        modalOverlay.classList.remove('hidden');
+        
+        const close = () => { modalOverlay.classList.add('hidden'); };
+        modalConfirm.onclick = () => { close(); if (onConfirm) onConfirm(); };
+        modalCancel.onclick = close;
+    };
+
+    window.vrAlert = (title, msg) => {
+        modalTitle.innerText = title;
+        modalText.innerText = msg;
+        modalCancel.classList.add('hidden');
+        modalOverlay.classList.remove('hidden');
+        modalConfirm.onclick = () => { modalOverlay.classList.add('hidden'); };
+    };
+
+    // -- ENTER KEY SUPPORT --
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const activeEl = document.activeElement;
+            if (activeEl.tagName === 'INPUT' && activeEl.closest('form')) {
+                e.preventDefault();
+                activeEl.closest('form').dispatchEvent(new Event('submit'));
+            } else if (activeEl.tagName === 'TEXTAREA' && e.ctrlKey && activeEl.closest('form')) {
+                e.preventDefault();
+                activeEl.closest('form').dispatchEvent(new Event('submit'));
+            }
+        }
+    });
     let calDate = new Date();
     const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
         ? 'http://localhost:3000/api' 
@@ -70,12 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let historyIndices = { analyze: -1, hooks: -1, captions: -1, tags: -1, trends: -1, rewrite: -1 };
 
-    const addToHistory = (tool, val) => {
-        if (!val || histories[tool][0] === val) return;
-        histories[tool].unshift(val);
+    const addToHistory = (tool, data) => {
+        if (!data) return;
+        // Check if data is already at the top
+        const first = histories[tool][0];
+        if (first && JSON.stringify(first) === JSON.stringify(data)) return;
+        
+        histories[tool].unshift(data);
         if (histories[tool].length > 10) histories[tool].pop();
         localStorage.setItem('vr_tool_histories', JSON.stringify(histories));
-        historyIndices[tool] = -1; // Reset cycle
+        historyIndices[tool] = -1;
     };
 
     window.cycleHistory = (tool) => {
@@ -84,21 +128,30 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         historyIndices[tool] = (historyIndices[tool] + 1) % histories[tool].length;
-        const val = histories[tool][historyIndices[tool]];
+        const data = histories[tool][historyIndices[tool]];
+        const val = typeof data === 'object' ? data.text : data;
         
+        // Restore main input
         let inputId = `${tool}Input`;
         if (tool === 'analyze') inputId = 'ideaInput';
         if (tool === 'hooks') inputId = 'customHookInput';
         if (tool === 'tags') inputId = 'dedTagsInput';
         if (tool === 'captions') inputId = 'dedCapInput';
-
         const input = document.getElementById(inputId);
         if (input) {
             input.value = val;
             input.classList.add('history-pop');
             setTimeout(() => input.classList.remove('history-pop'), 200);
-            showToast(`Loaded: "${val.substring(0, 15)}..."`);
         }
+
+        // Restore Metadata if available
+        if (typeof data === 'object') {
+            if (data.platform && document.getElementById('platformSelect')) document.getElementById('platformSelect').value = data.platform;
+            if (data.length && document.getElementById('lengthInput')) document.getElementById('lengthInput').value = data.length;
+            if (data.style && document.getElementById('dedCapStyle')) document.getElementById('dedCapStyle').value = data.style;
+        }
+        
+        showToast(`Loaded: "${val.substring(0, 15)}..."`);
     };
 
     // -- ANIMATION ENGINE --
@@ -535,8 +588,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="item-card">
                 <p class="item-text" style="white-space:pre-wrap;">${text}</p>
                 <div class="item-actions">
-                    <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i></button>
-                    ${type ? `<button class="action-btn" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i></button>` : ''}
+                    <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i> Copy</button>
+                    ${type === 'hook' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'hook', this)" title="Save to Ledger"><i data-lucide="archive"></i> Save to Ledger</button>` : ''}
+                    ${type === 'rewrite' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'rewrite', this)" title="Save to Vault"><i data-lucide="archive"></i> Save to Vault</button>` : ''}
                 </div>
             </div>
         `;
@@ -545,8 +599,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.saveToVault = (text, type, btnElem) => {
         if (type === 'hook') {
             savedHooks.unshift(text); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks));
+            if (typeof renderTracker === 'function') renderTracker();
         } else if (type === 'rewrite') {
             savedRewrites.unshift(text); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
+            if (typeof renderSavedRewrites === 'function') renderSavedRewrites();
         }
         btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); lucide.createIcons();
         triggerSuccess("Saved to Vault");
@@ -585,9 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK IMMEDIATELY
         consumeUse('analyze');
         lastUsedInputs.analyze = currentInputKey; // Mark as used
-        addToHistory('analyze', idea);
+        addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
         
-        btn.querySelector('span').innerText = "Analyzing Context...";
+        btn.querySelector('span').innerText = "";
         btn.querySelector('i').classList.add('hidden');
         btn.querySelector('.loader').classList.remove('hidden');
         document.getElementById('resultsDashboard').classList.add('hidden');
@@ -675,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('hooks');
         lastUsedInputs.hooks = inputStr;
-        addToHistory('hooks', inputStr);
+        addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -715,23 +771,79 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = savedHooks.map((h, i) => {
                 const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
                 return `
-                <div class="item-card flex-col pr-2">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="item-text mb-0 w-full" style="font-size:0.85rem; white-space:pre-wrap;">${h}</p>
+                <div class="item-card flex-col border-subtle bg-card-dark interactive-glow result-appear">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] bg-accent/20 text-accent font-bold px-2 py-0.5 rounded">HOOK #${savedHooks.length - i}</span>
+                        </div>
                         <button class="icon-button flex-shrink-0" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
-                    ${isVerified ? `
-                    <div class="flex items-center gap-1 text-green font-bold uppercase" style="font-size:0.6rem; letter-spacing:1px; background:rgba(6,214,160,0.1); padding:4px 8px; border-radius:4px; width:fit-content;">
-                        <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
-                    </div>` : `
-                    <div class="text-xs text-muted" style="font-size:0.65rem;">Unlinked to performance data</div>`}
+                    <p class="item-text mb-4 w-full text-sm" style="line-height:1.6; white-space:pre-wrap;">${h}</p>
+                    <div class="flex justify-between items-center pt-3 border-top border-subtle">
+                        ${isVerified ? `
+                        <div class="flex items-center gap-1 text-green font-bold uppercase" style="font-size:0.6rem; letter-spacing:1px;">
+                            <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
+                        </div>` : `
+                        <div class="text-[10px] text-muted uppercase tracking-wider">Unverified Prediction</div>`}
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${h.replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy</button>
+                    </div>
                 </div>
                 `;
             }).join('');
             lucide.createIcons();
         }
     };
-    window.deleteHook = (index) => { savedHooks.splice(index, 1); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks)); renderTracker(); };
+
+    // -- CSV EXPORT / IMPORT --
+    document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
+        if (savedHooks.length === 0) return showToast("No hooks to export.");
+        const csvContent = "data:text/csv;charset=utf-8,Timestamp,Hook Text\n" 
+            + savedHooks.map(h => `${Date.now()},"${h.replace(/"/g, '""')}"`).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `viralreels_hooks_${new Date().toLocaleDateString()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Hooks exported successfully.");
+    });
+
+    document.getElementById('importCsvBtn')?.addEventListener('click', () => {
+        document.getElementById('csvFileInput').click();
+    });
+
+    document.getElementById('csvFileInput')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target.result;
+                const lines = text.split("\n").slice(1); // skip header
+                const imported = lines.map(line => {
+                    const parts = line.split(/,(.*)/s); // split on first comma only
+                    if (parts[2]) return parts[2].replace(/^"|"$/g, '').replace(/""/g, '"');
+                    return null;
+                }).filter(h => h);
+                
+                if (imported.length > 0) {
+                    savedHooks = [...imported, ...savedHooks];
+                    localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks));
+                    renderTracker();
+                    showToast(`Imported ${imported.length} hooks!`);
+                }
+            } catch (err) {
+                showToast("Invalid CSV format.");
+            }
+        };
+        reader.readAsText(file);
+    });
+    window.deleteHook = (index) => {
+        window.vrConfirm("Delete Hook", "Are you sure you want to remove this hook from your tracker?", () => {
+             savedHooks.splice(index, 1); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks)); renderTracker(); 
+        });
+    };
 
     // -- 4. CALENDAR VIEW --
     let activeDayKey = null;
@@ -810,7 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('captions');
         lastUsedInputs.captions = currentKey;
-        addToHistory('captions', topic);
+        addToHistory('captions', { text: topic, style, timestamp: Date.now() });
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -855,7 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         btn.innerHTML = '<div class="loader"></div>';
         lastUsedInputs.tags = topic;
-        addToHistory('tags', topic);
+        addToHistory('tags', { text: topic, timestamp: Date.now() });
 
         try {
             const res = await fetch(`${API_BASE}/generate-tags`, {
@@ -928,9 +1040,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Reset Checklist --
     document.getElementById('resetChecklistBtn').addEventListener('click', () => {
-        if (!confirm("Start your checklist from scratch? Your current progress will be lost.")) return;
-        
-        const popIn = document.getElementById('checklistRefreshing');
+        window.vrConfirm("Reset Checklist", "Start your checklist from scratch? Your current progress will be lost.", () => {
+            const popIn = document.getElementById('checklistRefreshing');
+            // ... (keep rest of logic)
         if (popIn) {
             popIn.classList.remove('hidden');
             // Re-trigger animation if already in DOM
@@ -983,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('trends');
         lastUsedInputs.trends = val;
-        addToHistory('trends', val);
+        addToHistory('trends', { text: val, timestamp: Date.now() });
         
         btn.innerHTML = '<div class="loader"></div>';
 
@@ -999,12 +1111,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('trendsEmpty').classList.add('hidden');
             const out = document.getElementById('trendsOutput');
             out.innerHTML = (data.trends || []).map(t => {
-                const stars = Array(5).fill('').map((_, i) => `<i data-lucide="star" class="${i >= t.rep ? 'empty' : ''}"></i>`).join('');
+                const starsCount = t.rep || 0;
+                const starsHtml = '★'.repeat(starsCount).padEnd(5, '☆');
+                
                 return `
                 <div class="trend-card border-subtle result-appear animate-fade-in-up">
                     <div class="flex justify-between items-start mb-2">
                         <strong class="text-md text-primary font-bold" style="padding-right: 1rem;">${t.title}</strong>
-                        <div class="stars-container flex-shrink-0">${stars}</div>
+                        <div class="stars-container text-gold flex-shrink-0" style="letter-spacing:2px;">${starsHtml}</div>
                     </div>
                     <p class="text-sm text-secondary line-height-15">${t.desc}</p>
                 </div>
@@ -1046,9 +1160,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true; // LOCK
         consumeUse('rewrite');
         lastUsedInputs.rewrite = val;
-        addToHistory('rewrite', val);
+        addToHistory('rewrite', { text: val, timestamp: Date.now() });
         
-        btn.innerHTML = '<div class="loader"></div> Processing logic...';
+        btn.innerHTML = '<div class="loader"></div>';
 
         try {
             const res = await fetch(`${API_BASE}/rewrite`, {
@@ -1062,8 +1176,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('rewriteOutput').innerHTML = `
                 <h4 class="font-bold text-accent mb-3 flex items-center gap-2"><i data-lucide="bot"></i> Viral AI Rewrite</h4>
-                <div class="p-4 bg-card-dark result-appear" style="border-radius:8px; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05);">${rewritten}</div>
-                <div class="item-actions mt-4"><button class="action-btn" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'rewrite', this)"><i data-lucide="archive"></i> Save AI Template</button></div>
+                <div class="p-4 bg-card-dark result-appear" style="border-radius:8px; font-size:1rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05); color:white;">${rewritten}</div>
+                <div class="item-actions flex-col gap-2 mt-4">
+                    <button class="btn-primary w-full" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'rewrite', this)"><i data-lucide="archive"></i> Save to Vault</button>
+                    <button class="btn-secondary w-full" onclick="copyToClipboard('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy"></i> Copy Script</button>
+                </div>
             `;
             document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
         } catch(e) {
@@ -1083,15 +1200,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
             empty.classList.add('hidden');
             list.innerHTML = savedRewrites.map((r, i) => `
-                <div class="item-card relative result-appear">
-                    <div class="text-xs text-muted mb-3 font-bold uppercase"><i data-lucide="file-text" style="width:12px;display:inline"></i> Saved AI Rewrite ${i + 1}</div>
-                    <p class="item-text text-sm" style="white-space:pre-wrap; line-height:1.5;">${r}</p>
-                    <button class="icon-button absolute" style="top:12px; right:12px;" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                <div class="item-card border-subtle bg-card-dark interactive-glow result-appear">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] bg-purple/20 text-purple font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
+                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                    </div>
+                    <p class="item-text text-sm mb-4" style="white-space:pre-wrap; line-height:1.6;">${r}</p>
+                    <div class="flex justify-end pt-3 border-top border-subtle">
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
+                    </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
     };
+    document.getElementById('clearSavedBtn')?.addEventListener('click', () => {
+        window.vrConfirm("Clear Vault", "Are you sure you want to delete all saved scripts?", () => {
+            savedRewrites = []; localStorage.setItem('viralreels_saved_rewrites', '[]'); renderSavedRewrites();
+        });
+    });
     window.deleteRewrite = (index) => { savedRewrites.splice(index, 1); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites)); renderSavedRewrites(); };
 
     // -- ANALYTICS RENDER ENGINE --
@@ -1221,12 +1348,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.getElementById('clearChatLogsBtn')?.addEventListener('click', () => {
-        if (confirm("Delete all past conversations?")) {
+        window.vrConfirm("Clear Chat", "Are you sure you want to delete all past conversations?", () => {
             chatHistory = [];
             localStorage.setItem('vr_chat_history', '[]');
             renderChatLogs();
             showToast("History cleared.");
-        }
+        });
     });
 
     // Initial render
@@ -1258,7 +1385,8 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                const personaNiche = document.getElementById('personaNiche').options[document.getElementById('personaNiche').selectedIndex].text;
+                const nicheInput = document.getElementById('personaNiche');
+                const personaNiche = nicheInput ? nicheInput.value.trim() : 'General';
                 const personaTone = document.getElementById('personaTone').value;
 
                 const res = await fetch(`${API_BASE}/chat`, {

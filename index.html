@@ -22,7 +22,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-title" content="ViralReels">
+    <meta name="apple-mobile-web-app-title" content="ViralReels AI">
     <meta name="application-name" content="ViralReels AI">
 
     <!-- Open Graph / Facebook -->
@@ -58,7 +58,7 @@
     <!-- App Store / Play Store Readiness Meta -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ViralReels">
+    <meta name="apple-mobile-web-app-title" content="ViralReels AI">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0a0a0f">
 </head>
@@ -144,7 +144,7 @@
                 <div class="pro-badge mb-1 mx-auto" style="padding: 4px 10px; font-size: 0.7rem;"><i
                         data-lucide="crown"></i> PRO</div>
                 <h2 class="paywall-title" style="font-size: 1.25rem;">Unlock <span
-                        class="gradient-premium-text">ViralReels Pro</span></h2>
+                        class="gradient-premium-text">ViralReels AI Pro</span></h2>
             </div>
 
             <p class="paywall-desc text-secondary text-xs mb-2">Get our most powerful AI models and analytics.</p>
@@ -222,7 +222,7 @@
                 <i data-lucide="play-circle"
                     style="width:48px; height:48px; color:rgba(255,255,255,0.2); margin-bottom:12px;"></i>
                 <p class="text-secondary text-sm">Your ad is playing...</p>
-                <p class="text-xs text-muted mt-1">Sponsored by ViralReels Partners</p>
+                <p class="text-xs text-muted mt-1">Sponsored by ViralReels AI Partners</p>
                 <button id="adSkipBtn" class="btn-secondary text-xs mt-4"
                     style="padding:6px 16px; opacity:0.4; cursor:not-allowed;" disabled>Skip Ad</button>
             </div>
@@ -356,19 +356,9 @@
                 <div class="persona-grid">
                     <div class="persona-stat-box">
                         <label class="persona-label">Content Niche</label>
-                        <select id="personaNiche"
-                            class="text-input w-full p-2 bg-transparent border-none text-sm text-primary">
-                            <option value="tech">Artificial Intelligence / Tech</option>
-                            <option value="gaming">Gaming & Esports</option>
-                            <option value="fitness">Health & Fitness</option>
-                            <option value="business">Business & Wealth</option>
-                            <option value="finance">Finance & Crypto</option>
-                            <option value="lifestyle">Lifestyle / Travel</option>
-                            <option value="fashion">Fashion & Beauty</option>
-                            <option value="cooking">Cooking & Food</option>
-                            <option value="creative">Creative Art / Design</option>
-                            <option value="philosophy">Motivation & Philosophy</option>
-                        </select>
+                        <input type="text" id="personaNiche"
+                            class="text-input w-full p-2 bg-transparent border-none text-sm text-primary"
+                            placeholder="e.g. AI / Tech, Fitness, Cooking...">
                     </div>
                     <div class="persona-stat-box">
                         <label class="persona-label">Brand Voice (Relatable ↔ Aggressive)</label>
@@ -1037,22 +1027,29 @@
                     <p>Paste your boring script. Get instant viral-ready output.</p>
                     <div id="usage-badge-rewrite" class="usage-badge mt-2"></div>
                 </div>
-                <form id="rewriteForm" class="glass-card interactive-glow mt-4 mb-4 border-accent" style="position:relative;">
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('rewrite')" title="Recent Scripts" style="position:absolute; top:12px; right:12px; z-index:10;" aria-label="View recent script rewrites">
-                        <i data-lucide="history"></i>
-                    </button>
-                    <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
-                        rows="6" class="w-full text-input mb-4 bg-card-dark" required></textarea>
-                    <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite
-                        Script</button>
-                </form>
+                <div id="rewriteForm" class="mt-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-bold text-muted uppercase tracking-wide">Paste Your Script</label>
+                        <button type="button" class="tool-history-link" onclick="cycleHistory('rewrite')" title="Recent Scripts" aria-label="View recent script rewrites">
+                            <i data-lucide="history"></i> Recent
+                        </button>
+                    </div>
+                    <form id="rewriteFormEl" class="glass-card interactive-glow p-4 border-accent">
+                        <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
+                            rows="6" class="w-full text-input mb-4 bg-card-dark" required></textarea>
+                        <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite Script</button>
+                    </form>
+                </div>
                 <div id="rewriteOutput" class="hidden glass-card interactive-glow glow-box"></div>
             </section>
 
             <!-- 10. SAVED (Rewrites) -->
             <section id="view-saved" class="tab-view hidden scroll-container content-padding pb-heavy">
                 <div class="tab-header pt-4">
-                    <h2>Saved Rewrites</h2>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2>Saved Rewrites</h2>
+                        <button class="btn-text text-red" style="font-size:0.7rem;" id="clearSavedBtn"><i data-lucide="trash-2" style="width:12px;"></i> Clear Vault</button>
+                    </div>
                     <p>Your library of optimized scripts.</p>
                 </div>
                 <div id="savedEmpty" class="empty-state glass-card mt-4"><i data-lucide="save" class="lg-icon mb-2"></i>
@@ -1226,6 +1223,19 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Custom Branded Modal System -->
+    <div id="vrModalOverlay" class="fullscreen-overlay z-[10000] hidden">
+        <div class="glass-card text-center p-8 max-w-sm w-full animate-float" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(25px); border: 1px solid rgba(255,183,3,0.2);">
+            <div id="vrModalIcon" class="text-4xl mb-4">👑</div>
+            <h2 id="vrModalTitle" class="text-xl font-bold mb-2">ViralReels AI</h2>
+            <p id="vrModalText" class="text-white-80 text-sm mb-6"></p>
+            <div class="flex gap-3 w-full" id="vrModalActions">
+                <button class="btn-secondary w-full" id="vrModalCancel">Cancel</button>
+                <button class="btn-primary w-full" id="vrModalConfirm">Confirm</button>
+            </div>
+        </div>
     </div>
 
     <!-- Success Animation Overlay -->
