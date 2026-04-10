@@ -319,7 +319,7 @@ app.post('/api/checkout', async (req, res) => {
                 quantity: 1,
             }],
             mode: 'subscription',
-            success_url: `${FRONTEND_URL}/?checkout=success`,
+            success_url: `${FRONTEND_URL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${FRONTEND_URL}/?checkout=canceled`,
         });
 
@@ -327,6 +327,24 @@ app.post('/api/checkout', async (req, res) => {
     } catch (e) {
         console.error("Stripe Checkout Error:", e.message);
         res.status(500).json({ error: "Failed to initialize checkout." });
+    }
+});
+
+// Endpoint 6.1: Verify Checkout Session
+app.post('/api/verify-session', async (req, res) => {
+    const { session_id } = req.body;
+    if (!session_id) return res.status(400).json({ error: "Missing session_id" });
+    
+    try {
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+        if (session.payment_status === 'paid') {
+            res.json({ success: true, email: session.customer_details?.email });
+        } else {
+            res.json({ success: false, status: session.payment_status });
+        }
+    } catch (e) {
+        console.error("Session verification error:", e.message);
+        res.status(500).json({ error: "Verification failed." });
     }
 });
 

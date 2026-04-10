@@ -1588,6 +1588,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Handle Checkout Success Logic
+    async function handleStripeVerification() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const checkoutStatus = urlParams.get('checkout');
+        const sessionId = urlParams.get('session_id');
+
+        if (checkoutStatus === 'success' && sessionId) {
+            // Show a special verification overlay
+            const verifyOverlay = document.createElement('div');
+            verifyOverlay.className = 'glass-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center text-center p-6';
+            verifyOverlay.innerHTML = `
+                <div class="card p-8 max-w-sm w-full animate-float" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);">
+                    <div class="loader mx-auto mb-4" style="width:40px; height:40px; border-width:4px;"></div>
+                    <h2 class="text-xl font-bold mb-2">Verifying Payment...</h2>
+                    <p class="text-white-50 text-sm">Validating your Pro access with Stripe. Hang tight!</p>
+                </div>
+            `;
+            document.body.appendChild(verifyOverlay);
+
+            try {
+                const response = await fetch(`${API_BASE}/verify-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // UNLOCK PRO PERMANENTLY
+                    localStorage.setItem('vr_pro_status', 'true');
+                    isPro = true;
+                    
+                    verifyOverlay.innerHTML = `
+                        <div class="card p-8 max-w-sm w-full animate-appear" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);">
+                            <div class="text-4xl mb-4">🏆</div>
+                            <h2 class="text-2xl font-bold text-gradient mb-2">PRO UNLOCKED</h2>
+                            <p class="text-white-80 mb-6">Welcome to the elite tier of ViralReels. All limits are gone.</p>
+                            <button class="btn-primary w-full" id="closeVerifyBtn">Let's Rank!</button>
+                        </div>
+                    `;
+                    
+                    triggerConfetti();
+                    
+                    document.getElementById('closeVerifyBtn').addEventListener('click', () => {
+                        verifyOverlay.remove();
+                        // Clean URL and reload
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        window.location.reload(); 
+                    });
+                } else {
+                    throw new Error("Payment not verified");
+                }
+            } catch (err) {
+                console.error("Verification failed:", err);
+                verifyOverlay.innerHTML = `
+                    <div class="card p-8 max-w-sm w-full animate-appear" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);">
+                        <div class="text-4xl mb-4">❌</div>
+                        <h2 class="text-xl font-bold mb-2">Verification Failed</h2>
+                        <p class="text-white-50 text-sm mb-6">We couldn't verify your payment. If this is an error, contact support@viralreels.ai</p>
+                        <button class="btn-secondary w-full" onclick="this.parentElement.parentElement.remove()">Back to App</button>
+                    </div>
+                `;
+            }
+        } else if (checkoutStatus === 'canceled') {
+            showToast("Pro Upgrade Canceled.");
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    // Run verification check
+    handleStripeVerification();
+
     // =============================================
     // == FIREBASE AUTHENTICATION CONFIGURATION ==
     // =============================================
