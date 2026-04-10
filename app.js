@@ -61,21 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
  
     // -- DOM Elements (Explicit Declarations for UI Reliability) --
-    const verifyOverlay = document.getElementById('verifyOverlay');
+    // Unique declarations (others are defined further down or were missing)
     const emailLoginBtn = document.getElementById('emailLoginBtn');
-    const authBaseActions = document.getElementById('authBaseActions');
-    const emailLoginForm = document.getElementById('emailLoginForm');
-    const backToMethodsBtn = document.getElementById('backToMethodsBtn');
-    const authOverlay = document.getElementById('authOverlay');
-    const appContainer = document.getElementById('appContainer');
-    const authSubmitBtn = document.getElementById('authSubmitBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
-    const chatForm = document.getElementById('chatForm');
-    const chatInput = document.getElementById('chatInput');
-    const chatLogsList = document.getElementById('chatLogsList');
-    const chatMessages = document.getElementById('chatMessages');
-    const chatSubmit = document.getElementById('chatSubmit');
-    const nicheInput = document.getElementById('nicheInput');
     const appViews = document.querySelectorAll('.app-view');
     const navButtons = document.querySelectorAll('.nav-btn');
 
