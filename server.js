@@ -95,13 +95,14 @@ app.post('/api/analyze', async (req, res) => {
         const { idea, platform, length, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `ViralReels AI Expert. Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+        const basePrinciples = `2025 Viral Engine Expert. Frameworks: 1. Satisfaction Velocity 2. Retention Loops 3. Psychological Triggers 4. Visual Pacing 5. Search Discovery (SEO).`;
+        const gamingContext = niche === 'gaming' ? "Focus on: Skill-gaps, Easter-eggs, Rage-bait potential, and Speedrun pacing." : "";
 
-        const freePrompt = `${basePrinciples} Analyze for ${platform}. Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings).`;
-        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
-        Deep Analysis for ${platform} (${length}). 
-        Analyze psychology, pacing, and visual triggers.
-        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 elite improvements), 'insight' (1 high-impact psychological unlock).`;
+        const freePrompt = `${basePrinciples} Analyze for ${platform}. ${gamingContext} Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings).`;
+        const proPrompt = `Elite 2025 Virality Architect (Human-Professional Mode). ${basePrinciples}
+        Deep Analysis for ${platform} (${length}). ${gamingContext}
+        Analyze rewatch-potential, loop-seamlessness, and comment-velocity baits.
+        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 elite architecture upgrades), 'insight' (1 psychological algorithm unlock).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -126,13 +127,13 @@ app.post('/api/generate-hooks', async (req, res) => {
         const { topic, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `ViralReels AI Hook Engine. Expert Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+        const basePrinciples = `2025 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps, and Identity Signaling.`;
 
-        const freePrompt = `${basePrinciples} Generate 4 elite hooks & 2 captions. Return JSON: 'hooks' (array), 'captions' (array).`;
-        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
-        Generate 6 world-class hooks & 3 captions.
-        Frameworks: Pattern Interrupt, Curiosity Gap, Identity, Social Proof, Provocation, Transformation.
-        Return JSON: 'hooks' (6 strings with [Framework] prefix), 'captions' (3 strings with [Platform] prefix).`;
+        const freePrompt = `${basePrinciples} Generate 4 elite hooks & 2 captions. No AI fluff. Return JSON: 'hooks' (array), 'captions' (array).`;
+        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
+        Generate 6 unique world-class hooks & 3 captions. Focus on ${topic}.
+        Frameworks: [NEGATIVE HOOK], [CONTRARIAN], [IDENTITY], [LOOP-START], [SKILL-GAP], [CURIOSITY].
+        Return JSON: 'hooks' (6 unique strings with [Framework] prefix), 'captions' (3 unique strings with [Platform] prefix).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -223,17 +224,16 @@ app.post('/api/rewrite', async (req, res) => {
         const { script, isPro } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `ViralReels AI Director. Expert Principles: 1. Attention First (Pattern Interrupt) 2. Clarity 3. Retention (Remove Fluff) 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.`;
+        const basePrinciples = `2025 Retention Engineer. Focus: Removing breaths/pauses, increasing visual density, and loop optimization.`;
 
-        const freePrompt = `${basePrinciples} Rewrite for Clarity and Retention. Structure: [Hook], [Context], [Value], [CTA].`;
-        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
-        Rewrite using High-Retention Expert Architecture:
-        1. [THE HOOK]: Attention First - Visual + Verbal pattern interrupt (0-2s).
-        2. [EMOTIONAL TENSION]: Identify the gap/need (2-5s).
-        3. [VALUE DELIVERY]: Logical floor and flow.
-        4. [RETENTION BRIDGE]: High-speed pacing for mid-video drop-off.
-        5. [LOOP / ENGAGEMENT CTA]: Spark discussion and shares.
-        Include [ELITE FILMING TIP] for psychological retention at the end.`;
+        const freePrompt = `${basePrinciples} Rewrite for high-pacing. Structure: [Hook], [Value], [Loop-CTA].`;
+        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
+        Rewrite for maximum retention.
+        1. [THE HOOK]: 0-second payoff lead.
+        2. [RETENTION DENSITY]: High-speed information delivery.
+        3. [LOOP TRANSITION]: Match last frame to first frame for rewatch.
+        4. [DEBATE-BAIT]: Polarizing niche statement to drive comments.
+        Include [PRO FILMING TIP] for visual pattern interrupts.`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -260,22 +260,19 @@ app.post('/api/chat', async (req, res) => {
         const toneValue = persona?.tone || 50;
         let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
 
-        const systemPrompt = `You are an elite expert in short-form video growth (ViralReels AI Consultant).
-Task: Maximize attention, retention, and engagement.
+        const systemPrompt = `You are the "2025 Gaming Virality Architect" – the world's most optimized AI for short-form video growth.
+Role: Professional Strategist & Performance Expert.
+Current Niche Focus: ${niche} (Priority: Gaming Algorithms).
 
-CORE PRINCIPLES (The 10-Principle Framework):
-1. ATTENTION FIRST: Hooks must spark instant curiosity.
-2. CLARITY: Direct, impactful, and easy to understand.
-3. RETENTION: Structure to remove flat moments.
-4. EMOTIONAL IMPACT: Trigger curiosity, tension, or relatability.
-5. VALUE: Deliver high entertainment, information, or insight.
-6. FLOW: Logical progression and transitions.
-7. ENGAGEMENT: Spark reactions and discussions.
-8. PLATFORM AWARENESS: Optimize for watch time signals.
-9. ADAPTABILITY: Tailor advice to the niche: ${niche}.
-10. ACTIONABLE: Offer specific better alternatives.
+VIRAL FRAMEWORK (2025):
+- SATISFACTION PER SWIPE: No intros. Lead with the payoff.
+- RETENTION ENGINEERING: Suggest cuts every 3 seconds.
+- REWATCH LOOPS: Advise on seamless transitions.
+- DEBATE-BAIT: Use specific statements that drive comment velocity.
+- GAMING SPECIFIC: Mention skill-caps, rage-bait, speedruns, and easter-eggs if requested.
 
-STRICT RULES: No AI fluff. Tone: ${toneDesc}. Max 5 sentences.`;
+TONE: Human, direct, and professional. Zero AI fluff. Never say "I'm an AI" or "Hope this helps." Give specific, actionable blueprints.
+RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
 
         const completion = await openai.chat.completions.create({
             model,
