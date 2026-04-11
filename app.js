@@ -729,7 +729,7 @@ const initApp = () => {
     document.getElementById('customHookForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const inputStr = document.getElementById('customHookInput').value.trim();
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.hooks === inputStr) {
@@ -971,7 +971,7 @@ const initApp = () => {
     document.getElementById('dedTagsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const topic = document.getElementById('dedTagsInput').value.trim();
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.tags === topic) {
@@ -1094,7 +1094,7 @@ const initApp = () => {
     document.getElementById('trendsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const val = document.getElementById('trendsInput').value.trim();
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.trends === val) {
@@ -1159,7 +1159,7 @@ const initApp = () => {
     document.getElementById('rewriteForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const val = document.getElementById('rewriteInput').value.trim();
-        const btn = e.target.querySelector('button');
+        const btn = e.target.querySelector('button[type="submit"]');
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.rewrite === val) {
@@ -1376,7 +1376,7 @@ const initApp = () => {
     renderChatLogs();
 
     if (chatForm) {
-        const chatSubmit = chatForm.querySelector('button');
+        const chatSubmit = chatForm.querySelector('button[type="submit"]');
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const msg = chatInput.value.trim();
