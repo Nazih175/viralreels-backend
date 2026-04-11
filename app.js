@@ -71,6 +71,7 @@ const initApp = () => {
     // -- DOM Elements (Explicit Declarations for UI Reliability) --
     const emailLoginBtn = document.getElementById('emailLoginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const btnLogout = document.getElementById('btnLogout');
     const appViews = document.querySelectorAll('.app-view');
     const navButtons = document.querySelectorAll('.nav-btn');
 
@@ -1903,28 +1904,22 @@ const initApp = () => {
         setupMockAuth();
     }
 
-    function setupMockAuth() {
-        if (googleLoginBtn) {
-            googleLoginBtn.addEventListener('click', () => {
-                authOverlay.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-                lucide.createIcons();
-                if (!isOnboardingComplete) document.getElementById('onboardingOverlay').classList.remove('hidden');
-            });
-        }
-        if (emailLoginForm) {
-            emailLoginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                authOverlay.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-                lucide.createIcons();
-                if (!isOnboardingComplete) document.getElementById('onboardingOverlay').classList.remove('hidden');
-            });
-        }
+    // Sign Out Implementation
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            if (window.firebase && firebase.auth().currentUser) {
+                firebase.auth().signOut().then(() => {
+                    window.location.reload();
+                });
+            } else {
+                window.location.reload(); // Simple reload for mock state reset
+            }
+        });
     }
 
     lucide.createIcons();
-    setupMockAuth(); // Now safe: All DOM constants are assigned
+    // setupMockAuth() is NO LONGER called globally to avoid listener duplication.
+    // It is called exclusively as a fallback within the Firebase catch block.
 };
 
 if (document.readyState === 'loading') {
