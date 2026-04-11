@@ -101,8 +101,17 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 .glow-box { box-shadow: 0 0 40px rgba(67, 97, 238, 0.15) inset; }
 
 /* The Requested Interactive Box Glow */
-.interactive-glow { border: 1px solid rgba(157, 78, 221, 0.4) !important; box-shadow: 0 0 25px rgba(157, 78, 221, 0.15) !important; transition: box-shadow 0.3s ease, border-color 0.3s ease; }
-.interactive-glow:focus-within, .interactive-glow:hover { box-shadow: 0 0 35px rgba(157, 78, 221, 0.35) !important; border-color: rgba(157, 78, 221, 0.7) !important; }
+.interactive-glow { 
+    border: 1px solid rgba(157, 78, 221, 0.4) !important; 
+    box-shadow: 0 0 25px rgba(157, 78, 221, 0.15) !important; 
+    transition: box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease; 
+}
+.interactive-glow:focus-within, .interactive-glow:hover { 
+    box-shadow: 0 0 45px rgba(157, 78, 221, 0.4) !important; 
+    border-color: rgba(157, 78, 221, 0.9) !important; 
+    transform: translateY(-2px);
+}
+.gold-glow { box-shadow: 0 0 30px rgba(255, 183, 3, 0.3) !important; border-color: var(--accent-gold) !important; }
 
 /* Core Layout Utils */
 .w-full { width: 100%; } .flex-grow { flex-grow: 1; } .flex-col { display: flex; flex-direction: column; }
@@ -202,12 +211,26 @@ button { cursor: pointer; outline: none; border: none; font-family: 'Inter'; }
     100% { transform: translateX(100%) rotate(45deg); }
 }
 
-.pulse-btn { animation: pulse 2s infinite; }
-@keyframes pulse { 
-    0% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.4); } 
-    70% { box-shadow: 0 0 0 10px rgba(157, 78, 221, 0); } 
-    100% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0); } 
+.pulse-btn { animation: premiumPulse 2s infinite; }
+@keyframes premiumPulse { 
+    0% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.6); transform: scale(1); } 
+    50% { box-shadow: 0 0 0 15px rgba(157, 78, 221, 0); transform: scale(1.02); } 
+    100% { box-shadow: 0 0 0 0 rgba(157, 78, 221, 0); transform: scale(1); } 
 }
+
+.btn-share {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: var(--border-radius-pill);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+.btn-share:hover { background: rgba(255, 255, 255, 0.15); border-color: white; }
 
 .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: var(--glass-border); }
 .btn-primary:active, .btn-secondary:active { transform: scale(0.96); }

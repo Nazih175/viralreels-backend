@@ -182,7 +182,20 @@ const initApp = () => {
         if (overlay && textEl) {
             textEl.innerText = text;
             overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.add('hidden'), 2000);
+            triggerConfetti();
+            setTimeout(() => overlay.classList.add('hidden'), 2200);
+        }
+    };
+
+    window.nativeShare = (text, title = "ViralReels AI Idea") => {
+        if (navigator.share) {
+            navigator.share({ title, text, url: window.location.href })
+                .then(() => console.log('Viral Share Done'))
+                .catch((e) => console.log('Share canceled', e));
+        } else {
+            // Fallback: Copy to clipboard instead
+            navigator.clipboard.writeText(text);
+            showToast("System Share not supported. Copied to clipboard!");
         }
     };
 
@@ -600,12 +613,13 @@ const initApp = () => {
     const toItemCard = (text, type) => {
         const escapedText = text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
         return `
-            <div class="item-card">
+            <div class="item-card glass-card result-appear">
                 <p class="item-text" style="white-space:pre-wrap;">${text}</p>
                 <div class="item-actions">
                     <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i> Copy</button>
-                    ${type === 'hook' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'hook', this)" title="Save to Ledger"><i data-lucide="archive"></i> Save to Ledger</button>` : ''}
-                    ${type === 'rewrite' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'rewrite', this)" title="Save to Vault"><i data-lucide="archive"></i> Save to Vault</button>` : ''}
+                    <button class="action-btn btn-share" onclick="nativeShare('${escapedText}')" title="Share Content"><i data-lucide="share-2"></i> Share</button>
+                    ${type === 'hook' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'hook', this)" title="Save to Ledger"><i data-lucide="archive"></i> Save</button>` : ''}
+                    ${type === 'rewrite' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'rewrite', this)" title="Save to Vault"><i data-lucide="archive"></i> Save</button>` : ''}
                 </div>
             </div>
         `;
@@ -720,7 +734,7 @@ const initApp = () => {
             if (!currentAnalyzeData) return;
             analyticsData.push({ ...currentAnalyzeData, actualViews: 0 });
             localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
-            alert("Idea logged to Analytics DB! Switch to the Analytics sub-tab to enter Real Views later.");
+            triggerSuccess("Idea Logged to Analytics DB");
             renderAnalytics();
         });
     }
@@ -910,7 +924,9 @@ const initApp = () => {
         if (title && activeDayKey) {
             savedEvents[activeDayKey] = JSON.stringify({ title, desc });
             localStorage.setItem('viralreels_events', JSON.stringify(savedEvents));
-            calendarEventModal.classList.add('hidden'); renderCalendar();
+            calendarEventModal.classList.add('hidden'); 
+            renderCalendar();
+            triggerSuccess("Saved to Calendar");
         }
     });
 
