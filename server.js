@@ -30,14 +30,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.use(cors());
 app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
+// Static Files
 app.use(express.static('./'));
 
-// Explicit Asset Handling (Override for Query Strings)
-app.get('/app.js', (req, res) => {
-    res.sendFile(__dirname + '/app.js');
-});
-app.get('/styles.css', (req, res) => {
-    res.sendFile(__dirname + '/styles.css');
+// Fallback for SPA (Serve index.html for unknown routes)
+app.get('*', (req, res, next) => {
+    // Only fallback for non-file requests
+    if (req.path.includes('.')) return next();
+    res.sendFile(__dirname + '/index.html');
 });
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
