@@ -41,17 +41,22 @@ const initApp = () => {
     }
 
     console.log("ViralReels AI System: V3.1 Global Optimization Active");
-        lucide.createIcons();
-        setupMockAuth(); // Auth listeners must be attached first
         
-        // -- Safe Storage Helpers --
-        const safeGet = (key, fallback) => {
-            try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
-            catch (e) { return fallback; }
-        };
+    // -- Hardening Helper: safeListen --
+    const safeListen = (id, event, callback) => {
+        const el = document.getElementById(id);
+        if (el) { el.addEventListener(event, callback); }
+        else { console.warn(`[ViralReels Secure] Element NOT FOUND: ${id}. Initializer continuing...`); }
+    };
 
-        // -- State & Storage --
-        let currentAnalyzedIdea = null;
+    // -- Safe Storage Helpers --
+    const safeGet = (key, fallback) => {
+        try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
+        catch (e) { return fallback; }
+    };
+
+    // -- State & Storage --
+    let currentAnalyzedIdea = null;
     let savedEvents = safeGet('viralreels_events', {});
     let savedHooks = safeGet('viralreels_tracked_hooks', []);
     let savedRewrites = safeGet('viralreels_saved_rewrites', []);
@@ -64,7 +69,6 @@ const initApp = () => {
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
  
     // -- DOM Elements (Explicit Declarations for UI Reliability) --
-    // Unique declarations (others are defined further down)
     const emailLoginBtn = document.getElementById('emailLoginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const appViews = document.querySelectorAll('.app-view');
@@ -1918,6 +1922,9 @@ const initApp = () => {
             });
         }
     }
+
+    lucide.createIcons();
+    setupMockAuth(); // Now safe: All DOM constants are assigned
 };
 
 if (document.readyState === 'loading') {
