@@ -1692,20 +1692,41 @@ const initApp = () => {
         });
     }
 
-    if (cancelSubBtn) {
-        cancelSubBtn.addEventListener('click', () => {
-            if (!isSubCancelled) {
-                if (confirm("Are you sure you want to cancel? You will keep Pro access until the end of your billing cycle, but it will not renew.")) {
-                    isSubCancelled = true;
-                    localStorage.setItem('vr_sub_cancelled', 'true');
-                    showToast("Cancellation confirmed. Renews off.");
-                    updateBillingUI();
+    const manageBillingBtn = document.getElementById('manageBillingBtn');
+    if (manageBillingBtn) {
+        manageBillingBtn.addEventListener('click', async () => {
+            const originalText = manageBillingBtn.innerHTML;
+            manageBillingBtn.innerHTML = '<div class="loader"></div>';
+            manageBillingBtn.disabled = true;
+
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showToast("Please sign in to manage billing.");
+                    manageBillingBtn.innerHTML = originalText;
+                    manageBillingBtn.disabled = false;
+                    return;
                 }
-            } else {
-                isSubCancelled = false;
-                localStorage.setItem('vr_sub_cancelled', 'false');
-                showToast("Subscription reactivated!");
-                updateBillingUI();
+
+                const response = await fetch(`${API_BASE}/create-portal-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: user.uid })
+                });
+
+                const data = await response.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    showToast("Could not open billing portal.");
+                    manageBillingBtn.innerHTML = originalText;
+                    manageBillingBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Server error. Try again later.");
+                manageBillingBtn.innerHTML = originalText;
+                manageBillingBtn.disabled = false;
             }
         });
     }
