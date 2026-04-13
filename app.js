@@ -1557,17 +1557,13 @@ const initApp = () => {
             billingStatePro.classList.remove('hidden');
             billingStateStandard.classList.add('hidden');
 
-            const futureDate = new Date();
-            futureDate.setDate(futureDate.getDate() + 30);
-            const dateStr = futureDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
             if (isSubCancelled) {
-                planRenewalText.innerHTML = `<span class="text-red">Expires on ${dateStr}</span>`;
+                planRenewalText.innerHTML = `<span class="text-red">Canceled (Active until next cycle)</span>`;
                 cancelSubBtn.innerHTML = '<i data-lucide="refresh-cw"></i> Reactivate Auto-Renew';
                 cancelSubBtn.classList.remove('text-red');
                 cancelSubBtn.classList.add('text-gold');
             } else {
-                planRenewalText.textContent = `Renews on ${dateStr}`;
+                planRenewalText.textContent = `Renews Monthly`;
                 cancelSubBtn.innerHTML = '<i data-lucide="x-circle"></i> Cancel Subscription';
                 cancelSubBtn.classList.add('text-red');
                 cancelSubBtn.classList.remove('text-gold');
