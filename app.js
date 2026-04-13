@@ -884,7 +884,7 @@ const initApp = () => {
         const today = new Date();
         const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        document.getElementById('calMonthDisplay').innerText = `${monthNames[month]} ${year}`;
+        document.getElementById('calMonthDisplay').innerText = `${monthNames[month]}`;
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
