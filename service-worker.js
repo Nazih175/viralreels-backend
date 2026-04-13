@@ -1,4 +1,4 @@
-const CACHE_NAME = 'viralreels-v3.1-pwa-pro';
+const CACHE_NAME = 'viralreels-v10.0-FINAL-RECOVERY';
 const urlsToCache = [
   './',
   './index.html',
