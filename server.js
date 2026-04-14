@@ -31,13 +31,13 @@ app.use(cors());
 app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
 // Static Files
-app.use(express.static('public'));
+app.use(express.static('./'));
 
 // Fallback for SPA (Serve index.html for unknown routes)
 app.get('*', (req, res, next) => {
     // Only fallback for non-file requests
     if (req.path.includes('.')) return next();
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)

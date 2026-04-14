@@ -1,7 +1,7 @@
 {
   "appId": "com.viralreels.app",
   "appName": "ViralReels AI",
-  "webDir": "public",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
     "hostname": "viralreels-ai.onrender.com",

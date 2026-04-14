@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "cmd /c \"mkdir www & copy index.html www\\ & copy app.js www\\ & copy styles.css www\\ & copy manifest.json www\\ & copy service-worker.js www\\ & copy ads.txt www\\ & copy sitemap.xml www\\ & copy robots.txt www\\ & copy privacy.html www\\ & copy terms.html www\\ & copy support.html www\\ & xcopy /E /I assets www\\assets\""
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
