@@ -1,0 +1,10 @@
+{
+  "appId": "com.viralreels.app",
+  "appName": "ViralReels AI",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "hostname": "viralreels-ai.onrender.com",
+    "androidScheme": "https"
+  }
+}

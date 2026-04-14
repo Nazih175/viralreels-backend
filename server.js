@@ -31,13 +31,13 @@ app.use(cors());
 app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
 // Static Files
-app.use(express.static('./'));
+app.use(express.static('public'));
 
 // Fallback for SPA (Serve index.html for unknown routes)
 app.get('*', (req, res, next) => {
     // Only fallback for non-file requests
     if (req.path.includes('.')) return next();
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
@@ -156,22 +156,16 @@ app.post('/api/generate-hooks', async (req, res) => {
 app.post('/api/generate-captions', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
-
-        const systemPrompt = `ViralReels AI Caption Engine. Expert Principles: 1. Attention First 2. Clarity 3. Retention 4. Emotional Impact 5. Value Delivery 6. Flow 7. Engagement 8. Platform Awareness 9. Adaptability 10. Actionable.
-        Generate 5 variations for: "${topic}". 
-        Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME].
-        RULES: No AI fluff. Use emojis. No profanity. 
-        Return JSON: 'captions' (array of 5 strings).`;
+        const model = 'gpt-4o-mini';
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: systemPrompt },
+                { role: 'system', content: `ViralReels AI Caption Engine. Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME]. Rules: Emojis, No profanity. JSON: 'captions' (array of 5 strings).` },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
-            max_tokens: 1000
+            max_tokens: 500
         });
 
         const parsed = JSON.parse(completion.choices[0].message.content);
@@ -187,26 +181,15 @@ app.post('/api/generate-captions', async (req, res) => {
 app.post('/api/generate-tags', async (req, res) => {
     try {
         const { topic, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
-
-        const basePrinciples = `ViralReels AI SEO Expert. Principles: 1. Attention First 2. Clarity 3. Engagement 4. Platform Awareness 5. Adaptability.`;
-
-        const freePrompt = `${basePrinciples} 3 categories for: "${topic}". 1. Viral (Attention) 2. Niche (Clarity) 3. Recommended. Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
-        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
-        3 depth-first categories for: "${topic}". Focus on reach velocity and discovery signals.
-        1. Viral Momentum (Max reach) - 8 tags.
-        2. Hyper-Niche SEO (Targeted) - 8 tags.
-        3. AI Power Picks (Engagement) - 8 tags.
-        Return JSON: { "viral": [], "niche": [], "recommended": [] }`;
-
+        const model = 'gpt-4o-mini';
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: (isPro ? proPrompt : freePrompt) },
+                { role: 'system', content: `ViralReels AI SEO Expert. 3 Categories: Viral (8 tags), Niche (8 tags), Recommended (8 tags). JSON: { "viral": [], "niche": [], "recommended": [] }` },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
-            max_tokens: 600
+            max_tokens: 400
         });
 
         const parsed = JSON.parse(completion.choices[0].message.content);
@@ -222,26 +205,15 @@ app.post('/api/generate-tags', async (req, res) => {
 app.post('/api/rewrite', async (req, res) => {
     try {
         const { script, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
-
-        const basePrinciples = `2025 Retention Engineer. Focus: Removing breaths/pauses, increasing visual density, and loop optimization.`;
-
-        const freePrompt = `${basePrinciples} Rewrite for high-pacing. Structure: [Hook], [Value], [Loop-CTA].`;
-        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
-        Rewrite for maximum retention.
-        1. [THE HOOK]: 0-second payoff lead.
-        2. [RETENTION DENSITY]: High-speed information delivery.
-        3. [LOOP TRANSITION]: Match last frame to first frame for rewatch.
-        4. [DEBATE-BAIT]: Polarizing niche statement to drive comments.
-        Include [PRO FILMING TIP] for visual pattern interrupts.`;
+        const model = 'gpt-4o-mini';
 
         const completion = await openai.chat.completions.create({
             model,
             messages: [
-                { role: 'system', content: isPro ? proPrompt : freePrompt },
+                { role: 'system', content: `ViralReels AI Script Rewriter. Pacing-focused. Structure: [Hook], [Value], [Loop-CTA]. Include [PRO TIP].` },
                 { role: 'user', content: script }
             ],
-            max_tokens: 1000
+            max_tokens: 800
         });
 
         res.json({ rewritten: completion.choices[0].message.content });
@@ -294,24 +266,16 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
 // Endpoint 5: Trends Radar
 app.post('/api/trends', async (req, res) => {
     try {
-        const { niche, isPro } = req.body;
-        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
-
-        const basePrinciples = `ViralReels AI Trend Strategist. Principles: 1. Attention First 2. Clarity 3. Retention 4. Engagement Triggers 5. Platform Psychology.`;
-
-        const freePrompt = `${basePrinciples} Identify 4 trending formats for ${niche}. Return JSON: 'trends' (array: {title, desc, rep (1-5 rating)}).`;
-        const proPrompt = `Elite ViralReels AI Virality Strategist. ${basePrinciples}
-        Identify 6 high-momentum trends for ${niche}. Focus on reach velocity.
-        Return JSON: 'trends' (array: {title, desc, rep (1-5 rating)}).`;
-
+        const { concept, isPro } = req.body;
+        const model = 'gpt-4o-mini';
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: isPro ? proPrompt : freePrompt },
-                { role: 'user', content: `Niche: ${niche}` }
+                { role: 'system', content: `ViralReels AI Analyzer. Principles: Hook-Velocity, Retention-Nodes, Visual-Density. Return JSON: { "data_points": [ { "label": "", "value": 0 } ], "verdict": "", "recommendation": "" }` },
+                { role: 'user', content: `Concept: ${concept}` }
             ],
-            max_tokens: 600
+            max_tokens: 400
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
