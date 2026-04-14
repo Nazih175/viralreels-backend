@@ -1971,13 +1971,15 @@ const initApp = () => {
     // Sign Out Implementation
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            if (window.firebase && firebase.auth().currentUser) {
-                firebase.auth().signOut().then(() => {
-                    window.location.reload();
-                });
-            } else {
-                window.location.reload(); // Simple reload for mock state reset
-            }
+            window.vrConfirm("Sign Out?", "Are you sure you want to log out of ViralReels AI?", () => {
+                if (window.firebase && firebase.auth().currentUser) {
+                    firebase.auth().signOut().then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    window.location.reload(); // Simple reload for mock state reset
+                }
+            });
         });
     }
 
