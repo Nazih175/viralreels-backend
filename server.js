@@ -341,7 +341,7 @@ app.post('/api/create-portal-session', async (req, res) => {
         // Step 2: Create a billing portal session
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: customerId,
-            return_url: 'https://nazih175.github.io/viralreels-backend/',
+            return_url: req.headers.origin || 'https://nazih175.github.io/viralreels-backend/',
         });
 
         res.json({ url: portalSession.url });
