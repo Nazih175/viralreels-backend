@@ -1737,7 +1737,8 @@ const initApp = () => {
                 }
             } catch (err) {
                 console.error(err);
-                showToast("Server error. Try again later.");
+                const errorMsg = err.detail || "Server error. Try again later.";
+                showToast(errorMsg);
                 manageBillingBtn.innerHTML = originalText;
                 manageBillingBtn.disabled = false;
             }

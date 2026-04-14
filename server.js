@@ -346,8 +346,12 @@ app.post('/api/create-portal-session', async (req, res) => {
 
         res.json({ url: portalSession.url });
     } catch (e) {
-        console.error("Portal Error:", e.message);
-        res.status(500).json({ error: "Could not create portal session." });
+        console.error("Portal Error Detail:", e);
+        res.status(500).json({ 
+            error: "Could not create portal session.", 
+            detail: e.message,
+            hint: "Make sure Customer Portal is ENABLED in your Stripe Dashboard (Settings > Customer Portal)."
+        });
     }
 });
 
