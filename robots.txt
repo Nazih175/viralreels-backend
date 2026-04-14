@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nazih175.github.io/viralreels-backend/sitemap.xml
