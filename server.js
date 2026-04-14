@@ -356,6 +356,31 @@ app.post('/api/checkout', async (req, res) => {
     }
 });
 
+// Endpoint 6.05: Stripe Customer Portal Session
+app.post('/api/create-portal-session', async (req, res) => {
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://nazih175.github.io/viralreels-backend';
+    const { uid } = req.body;
+    try {
+        // In a real app, you would fetch the stripe_customer_id from your DB using the uid
+        // For now, we will use the session generator. 
+        // NOTE: For the portal to work, the user must have a Customer ID.
+        // If they just checked out, Stripe creates one.
+        
+        // This is a placeholder for the logic to find the customer:
+        // const user = await db.users.get(uid);
+        // const customerId = user.stripe_customer_id;
+
+        // For this implementation, we assume the customer is managed via Stripe search or 
+        // you'll need a customer ID. 
+        // If you don't have it saved, the portal session creation requires it.
+        
+        res.status(400).json({ error: "Portal requires a Customer ID. Please complete a checkout first." });
+    } catch (e) {
+        console.error("Portal Error:", e.message);
+        res.status(500).json({ error: "Could not create portal session." });
+    }
+});
+
 // Endpoint 6.1: Verify Checkout Session
 app.post('/api/verify-session', async (req, res) => {
     const { session_id } = req.body;
