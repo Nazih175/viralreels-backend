@@ -323,23 +323,28 @@ app.post('/api/checkout', async (req, res) => {
 
 // Endpoint 6.05: Stripe Customer Portal Session
 app.post('/api/create-portal-session', async (req, res) => {
-    const FRONTEND_URL = process.env.FRONTEND_URL || 'https://nazih175.github.io/viralreels-backend';
-    const { uid } = req.body;
+    const { uid, email } = req.body;
+    
     try {
-        // In a real app, you would fetch the stripe_customer_id from your DB using the uid
-        // For now, we will use the session generator. 
-        // NOTE: For the portal to work, the user must have a Customer ID.
-        // If they just checked out, Stripe creates one.
-        
-        // This is a placeholder for the logic to find the customer:
-        // const user = await db.users.get(uid);
-        // const customerId = user.stripe_customer_id;
+        // Step 1: Look up Stripe Customer by email
+        const customers = await stripe.customers.list({
+            email: email,
+            limit: 1
+        });
 
-        // For this implementation, we assume the customer is managed via Stripe search or 
-        // you'll need a customer ID. 
-        // If you don't have it saved, the portal session creation requires it.
-        
-        res.status(400).json({ error: "Portal requires a Customer ID. Please complete a checkout first." });
+        if (customers.data.length === 0) {
+            return res.status(400).json({ error: "No active subscription found for this email. Please upgrade first." });
+        }
+
+        const customerId = customers.data[0].id;
+
+        // Step 2: Create a billing portal session
+        const portalSession = await stripe.billingPortal.sessions.create({
+            customer: customerId,
+            return_url: 'https://nazih175.github.io/viralreels-backend/',
+        });
+
+        res.json({ url: portalSession.url });
     } catch (e) {
         console.error("Portal Error:", e.message);
         res.status(500).json({ error: "Could not create portal session." });

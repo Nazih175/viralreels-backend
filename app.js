@@ -1724,7 +1724,7 @@ const initApp = () => {
                 const response = await fetch(`${API_BASE}/create-portal-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uid: user.uid })
+                    body: JSON.stringify({ uid: user.uid, email: user.email })
                 });
 
                 const data = await response.json();
