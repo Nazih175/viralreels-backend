@@ -92,17 +92,17 @@ app.get('/api/health', (req, res) => {
 // Endpoint 1: Analyzer (Predictor)
 app.post('/api/analyze', async (req, res) => {
     try {
-        const { idea, platform, length, isPro } = req.body;
+        const { idea, platform, length, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `2025 Viral Engine Expert. Frameworks: 1. Satisfaction Velocity 2. Retention Loops 3. Psychological Triggers 4. Visual Pacing 5. Search Discovery (SEO).`;
+        const basePrinciples = `2025 Viral Engine Expert. Frameworks: Satisfaction Velocity, Retention Loops, Psychological Triggers.`;
         const gamingContext = niche === 'gaming' ? "Focus on: Skill-gaps, Easter-eggs, Rage-bait potential, and Speedrun pacing." : "";
 
-        const freePrompt = `${basePrinciples} Analyze for ${platform}. ${gamingContext} Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 strings).`;
-        const proPrompt = `Elite 2025 Virality Architect (Human-Professional Mode). ${basePrinciples}
+        const freePrompt = `${basePrinciples} Analyze for ${platform}. ${gamingContext} Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 unique strings).`;
+        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
         Deep Analysis for ${platform} (${length}). ${gamingContext}
-        Analyze rewatch-potential, loop-seamlessness, and comment-velocity baits.
-        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 elite architecture upgrades), 'insight' (1 psychological algorithm unlock).`;
+        MANDATE: Prioritize creative variance. Never repeat phrases.
+        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 distinct architecture upgrades), 'insight' (1 unique psychological algorithm unlock).`;
 
         const completion = await openai.chat.completions.create({
             model,
@@ -124,15 +124,16 @@ app.post('/api/analyze', async (req, res) => {
 // Endpoint 2: Hooks & Captions Generator
 app.post('/api/generate-hooks', async (req, res) => {
     try {
-        const { topic, isPro } = req.body;
+        const { topic, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `2025 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps, and Identity Signaling.`;
+        const basePrinciples = `2025 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps. Niche: ${niche}.`;
+        const varietyRules = `MANDATE: High variance. Avoid common AI patterns. Focus on high-retention patterns.`;
 
-        const freePrompt = `${basePrinciples} Generate 4 elite hooks & 2 captions. No AI fluff. Return JSON: 'hooks' (array), 'captions' (array).`;
-        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
+        const freePrompt = `${basePrinciples} ${varietyRules} Generate 4 elite hooks & 2 captions. JSON: 'hooks' (array), 'captions' (array).`;
+        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples} ${varietyRules}
         Generate 6 unique world-class hooks & 3 captions. Focus on ${topic}.
-        Frameworks: [NEGATIVE HOOK], [CONTRARIAN], [IDENTITY], [LOOP-START], [SKILL-GAP], [CURIOSITY].
+        Frameworks: [NEGATIVE HOOK], [CONTRARIAN], [IDENTITY], [LOOP-START], [SKILL-GAP], [CURIOSITY]. Ensure each is fundamentally different.
         Return JSON: 'hooks' (6 unique strings with [Framework] prefix), 'captions' (3 unique strings with [Platform] prefix).`;
 
         const completion = await openai.chat.completions.create({
@@ -155,14 +156,14 @@ app.post('/api/generate-hooks', async (req, res) => {
 // Endpoint 2.5: Dedicated Unique Captions Generator
 app.post('/api/generate-captions', async (req, res) => {
     try {
-        const { topic, isPro } = req.body;
+        const { topic, isPro, niche = 'general' } = req.body;
         const model = 'gpt-4o-mini';
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `ViralReels AI Caption Engine. Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME]. Rules: Emojis, No profanity. JSON: 'captions' (array of 5 strings).` },
+                { role: 'system', content: `ViralReels AI Caption Engine. Niche: ${niche}. Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME]. MANDATE: High creativity, variety, and unique emojis. JSON: 'captions' (array of 5 unique strings).` },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 500
@@ -180,13 +181,13 @@ app.post('/api/generate-captions', async (req, res) => {
 // Endpoint 2.6: Hashtag Generator
 app.post('/api/generate-tags', async (req, res) => {
     try {
-        const { topic, isPro } = req.body;
+        const { topic, isPro, niche = 'general' } = req.body;
         const model = 'gpt-4o-mini';
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `ViralReels AI SEO Expert. 3 Categories: Viral (8 tags), Niche (8 tags), Recommended (8 tags). JSON: { "viral": [], "niche": [], "recommended": [] }` },
+                { role: 'system', content: `ViralReels AI SEO Expert. Niche: ${niche}. 3 Categories: Viral (8 tags), Niche (8 tags), Recommended (8 tags). MANDATE: Mix high-volume and long-tail tags. JSON: { "viral": [], "niche": [], "recommended": [] }` },
                 { role: 'user', content: `Topic: ${topic}` }
             ],
             max_tokens: 400
