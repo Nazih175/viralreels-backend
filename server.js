@@ -91,15 +91,20 @@ app.get('/api/health', (req, res) => {
 
 // Endpoint 1: Analyzer (Predictor)
 app.post('/api/analyze', async (req, res) => {
+    console.log(`[ViralReels Backend] POST /api/analyze - Idea: "${req.body.idea?.substring(0, 30)}..."`);
     try {
         const { idea, platform, length, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        
+        // Timeout protection for the AI call
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
-        const basePrinciples = `2025 Viral Engine Expert. Frameworks: Satisfaction Velocity, Retention Loops, Psychological Triggers.`;
+        const basePrinciples = `2026 Viral Engine Expert. Frameworks: Satisfaction Velocity, Retention Loops, Psychological Triggers.`;
         const gamingContext = niche === 'gaming' ? "Focus on: Skill-gaps, Easter-eggs, Rage-bait potential, and Speedrun pacing." : "";
 
         const freePrompt = `${basePrinciples} Analyze for ${platform}. ${gamingContext} Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 unique strings).`;
-        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples}
+        const proPrompt = `Elite 2026 Virality Architect. ${basePrinciples}
         Deep Analysis for ${platform} (${length}). ${gamingContext}
         MANDATE: Prioritize creative variance. Never repeat phrases.
         Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 distinct architecture upgrades), 'insight' (1 unique psychological algorithm unlock).`;
@@ -112,12 +117,14 @@ app.post('/api/analyze', async (req, res) => {
                 { role: 'user', content: `Platform: ${platform}. Length: ${length}. Idea: ${idea}` }
             ],
             max_tokens: 500
-        });
-
+        }, { signal: controller.signal });
+        
+        clearTimeout(timeoutId);
+        console.log(`[ViralReels Backend] Analysis Complete for idea: ${idea?.substring(0,20)}`);
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
         console.error('Analyzer Error:', e.message);
-        res.status(500).json({ error: 'Failed to communicate with AI Engine.' });
+        res.status(500).json({ error: 'AI engine timed out or disconnected. Please try again.' });
     }
 });
 
@@ -127,11 +134,11 @@ app.post('/api/generate-hooks', async (req, res) => {
         const { topic, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `2025 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps. Niche: ${niche}.`;
+        const basePrinciples = `2026 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps. Niche: ${niche}.`;
         const varietyRules = `MANDATE: High variance. Avoid common AI patterns. Focus on high-retention patterns.`;
 
         const freePrompt = `${basePrinciples} ${varietyRules} Generate 4 elite hooks & 2 captions. JSON: 'hooks' (array), 'captions' (array).`;
-        const proPrompt = `Elite 2025 Virality Architect. ${basePrinciples} ${varietyRules}
+        const proPrompt = `Elite 2026 Virality Architect. ${basePrinciples} ${varietyRules}
         Generate 6 unique world-class hooks & 3 captions. Focus on ${topic}.
         Frameworks: [NEGATIVE HOOK], [CONTRARIAN], [IDENTITY], [LOOP-START], [SKILL-GAP], [CURIOSITY]. Ensure each is fundamentally different.
         Return JSON: 'hooks' (6 unique strings with [Framework] prefix), 'captions' (3 unique strings with [Platform] prefix).`;
@@ -233,16 +240,16 @@ app.post('/api/chat', async (req, res) => {
         const toneValue = persona?.tone || 50;
         let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
 
-        const systemPrompt = `You are the "2025 Gaming Virality Architect" – the world's most optimized AI for short-form video growth.
+        const systemPrompt = `You are the "2026 Algorithm Virality Architect" – the world's most optimized AI for short-form video growth.
 Role: Professional Strategist & Performance Expert.
-Current Niche Focus: ${niche} (Priority: Gaming Algorithms).
+Current Niche Focus: ${niche} (Priority: Viral Retention Algorithms).
 
-VIRAL FRAMEWORK (2025):
+VIRAL FRAMEWORK (2026):
 - SATISFACTION PER SWIPE: No intros. Lead with the payoff.
 - RETENTION ENGINEERING: Suggest cuts every 3 seconds.
 - REWATCH LOOPS: Advise on seamless transitions.
 - DEBATE-BAIT: Use specific statements that drive comment velocity.
-- GAMING SPECIFIC: Mention skill-caps, rage-bait, speedruns, and easter-eggs if requested.
+- ALGORITHM-SPECIFIC: Mention skill-caps, pattern-interrupts, and high-retention frameworks as requested.
 
 TONE: Human, direct, and professional. Zero AI fluff. Never say "I'm an AI" or "Hope this helps." Give specific, actionable blueprints.
 RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;

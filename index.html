@@ -112,8 +112,8 @@
                 </svg>
             </div>
             <h1 class="auth-title">ViralReels <span class="gradient-text">AI</span></h1>
-            <h2 class="auth-subtitle">2025 AI Engine <span class="text-accent">•</span> Gaming Optimized</h2>
-            <p class="auth-desc text-xs mb-6">Gain the unfair advantage with the world's first Algorithm-Grounded creator suite. Analyze ideas, engineer hooks, and dominate the 2025 meta.</p>
+            <h2 class="auth-subtitle">2026 AI Engine <span class="text-accent">•</span> Algorithm Optimized</h2>
+            <p class="auth-desc text-xs mb-6">Gain the unfair advantage with the world's first Algorithm-Grounded creator suite. Analyze ideas, engineer hooks, and dominate the 2026 meta.</p>
             <div class="auth-actions" id="authBaseActions">
                 <button class="btn-primary w-full" id="googleLoginBtn"><i data-lucide="chrome"></i> Continue with
                     Google</button>
@@ -618,6 +618,14 @@
                         </button>
                     </form>
 
+                    <div id="analyzerSkeleton" class="hidden interactive-glow glass-card mb-6 p-4">
+                        <div class="skeleton-title skeleton mx-auto mb-4"></div>
+                        <div class="skeleton-card skeleton mb-4" style="height: 180px;"></div>
+                        <div class="skeleton-text skeleton mb-2"></div>
+                        <div class="skeleton-text skeleton mb-2"></div>
+                        <div class="skeleton-text skeleton w-1/2"></div>
+                    </div>
+
                     <div id="resultsDashboard"
                         class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4">
                         <h3 class="font-bold text-lg mb-2">Viral Readiness</h3>
@@ -723,6 +731,13 @@
                         <strong>💡 Quick Tip:</strong> Try topics like "Daily Routine" or "3 Mindset Hacks"
                     </div>
                 </div>
+                <!-- Skeleton Loader for Hooks -->
+                <div id="hooksSkeleton" class="hidden">
+                    <div class="skeleton skeleton-card" style="height: 100px; margin-bottom:12px;"></div>
+                    <div class="skeleton skeleton-card" style="height: 100px; margin-bottom:12px;"></div>
+                    <div class="skeleton skeleton-card" style="height: 100px;"></div>
+                </div>
+
                 <div id="hooksGeneratorsContent" class="hidden mt-2">
                     <div class="pill-tabs mb-4 sticky-pill interactive-glow"><button class="pill active"
                             data-subtab="hooks-list">Hooks</button><button class="pill"
@@ -821,7 +836,7 @@
             <section id="view-tags" class="tab-view hidden scroll-container content-padding pb-heavy">
                 <div class="tab-header pt-4">
                     <h2>Hashtag Gen</h2>
-                    <p>Optimized for 2025 Search Signals. Manifest 10-15 hyper-relevant tags to trigger reach velocity.</p>
+                    <p>Optimized for 2026 Search Signals. Manifest 10-15 hyper-relevant tags to trigger reach velocity.</p>
                 </div>
                 <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
                     <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches" aria-label="View recent tag searches">
@@ -1153,8 +1168,8 @@
             <!-- 12. AI CHAT (PRO) -->
             <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%;">
                 <div class="tab-header pt-4 content-padding border-bottom pb-2">
-                    <h2 class="flex items-center gap-2">Gaming Architect <i data-lucide="sparkles" class="text-purple"></i></h2>
-                    <p>Elite algorithmic advisor active. Grounded in 2025 Viral Playbook.</p>
+                    <h2 class="flex items-center gap-2">Algorithm Architect <i data-lucide="sparkles" class="text-purple"></i></h2>
+                    <p>Elite algorithmic advisor active. Grounded in 2026 Viral Playbook.</p>
                 </div>
 
                 <div class="pill-tabs mb-2 sticky-pill interactive-glow mx-auto mt-2" style="max-width:240px;">

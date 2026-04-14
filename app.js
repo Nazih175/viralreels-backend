@@ -101,6 +101,21 @@ const initApp = () => {
         modalConfirm.onclick = () => { modalOverlay.classList.add('hidden'); };
     };
 
+    // -- PREMIUM CELEBRATIONS --
+    window.vrCelebrate = (type = 'basic') => {
+        if (type === 'basic') {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#9d4edd', '#4361ee', '#00f5d4'] });
+        } else if (type === 'viral') {
+            const end = Date.now() + (2 * 1000);
+            const colors = ['#ffb703', '#9d4edd', '#ffffff'];
+            (function frame() {
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
+    };
+
     // -- ENTER KEY SUPPORT --
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -115,9 +130,8 @@ const initApp = () => {
         }
     });
     let calDate = new Date();
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:3000/api' 
-        : 'https://viralreels-ai.onrender.com/api';
+    const API_BASE = window.location.origin + '/api';
+    console.log("[ViralReels] Booting with API_BASE:", API_BASE);
 
     // -- HISTORY MANAGEMENT --
     let histories = safeGet('vr_tool_histories', {
@@ -519,7 +533,7 @@ const initApp = () => {
     document.getElementById('closePaywallBtn').addEventListener('click', () => paywallOverlay.classList.add('hidden'));
 
     // -- Navigation (12-Icon Routing) --
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.nav-item, .nav-btn');
     const tabViews = document.querySelectorAll('.tab-view');
 
     navItems.forEach(btn => {
@@ -530,23 +544,9 @@ const initApp = () => {
                 return;
             }
 
-            // --- RESET ON LEAVE ---
+            // --- PRESERVE STATE ON LEAVE (REMOVED AGGRESSIVE RESET) ---
             const activeView = document.querySelector('.active-view');
-            if (activeView) {
-                // Clear inputs
-                activeView.querySelectorAll('input, textarea').forEach(i => i.value = '');
-                // Hide specific dashboards/results
-                activeView.querySelectorAll('.results-dashboard, #hooksGeneratorsContent, #dedTagsOutput, #dedCapOutput, #trendsOutput, #rewriteOutput').forEach(o => o.classList.add('hidden'));
-                // Restore empty states where applicable
-                activeView.querySelectorAll('#hooksGeneratorsEmpty, #trendsEmpty').forEach(e => e.classList.remove('hidden'));
-                // Reset checklist specifically if leaving
-                if (activeView.id === 'view-checklist') {
-                    document.querySelectorAll('.task-check').forEach(c => c.checked = false);
-                    const st = document.getElementById('checklistScore');
-                    const sb = document.getElementById('checklistScoreBar');
-                    if (st && sb) { st.innerText = '0%'; sb.style.width = '0%'; }
-                }
-            }
+            // We no longer clear inputs or hide dashboards here to allow seamless multi-tasking.
 
             // Identify current active view for exit animation
             const currentView = document.querySelector('.tab-view.active-view');
@@ -583,6 +583,8 @@ const initApp = () => {
             if (targetId === 'tracker') renderTracker();
             if (targetId === 'saved') renderSavedRewrites();
             if (targetId === 'analyze') renderAnalytics();
+            
+            console.log(`[ViralReels] Navigated to ${targetId}`);
 
             const tabName = btn.querySelector('span')?.innerText || 'Dashboard';
             document.title = `ViralReels | ${tabName}`;
@@ -685,14 +687,14 @@ const initApp = () => {
         }
 
         btn.disabled = true; // LOCK IMMEDIATELY
-        consumeUse('analyze');
         lastUsedInputs.analyze = currentInputKey; // Mark as used
-        addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
         
-        btn.querySelector('span').innerText = "";
-        btn.querySelector('i').classList.add('hidden');
+        // --- UI GATING: SKELETON ON ---
         btn.querySelector('.loader').classList.remove('hidden');
+        btn.querySelector('i').classList.add('hidden');
         document.getElementById('resultsDashboard').classList.add('hidden');
+        document.getElementById('analyzerSkeleton').classList.remove('hidden');
+        document.getElementById('analyzerSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
             const platform = document.getElementById('platformSelect')?.value || 'all';
@@ -707,12 +709,28 @@ const initApp = () => {
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
             
+            // --- USAGE & HISTORY (Move here to prevent bug) ---
+            consumeUse('analyze');
+            addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
+
+            // --- UI GATING: SKELETON OFF ---
+            document.getElementById('analyzerSkeleton').classList.add('hidden');
+            document.getElementById('resultsDashboard').classList.remove('hidden');
+            
+            btn.disabled = false;
+            btn.querySelector('.loader').classList.add('hidden');
+            btn.querySelector('i').classList.remove('hidden');
+
             const score = data.score;
             currentAnalyzedIdea = { idea, score };
             currentAnalyzeData = { id: Date.now().toString(), idea, platform, score };
 
             document.getElementById('resViralScore').innerText = score;
             document.querySelector('.score-container').style.setProperty('--progress', `${score}%`);
+
+            if (score >= 80) {
+                setTimeout(() => vrCelebrate('viral'), 500);
+            }
             document.getElementById('resScoreText').innerText = score > 80 ? "Viral Potential 🔥" : "Solid 📈";
             document.getElementById('resHookBar').style.width = `${(data.hookStrength / 10) * 100}%`;
             document.getElementById('resHookRating').innerText = `${data.hookStrength}/10`;
@@ -720,6 +738,8 @@ const initApp = () => {
             document.getElementById('resRetentionPerc').innerText = `${data.retention}%`;
             document.getElementById('resTipsList').innerHTML = (data.tips || []).map(t => `<li class="tip-item text-xs">${t}</li>`).join('');
 
+            console.log("[ViralReels] AI Data Received:", data);
+            
             // Pro-only Elite Insight callout
             const insightEl = document.getElementById('resProInsight');
             if (insightEl) {
@@ -735,12 +755,15 @@ const initApp = () => {
             console.error(err);
             showToast("Analyzer unavailable. Check connection.");
         } finally {
+            document.getElementById('analyzerSkeleton').classList.add('hidden');
             btn.disabled = false;
-            btn.innerHTML = '<span>Generate Analysis</span><i data-lucide="arrow-right"></i><div class="loader hidden"></div>';
-            lucide.createIcons();
+            btn.querySelector('.loader').classList.add('hidden');
+            btn.querySelector('i').classList.remove('hidden');
             const resDash = document.getElementById('resultsDashboard');
-            resDash.classList.remove('hidden');
-            resDash.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (resDash.classList.contains('hidden')) {
+                 // only show if not already shown by success
+            }
+            lucide.createIcons();
         }
     });
 
@@ -775,11 +798,18 @@ const initApp = () => {
         }
 
         btn.disabled = true; // LOCK
-        consumeUse('hooks');
         lastUsedInputs.hooks = inputStr;
-        addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
         
-        btn.innerHTML = '<div class="loader"></div>';
+        // --- UI GATING: SKELETON ON ---
+        btn.querySelector('i').classList.add('hidden');
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        btn.appendChild(loader);
+
+        document.getElementById('hooksGeneratorsEmpty').classList.add('hidden');
+        document.getElementById('hooksGeneratorsContent').classList.add('hidden');
+        document.getElementById('hooksSkeleton').classList.remove('hidden');
+        document.getElementById('hooksSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
             const res = await fetch(`${API_BASE}/generate-hooks`, {
@@ -787,20 +817,35 @@ const initApp = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: inputStr, isPro, niche: persona.niche })
             });
+
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
+            
+            consumeUse('hooks');
+            addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
 
-            document.getElementById('hooksGeneratorsEmpty').classList.add('hidden');
+            vrCelebrate('basic');
+
+            // --- UI GATING: SKELETON OFF ---
+            document.getElementById('hooksSkeleton').classList.add('hidden');
             document.getElementById('hooksGeneratorsContent').classList.remove('hidden');
+            
+            btn.disabled = false;
+            if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
+            btn.querySelector('i').classList.remove('hidden');
+
             document.getElementById('sub-hooks-list').innerHTML = (data.hooks || []).map(h => toItemCard(h, 'hook')).join('');
             document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
         } catch (err) {
             console.error(err);
             showToast("Hook engine offline. Try later.");
         } finally {
+            document.getElementById('hooksSkeleton').classList.add('hidden');
             btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="zap"></i> Generate Hooks';
+            if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
+            btn.querySelector('i').classList.remove('hidden');
             lucide.createIcons();
+            
             const hooksContent = document.getElementById('hooksGeneratorsContent');
             if (!hooksContent.classList.contains('hidden')) {
                 hooksContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1918,7 +1963,7 @@ const initApp = () => {
                     authSubmitBtn.innerHTML = '<div class="loader"></div>';
                     
                     // --- REVIEWER BYPASS ---
-                    if (email.toLowerCase() === 'reviewer@viralreels.com' && pass === 'ViralReview2025!') {
+                    if (email.toLowerCase() === 'reviewer@viralreels.com' && pass === 'ViralReview2026!') {
                         localStorage.setItem('vr_pro_status', 'true');
                         localStorage.setItem('vr_bypass_active', 'true');
                         // Fake a success login to satisfy the crawler
