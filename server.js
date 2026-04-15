@@ -38,12 +38,6 @@ app.use(express.urlencoded({ limit: '300mb', extended: true }));
 // Static Files
 app.use(express.static('./'));
 
-// Fallback for SPA (Serve index.html for unknown routes)
-app.get('*', (req, res, next) => {
-    // Only fallback for non-file requests
-    if (req.path.includes('.')) return next();
-    res.sendFile(__dirname + '/index.html');
-});
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
 app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
@@ -383,6 +377,14 @@ app.post('/api/verify-session', async (req, res) => {
         console.error("Session verification error:", e.message);
         res.status(500).json({ error: "Verification failed." });
     }
+});
+
+
+// Fallback for SPA (Serve index.html for unknown routes)
+app.get('*', (req, res, next) => {
+    // Only fallback for non-file requests
+    if (req.path.includes('.')) return next();
+    res.sendFile(__dirname + '/index.html');
 });
 
 // Start Server
