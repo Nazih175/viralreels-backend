@@ -200,21 +200,108 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 
 /* V1 Auth Card Restore (Flexible Heights so buttons fit) */
 .auth-card { 
-    max-width: 400px;
+    max-width: 420px;
     width: 95vw; 
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
     align-items: center; 
     text-align: center; 
-    padding: 2.5rem 1.5rem;
+    padding: 3rem 2rem;
     overflow: hidden;
     margin: 0 auto;
-    border-radius: 20px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 100px rgba(157, 78, 221, 0.1);
 }
-.auth-title { font-size: 1.8rem; margin-bottom: 0.2rem; }
-.auth-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500; }
-.auth-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.auth-title { font-size: 2.2rem; margin-bottom: 0.2rem; font-weight: 900; letter-spacing: -1px; }
+.auth-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500; }
+.auth-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+
+/* Branding & Trust Utils */
+.certified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--accent-blue-light);
+    border: 1px solid rgba(67, 97, 238, 0.2);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+
+.social-proof {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    width: 100%;
+    justify-content: center;
+}
+
+.trust-icons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.6;
+    filter: grayscale(1);
+    transition: opacity 0.3s, filter 0.3s;
+}
+.trust-icons:hover { opacity: 0.9; filter: grayscale(0); }
+.trust-icon { height: 16px; width: auto; }
+
+.stripe-secure-msg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 1rem;
+}
+.stripe-secure-msg i { color: #6772e5; } /* Stripe Blue */
+
+/* Real-time Status Indicator */
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(6, 214, 160, 0.08);
+    padding: 4px 10px;
+    border-radius: 50px;
+    border: 1px solid rgba(6, 214, 160, 0.2);
+    margin-right: auto;
+    margin-left: 12px;
+}
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-green);
+    animation: statusPulse 1.5s infinite;
+}
+.status-text {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent-green);
+}
+@keyframes statusPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
 /* About Tool Grid */
 .about-tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
