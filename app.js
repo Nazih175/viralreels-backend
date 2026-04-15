@@ -130,7 +130,9 @@ const initApp = () => {
         }
     });
     let calDate = new Date();
-    const API_BASE = window.location.origin + '/api';
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000/api' 
+        : 'https://viralreels-ai-backend.onrender.com/api';
     console.log("[ViralReels] Booting with API_BASE:", API_BASE);
 
     // -- HISTORY MANAGEMENT --
