@@ -27,6 +27,8 @@ const PORT = process.env.PORT || 3000;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Middleware
+
+// Middleware
 app.use(cors({
     origin: ['https://nazih175.github.io', 'http://localhost:3000', 'http://127.0.0.1:3000', 'https://nazih175.github.io/viralreels-backend'],
     credentials: true,
@@ -35,6 +37,12 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
+
+// Log all requests for debugging
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
 app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
@@ -377,16 +385,6 @@ app.post('/api/verify-session', async (req, res) => {
 });
 
 
-
-// Fallback for SPA & Static Assets
-app.use(express.static('./'));
-
-// Fallback for SPA (Serve index.html for unknown routes)
-app.get('*', (req, res, next) => {
-    // Only fallback for non-file requests
-    if (req.path.includes('.')) return next();
-    res.sendFile(__dirname + '/index.html');
-});
 
 // Start Server
 app.listen(PORT, () => {
