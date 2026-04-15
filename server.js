@@ -304,7 +304,7 @@ app.post('/api/checkout', async (req, res) => {
     const { uid } = req.body;
     try {
         const session = await stripe.checkout.sessions.create({
-            automatic_payment_methods: { enabled: true },
+            payment_method_types: ['card'],
             client_reference_id: uid || null,
             metadata: { user_id: uid || 'anonymous' },
             line_items: [{
