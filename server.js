@@ -327,8 +327,12 @@ app.post('/api/checkout', async (req, res) => {
 
         res.json({ url: session.url });
     } catch (e) {
-        console.error("Stripe Checkout Error:", e.message);
-        res.status(500).json({ error: "Failed to initialize checkout." });
+        console.error("Stripe Checkout ERROR:", e.message);
+        res.status(500).json({ 
+            error: "Failed to initialize checkout.", 
+            detail: e.message,
+            hint: e.message.includes('No API key provided') ? "Check your STRIPE_SECRET_KEY in Render Environment Variables." : "Check your Stripe Dashboard for account status."
+        });
     }
 });
 
