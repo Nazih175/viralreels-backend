@@ -35,6 +35,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Stripe-Signature']
 }));
+app.use(express.static('.'));
 app.use(express.json({ limit: '300mb' }));
 app.use(express.urlencoded({ limit: '300mb', extended: true }));
 
@@ -451,63 +452,93 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
             const token = chunk.choices[0]?.delta?.content || '';
             if (token) {
                 fullReply += token;
-                res.write(`data: ${JSON.stringify({ token })}
-
-`);
+                res.write(`data: ${JSON.stringify({ token })}\n\n`);
             }
         }
 
-        res.write(`data: [DONE]
-
-`);
+        res.write(`data: [DONE]\n\n`);
         res.end();
 
     } catch (e) {
         console.error('Chat Stream Error:', e.message);
-        res.write(`data: ${JSON.stringify({ error: 'Consultant is offline.' })}
-
-`);
+        res.write(`data: ${JSON.stringify({ error: 'Consultant is offline.' })}\n\n`);
         res.end();
     }
 });
 
-// Endpoint 5: Trends Radar
+// --- LIVE TRENDS ENGINE (RSS FETCH) ---
+async function fetchLiveTrends(niche) {
+    try {
+        const query = encodeURIComponent(`${niche} trending short form video 2026`);
+        const url = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en`;
+        
+        const response = await fetch(url);
+        if (!response.ok) return [];
+        const text = await response.text();
+        
+        // Lightweight Regex XML Parsing (Zero Dependency)
+        const titles = [];
+        const matches = text.matchAll(/<title>(.*?)<\/title>/g);
+        for (const match of matches) {
+            const t = match[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim();
+            if (t && !t.includes('Google News')) titles.push(t);
+            if (titles.length >= 8) break; 
+        }
+        return titles;
+    } catch (e) {
+        console.error("Live fetch error:", e.message);
+        return [];
+    }
+}
+
+// Endpoint 5: Trends Radar (UPGRADED: REAL-TIME DATA BRIDGE)
 app.post('/api/trends', async (req, res) => {
     try {
         const { val, concept, isPro } = req.body;
         const topic = val || concept || 'general';
         const model = 'gpt-4o-mini';
+
+        // 1. Fetch Real-time Context
+        console.log(`[Trends Bridge] Fetching live data for: ${topic}...`);
+        const liveContext = await fetchLiveTrends(topic);
+        const contextString = liveContext.length > 0 
+            ? `REAL-TIME DATA PULLED FROM LIVE NEWS FEEDS:\n- ${liveContext.join('\n- ')}`
+            : "No live news found. Fallback to algorithm knowledge.";
+
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `You are a 2026 short-form video trend intelligence analyst. You predict viral momentum before it peaks.
+                { role: 'system', content: `You are the "2026 Live Trend Intelligence Bridge." 
+                
+YOUR MANDATE: You analyze real-time news context to predict the next viral wave in short-form video.
 
-ANALYSIS FRAMEWORK:
-- Hook-Velocity (0-100): How fast is this topic generating new viral content right now?
-- Retention-Score (0-100): How long do people watch content on this topic?
-- Competition-Level (0-100): How saturated is this niche? Lower = more opportunity.
-- Engagement-Rate (0-100): Comments + shares relative to views in this category.
-- Longevity (0-100): Is this a flash trend (low) or evergreen content (high)?
+[LIVE CONTEXT]
+${contextString}
 
-After scoring, provide:
-- verdict: A bold 1-sentence prediction about this topic's viral trajectory right now
-- recommendation: 3 SPECIFIC content angles or formats that are outperforming on this topic right now. Be specific to the topic — not generic advice.
+[VIRAL PLAYBOOK]
+${VIRAL_PLAYBOOK}
+
+DIRECTIONS:
+1. Synthesize the [LIVE CONTEXT] headlines into 5 actionable video trends.
+2. Use the VIRAL PLAYBOOK to ensure these trends are retention-engineered.
+3. If the context is specific (e.g., a new AI launch), make the trends VERY specific to that launch.
 
 Return JSON: {
   "data_points": [
-    { "label": "Hook-Velocity", "value": number },
-    { "label": "Retention-Score", "value": number },
-    { "label": "Competition-Level", "value": number },
-    { "label": "Engagement-Rate", "value": number },
-    { "label": "Longevity", "value": number }
+    { "label": "Hook-Velocity", "value": 0-100 },
+    { "label": "Retention-Score", "value": 0-100 },
+    { "label": "Competition-Level", "value": 0-100 },
+    { "label": "Engagement-Rate", "value": 0-100 },
+    { "label": "Longevity", "value": 0-100 }
   ],
-  "verdict": string,
-  "recommendation": string
+  "verdict": "Bold 1-sentence live prediction.",
+  "recommendation": ["Blueprint 1", "Blueprint 2", "Blueprint 3"],
+  "isLive": true
 }` },
-                { role: 'user', content: `Analyze the viral trend potential for: ${topic}` }
+                { role: 'user', content: `Analyze real-time viral potential for: ${topic}` }
             ],
-            max_tokens: 500,
+            max_tokens: 600,
             temperature: 0.7
         });
 

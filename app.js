@@ -1299,20 +1299,68 @@ const initApp = () => {
 
             document.getElementById('trendsEmpty').classList.add('hidden');
             const out = document.getElementById('trendsOutput');
-            out.innerHTML = (data.trends || []).map(t => {
-                const starsCount = t.rep || 0;
-                const starsHtml = '★'.repeat(starsCount).padEnd(5, '☆');
-                
-                return `
-                <div class="trend-card border-subtle result-appear animate-fade-in-up">
-                    <div class="flex justify-between items-start mb-2">
-                        <strong class="text-md text-primary font-bold" style="padding-right: 1rem;">${t.title}</strong>
-                        <div class="stars-container text-gold flex-shrink-0" style="letter-spacing:2px;">${starsHtml}</div>
+            out.innerHTML = '';
+
+            // 1. Live Badge
+            const liveBadge = document.createElement('div');
+            liveBadge.className = 'live-data-badge';
+            liveBadge.innerHTML = `<span class="pulse-dot"></span><span class="text-xs font-bold uppercase tracking-widest text-accent">Verified Live Intelligence</span>`;
+            out.appendChild(liveBadge);
+
+            // 2. Metrics Grid
+            if (data.data_points) {
+                const metricsGrid = document.createElement('div');
+                metricsGrid.className = 'trends-metrics-grid';
+                metricsGrid.innerHTML = data.data_points.map(mp => `
+                    <div class="metric-row">
+                        <div class="flex justify-between items-center">
+                            <span class="metric-label">${mp.label}</span>
+                            <span class="text-xs font-bold text-primary">${mp.value}%</span>
+                        </div>
+                        <div class="metric-bar-bg">
+                            <div class="metric-bar-fill" style="width: 0%; background: var(--accent-cyan);"></div>
+                        </div>
                     </div>
-                    <p class="text-sm text-secondary line-height-15">${t.desc}</p>
-                </div>
+                `).join('');
+                out.appendChild(metricsGrid);
+
+                // Animate bars
+                setTimeout(() => {
+                    out.querySelectorAll('.metric-bar-fill').forEach((bar, i) => {
+                        bar.style.width = `${data.data_points[i].value}%`;
+                    });
+                }, 100);
+            }
+
+            // 3. Verdict
+            if (data.verdict) {
+                const verdict = document.createElement('div');
+                verdict.className = 'verdict-banner interactive-glow';
+                verdict.innerHTML = `<p class="verdict-text">${data.verdict}</p>`;
+                out.appendChild(verdict);
+            }
+
+            // 4. Recommendation (Blueprints)
+            if (data.recommendation) {
+                const blueprint = document.createElement('div');
+                blueprint.className = 'strategy-card border-accent';
+                
+                let recContent = '';
+                if (Array.isArray(data.recommendation)) {
+                    recContent = data.recommendation.map(r => `<p class="text-sm text-secondary mb-2">• ${r}</p>`).join('');
+                } else if (typeof data.recommendation === 'object') {
+                    recContent = `<p class="text-sm text-secondary">${JSON.stringify(data.recommendation)}</p>`;
+                } else {
+                    recContent = `<p class="text-sm text-secondary">${data.recommendation}</p>`;
+                }
+
+                blueprint.innerHTML = `
+                    <span class="strategy-label">ELITE BLUEPRINTS</span>
+                    ${recContent}
                 `;
-            }).join('');
+                out.appendChild(blueprint);
+            }
+
             out.classList.remove('hidden');
         } catch (err) {
             console.error(err);
