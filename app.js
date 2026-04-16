@@ -700,7 +700,7 @@ const initApp = () => {
         
         // --- UI GATING: SKELETON ON ---
         btn.querySelector('.loader').classList.remove('hidden');
-        btn.querySelector('i').classList.add('hidden');
+        (btn.querySelector('i, svg'))?.classList.add('hidden');
         document.getElementById('resultsDashboard').classList.add('hidden');
         document.getElementById('analyzerSkeleton').classList.remove('hidden');
         document.getElementById('analyzerSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -728,7 +728,7 @@ const initApp = () => {
             
             btn.disabled = false;
             btn.querySelector('.loader').classList.add('hidden');
-            btn.querySelector('i').classList.remove('hidden');
+            (btn.querySelector('i, svg'))?.classList.remove('hidden');
 
             const score = data.score;
             currentAnalyzedIdea = { idea, score };
@@ -767,7 +767,7 @@ const initApp = () => {
             document.getElementById('analyzerSkeleton').classList.add('hidden');
             btn.disabled = false;
             btn.querySelector('.loader').classList.add('hidden');
-            btn.querySelector('i').classList.remove('hidden');
+            (btn.querySelector('i, svg'))?.classList.remove('hidden');
             const resDash = document.getElementById('resultsDashboard');
             if (resDash.classList.contains('hidden')) {
                  // only show if not already shown by success
@@ -812,7 +812,7 @@ const initApp = () => {
         lastUsedInputs.hooks = inputStr;
         
         // --- UI GATING: SKELETON ON ---
-        btn.querySelector('i').classList.add('hidden');
+        (btn.querySelector('i, svg'))?.classList.add('hidden');
         const loader = document.createElement('div');
         loader.className = 'loader';
         btn.appendChild(loader);
@@ -843,7 +843,7 @@ const initApp = () => {
             
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
-            btn.querySelector('i').classList.remove('hidden');
+            (btn.querySelector('i, svg'))?.classList.remove('hidden');
 
             document.getElementById('sub-hooks-list').innerHTML = (data.hooks || []).map(h => toItemCard(h, 'hook')).join('');
             document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
@@ -854,7 +854,7 @@ const initApp = () => {
             document.getElementById('hooksSkeleton').classList.add('hidden');
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
-            btn.querySelector('i').classList.remove('hidden');
+            (btn.querySelector('i, svg'))?.classList.remove('hidden');
             lucide.createIcons();
             
             const hooksContent = document.getElementById('hooksGeneratorsContent');
