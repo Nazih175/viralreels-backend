@@ -207,7 +207,7 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
     justify-content: center; 
     align-items: center; 
     text-align: center; 
-    padding: 3rem 2rem;
+    padding: 1.5rem 1.5rem;
     overflow-y: auto;
     max-height: 95vh;
     margin: 0 auto;
@@ -215,8 +215,8 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
     border: 1px solid rgba(255,255,255,0.08);
     box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 100px rgba(157, 78, 221, 0.1);
 }
-.auth-title { font-size: 2.2rem; margin-bottom: 0.2rem; font-weight: 900; letter-spacing: -1px; }
-.auth-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500; }
+.auth-title { font-size: 2rem; margin-bottom: 0.1rem; font-weight: 900; letter-spacing: -1px; }
+.auth-subtitle { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 500; }
 .auth-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
 /* Branding & Trust Utils */
@@ -233,15 +233,15 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .social-proof {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
     border-top: 1px solid rgba(255,255,255,0.05);
     width: 100%;
     justify-content: center;
