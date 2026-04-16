@@ -1940,6 +1940,16 @@ const initApp = () => {
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
 
+            // Handle Redirect Result (Processing return from Google)
+            auth.getRedirectResult().then((result) => {
+                if (result.user) {
+                    console.log("Redirect login successful", result.user.email);
+                }
+            }).catch((error) => {
+                console.error("Redirect Auth Error:", error);
+                showToast("Authentication interrupted. Please try again.");
+            });
+
             // Check Auth State
             auth.onAuthStateChanged((user) => {
                 if (user) {
@@ -1997,9 +2007,10 @@ const initApp = () => {
             // Google Login
             if (googleLoginBtn) {
                 googleLoginBtn.addEventListener('click', () => {
-                    googleLoginBtn.innerHTML = '<div class="loader"></div> Processing...';
+                    googleLoginBtn.innerHTML = '<div class="loader"></div> Securely Redirecting...';
                     const provider = new firebase.auth.GoogleAuthProvider();
-                    auth.signInWithPopup(provider).catch(err => {
+                    // Using Redirect for better compatibility (Mobile/COOP/Popup blockers)
+                    auth.signInWithRedirect(provider).catch(err => {
                         console.error(err);
                         showToast("Google Auth Failed. Check API Key.");
                         googleLoginBtn.innerHTML = '<i data-lucide="chrome"></i> Continue with Google';
