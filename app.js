@@ -794,6 +794,8 @@ const initApp = () => {
         const inputStr = document.getElementById('customHookInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
 
+        if (!inputStr) { showToast("Please enter a topic first!"); return; }
+
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.hooks === inputStr) {
             showToast("Modify the topic for new hooks!");
@@ -1008,6 +1010,8 @@ const initApp = () => {
         const style = document.getElementById('dedCapStyle').value;
         const btn = document.getElementById('dedCapBtn');
 
+        if (!topic) { showToast("Please enter a topic first!"); return; }
+
         // --- DUPLICATE CHECK ---
         const currentKey = `${topic}-${style}`;
         if (lastUsedInputs.captions === currentKey) {
@@ -1059,6 +1063,8 @@ const initApp = () => {
         e.preventDefault();
         const topic = document.getElementById('dedTagsInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
+
+        if (!topic) { showToast("Please enter a topic first!"); return; }
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.tags === topic) {
@@ -1209,6 +1215,8 @@ const initApp = () => {
         const val = document.getElementById('trendsInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
 
+        if (!val) { showToast("Please enter a topic first!"); return; }
+
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.trends === val) {
             showToast("Change your niche to see new trends!");
@@ -1273,6 +1281,8 @@ const initApp = () => {
         e.preventDefault();
         const val = document.getElementById('rewriteInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
+
+        if (!val) { showToast("Please enter a script to rewrite!"); return; }
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.rewrite === val) {

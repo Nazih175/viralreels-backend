@@ -56,7 +56,7 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=v3.6.7">
+    <link rel="stylesheet" href="styles.css?v=v3.6.8">
 
     <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="qeTX-PqqrETEAihNDcIaqUUe2FClsHVoWwxoX5Uxy5M" />
@@ -742,7 +742,7 @@
                     </button>
                     <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
                         class="w-full flex-grow text-input"
-                        style="border:none; background:transparent; box-shadow:none;" required>
+                        style="border:none; background:transparent; box-shadow:none;" >
                     <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
                             data-lucide="zap"></i></button>
                 </form>
@@ -834,7 +834,7 @@
                             </button>
                         </div>
                         <input type="text" id="dedCapInput"
-                            class="text-input bg-card-dark" placeholder="e.g. Budget traveling" required>
+                            class="text-input bg-card-dark" placeholder="e.g. Budget traveling" >
                     </div>
                     <div class="form-group"><label>Tone / Genre (Optional)</label>
                         <div class="custom-select-wrapper">
@@ -868,7 +868,7 @@
                     </button>
                     <input type="text" id="dedTagsInput" class="text-input w-full flex-grow"
                         style="border:none; background:transparent; box-shadow:none;" placeholder="Enter broad niche..."
-                        required>
+                        >
                     <button type="submit" class="btn-primary"><i data-lucide="hash"></i></button>
                 </form>
                 <div id="dedTagsOutput" class="glass-card hidden glow-box interactive-glow">
@@ -1066,7 +1066,7 @@
                     </button>
                     <input type="text" id="trendsInput" placeholder="e.g. Finance..."
                         class="w-full flex-grow text-input"
-                        style="border:none; background:transparent; box-shadow:none;" required>
+                        style="border:none; background:transparent; box-shadow:none;" >
                     <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
                             data-lucide="trending-up"></i></button>
                 </form>
@@ -1095,7 +1095,7 @@
                     </div>
                     <form id="rewriteFormEl" class="glass-card interactive-glow p-4 border-accent">
                         <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
-                            rows="6" class="w-full text-input mb-4 bg-card-dark" required></textarea>
+                            rows="6" class="w-full text-input mb-4 bg-card-dark" ></textarea>
                         <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite Script</button>
                     </form>
                 </div>
@@ -1213,7 +1213,7 @@
                         </div>
                         <form class="chat-input-area" id="chatForm">
                             <input type="text" class="chat-input text-input" id="chatInput"
-                                placeholder="Message your consultant..." required>
+                                placeholder="Message your consultant..." >
                             <button type="submit" class="btn-primary"
                                 style="padding: 10px; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;"><i
                                     data-lucide="send"></i></button>
@@ -1282,7 +1282,7 @@
                 <h3 class="font-bold text-lg mb-4 text-accent" id="eventModalDateText">Save Idea</h3>
                 <label class="text-xs font-bold text-muted uppercase tracking-wide">Video Title</label>
                 <input type="text" id="eventTitleInput" class="text-input bg-card-dark w-full mb-4 mt-1"
-                    placeholder="e.g. Budget Vlog Ep.1" required>
+                    placeholder="e.g. Budget Vlog Ep.1" >
 
                 <label class="text-xs font-bold text-muted uppercase tracking-wide">Details & Script</label>
                 <textarea id="eventDescInput" class="text-input bg-card-dark w-full mb-6 mt-1"
@@ -1353,6 +1353,7 @@
 </body>
 
 </html>
+
 
 
 
