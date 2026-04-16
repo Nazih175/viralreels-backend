@@ -208,7 +208,8 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
     align-items: center; 
     text-align: center; 
     padding: 3rem 2rem;
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 95vh;
     margin: 0 auto;
     border-radius: 28px;
     border: 1px solid rgba(255,255,255,0.08);
