@@ -99,32 +99,60 @@ app.post('/api/analyze', async (req, res) => {
     try {
         const { idea, platform, length, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
-        
-        // Timeout protection for the AI call
+
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-        const basePrinciples = `2026 Viral Engine Expert. Frameworks: Satisfaction Velocity, Retention Loops, Psychological Triggers.`;
-        const gamingContext = niche === 'gaming' ? "Focus on: Skill-gaps, Easter-eggs, Rage-bait potential, and Speedrun pacing." : "";
+        const platformContext = {
+            tiktok: 'TikTok: Hook must land in 0.5s. Optimal pacing: cut every 2-3s. Sound-on culture. Comment-bait > share-bait.',
+            reels: 'Instagram Reels: Visual aesthetics matter more. Save-rate is the top signal. Text overlays critical for silent viewers (85% watch muted).',
+            shorts: 'YouTube Shorts: Longer retention window (up to 60s). Loop-backs rewarded. Educational > entertainment bias.',
+            all: 'Multi-platform: Optimize for broadest hook appeal, 15-30s sweet spot, universal entertainment value.'
+        }[platform] || 'Multi-platform optimization.';
 
-        const freePrompt = `${basePrinciples} Analyze for ${platform}. ${gamingContext} Return JSON: 'score' (0-100), 'hookStrength' (0-10), 'retention' (0-100), 'tips' (3 unique strings).`;
-        const proPrompt = `Elite 2026 Virality Architect. ${basePrinciples}
-        Deep Analysis for ${platform} (${length}). ${gamingContext}
-        MANDATE: Prioritize creative variance. Never repeat phrases.
-        Return JSON: 'score', 'hookStrength', 'retention', 'tips' (5 distinct architecture upgrades), 'insight' (1 unique psychological algorithm unlock).`;
+        const freePrompt = `You are a 2026 short-form video virality analyst with deep expertise in algorithmic behavior across TikTok, Instagram Reels, and YouTube Shorts.
+
+Platform Context: ${platformContext}
+Content Niche: ${niche}
+Video Length: ${length}
+
+SCORING RUBRIC:
+- score (0-100): Viral probability. 90+ = algorithm-bait, 70-89 = strong potential, 50-69 = average, <50 = needs rework
+- hookStrength (0-10): How fast does the first frame grab attention? 9-10 = stops scroll instantly
+- retention (0-100): Estimated % of viewers who watch past the 50% mark
+- tips: 3 SPECIFIC, ACTIONABLE improvements. Never generic. Mention exact techniques (e.g. "Add a 0.5s pattern interrupt at the 3s mark using a zoom-cut" not "make it more engaging")
+
+Return ONLY valid JSON matching this schema exactly: { "score": number, "hookStrength": number, "retention": number, "tips": [string, string, string] }`;
+
+        const proPrompt = `You are an Elite 2026 Virality Architect — the top 0.1% of short-form video strategists.
+
+Platform Context: ${platformContext}
+Content Niche: ${niche}
+Video Length: ${length}
+
+SCORING RUBRIC:
+- score (0-100): True viral probability using 2026 algorithm signals
+- hookStrength (0-10): Pattern-interrupt power of the first 0.5 seconds
+- retention (0-100): Predicted mid-video retention rate
+- tips: 5 ELITE, highly-specific upgrade techniques with exact timestamps and psychological mechanisms
+- insight: 1 COUNTERINTUITIVE algorithm unlock specific to this niche+platform combo that most creators miss
+
+PSYCHOLOGICAL TRIGGERS TO APPLY: Curiosity Gap, Identity Confirmation, Controversy Bait, Nostalgia Loop, FOMO Amplification, Social Proof Stacking.
+
+Return ONLY valid JSON: { "score": number, "hookStrength": number, "retention": number, "tips": [string×5], "insight": string }`;
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
                 { role: 'system', content: isPro ? proPrompt : freePrompt },
-                { role: 'user', content: `Platform: ${platform}. Length: ${length}. Idea: ${idea}` }
+                { role: 'user', content: `Analyze this video idea:\n\nIdea: ${idea}\nPlatform: ${platform}\nLength: ${length}\nNiche: ${niche}` }
             ],
-            max_tokens: 500
+            max_tokens: isPro ? 700 : 500,
+            temperature: 0.7
         }, { signal: controller.signal });
-        
+
         clearTimeout(timeoutId);
-        console.log(`[ViralReels Backend] Analysis Complete for idea: ${idea?.substring(0,20)}`);
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
         console.error('Analyzer Error:', e.message);
@@ -138,23 +166,65 @@ app.post('/api/generate-hooks', async (req, res) => {
         const { topic, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
-        const basePrinciples = `2026 Hook Strategist. Principles: 0-second Payoff, Negative Hooks, Curiosity Gaps. Niche: ${niche}.`;
-        const varietyRules = `MANDATE: High variance. Avoid common AI patterns. Focus on high-retention patterns.`;
+        const hookFormulas = `
+PROVEN 2026 HOOK FORMULAS — use these as your architecture:
+1. [NEGATIVE] "Why [common belief] is destroying your [outcome]" — controversy + identity threat
+2. [CURIOSITY GAP] "The one thing [authority] never tells you about [topic]" — open loop
+3. [PATTERN INTERRUPT] Start mid-action. No intro. Drop the viewer into the highest-value moment.
+4. [IDENTITY] "If you [identity trait], you already know this" — group membership trigger
+5. [STATISTIC SHOCK] Lead with a number that defies expectations
+6. [LOOP OPEN] Ask a question the viewer MUST stay to see answered
+7. [CONTRARIAN] "Everyone says [popular advice]. They're wrong. Here's why:"
+8. [TRANSFORMATION] "[Before state] → [After state] in [timeframe]"
 
-        const freePrompt = `${basePrinciples} ${varietyRules} Generate 4 elite hooks & 2 captions. JSON: 'hooks' (array), 'captions' (array).`;
-        const proPrompt = `Elite 2026 Virality Architect. ${basePrinciples} ${varietyRules}
-        Generate 6 unique world-class hooks & 3 captions. Focus on ${topic}.
-        Frameworks: [NEGATIVE HOOK], [CONTRARIAN], [IDENTITY], [LOOP-START], [SKILL-GAP], [CURIOSITY]. Ensure each is fundamentally different.
-        Return JSON: 'hooks' (6 unique strings with [Framework] prefix), 'captions' (3 unique strings with [Platform] prefix).`;
+PLATFORM RULES:
+- TikTok: Max 8 words. Sound-on. Must create immediate verbal curiosity.
+- Reels: Visual-first. Text overlay must work without audio.
+- Shorts: Can be slightly longer (10-12 words). Educational tone allowed.`;
+
+        const freePrompt = `You are a 2026 viral hook specialist. Generate hooks that stop the scroll dead.
+
+Niche: ${niche}
+Topic: ${topic}
+
+${hookFormulas}
+
+Generate 4 scroll-stopping hooks and 2 companion captions. Each hook must use a DIFFERENT formula. No filler words. No "Are you ready?" No generic openers.
+
+Return JSON: { "hooks": [4 strings, each starting with [FORMULA TYPE]], "captions": [2 platform-optimized strings] }`;
+
+        const proPrompt = `You are an elite 2026 viral content architect. Your hooks have generated 100M+ views.
+
+Niche: ${niche}
+Topic: ${topic}
+
+${hookFormulas}
+
+Generate 6 elite hooks using 6 DIFFERENT formulas, + 3 platform-specific captions.
+
+HOOK REQUIREMENTS:
+- Each must be fundamentally mechanically different
+- Each must create immediate psychological engagement
+- Include the exact psychological mechanism in brackets: [CURIOSITY GAP], [IDENTITY], etc.
+- No repeated sentence structures
+- Average reading time under 3 seconds
+
+CAPTION REQUIREMENTS:
+- Label each by platform: [TikTok], [Reels], [Shorts]
+- Optimized character count per platform
+- Include strategic CTA
+
+Return JSON: { "hooks": [6 strings], "captions": [3 strings] }`;
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
                 { role: 'system', content: isPro ? proPrompt : freePrompt },
-                { role: 'user', content: `Topic: ${topic}` }
+                { role: 'user', content: `Generate hooks for: ${topic} (Niche: ${niche})` }
             ],
-            max_tokens: 800
+            max_tokens: 900,
+            temperature: 0.9
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
@@ -167,17 +237,37 @@ app.post('/api/generate-hooks', async (req, res) => {
 // Endpoint 2.5: Dedicated Unique Captions Generator
 app.post('/api/generate-captions', async (req, res) => {
     try {
-        const { topic, isPro, niche = 'general' } = req.body;
+        const { topic, isPro, niche = 'general', style = 'engaging' } = req.body;
         const model = 'gpt-4o-mini';
 
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `ViralReels AI Caption Engine. Niche: ${niche}. Styles: [HYPED], [SERIOUS], [SHORT], [EDUCATIONAL], [STORYTIME]. MANDATE: High creativity, variety, and unique emojis. JSON: 'captions' (array of 5 unique strings).` },
-                { role: 'user', content: `Topic: ${topic}` }
+                { role: 'system', content: `You are a 2026 social media caption specialist who understands platform algorithms deeply.
+
+Niche: ${niche}
+Style preference: ${style}
+
+CAPTION STRATEGY BY PLATFORM:
+- TikTok: Short punchy captions (under 150 chars). High-energy. Use 3-5 relevant hashtags inline. Drive comments with a bold statement or question.
+- Instagram Reels: 125-150 chars before the fold is critical. Hook first sentence. Save-worthy insight. 5-10 hashtags at end.
+- YouTube Shorts: Slightly longer OK. SEO-friendly language. Keyword in first 5 words.
+
+CAPTION FORMULAS TO USE:
+1. [HYPED]: Hype energy, emoji-forward, FOMO-driven
+2. [EDUCATIONAL]: Lead with fact/insight, CTA to save
+3. [STORYTIME]: First-person narrative hook that makes them want context
+4. [CONTROVERSIAL]: Polarizing statement that drives comments
+5. [MINIMALIST]: 1 punchy line + perfect emoji. Under 80 chars.
+
+MANDATE: Every caption must be immediately copy-pasteable. Real creators will use these as-is. No placeholders. No [your name here]. Include specific emojis, not generic ones.
+
+Return JSON: { "captions": [5 ready-to-post strings, each labeled with [TYPE]] }` },
+                { role: 'user', content: `Write captions for: ${topic} (Niche: ${niche}, Style: ${style})` }
             ],
-            max_tokens: 500
+            max_tokens: 600,
+            temperature: 0.85
         });
 
         const parsed = JSON.parse(completion.choices[0].message.content);
@@ -198,10 +288,27 @@ app.post('/api/generate-tags', async (req, res) => {
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `ViralReels AI SEO Expert. Niche: ${niche}. 3 Categories: Viral (8 tags), Niche (8 tags), Recommended (8 tags). MANDATE: Mix high-volume and long-tail tags. JSON: { "viral": [], "niche": [], "recommended": [] }` },
-                { role: 'user', content: `Topic: ${topic}` }
+                { role: 'system', content: `You are a 2026 short-form video SEO specialist. You understand how hashtags function differently across TikTok, Instagram, and YouTube Shorts.
+
+Niche: ${niche}
+
+HASHTAG STRATEGY:
+- VIRAL (broad reach): 50M-500M posts. Gets you on For You/Explore pages. High competition but necessary.
+- NICHE (targeted reach): 1M-20M posts. Algorithmic sweet spot. Highly relevant community.
+- RECOMMENDED (long-tail/rising): Under 1M posts or trending upward. Fastest path to ranking #1 in a tag.
+
+RULES:
+- No generic tags like #fyp #foryou #viral that are algorithmic dead weight in 2026
+- Include at least 2 tags that are trending or rising in the specific niche
+- Mix topic + format tags (e.g., #dogtricks AND #dogvideo AND #pettok)
+- All tags must be lowercase, no spaces, no # symbol included (frontend handles that)
+- 8 per category, all unique, no duplicates across categories
+
+Return JSON: { "viral": [8 strings], "niche": [8 strings], "recommended": [8 strings] }` },
+                { role: 'user', content: `Generate optimized hashtags for: ${topic} (Niche: ${niche})` }
             ],
-            max_tokens: 400
+            max_tokens: 500,
+            temperature: 0.7
         });
 
         const parsed = JSON.parse(completion.choices[0].message.content);
@@ -216,16 +323,38 @@ app.post('/api/generate-tags', async (req, res) => {
 // Endpoint 3: Script Rewriter
 app.post('/api/rewrite', async (req, res) => {
     try {
-        const { script, isPro } = req.body;
-        const model = 'gpt-4o-mini';
+        const { script, isPro, niche = 'general' } = req.body;
+        const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
 
         const completion = await openai.chat.completions.create({
             model,
             messages: [
-                { role: 'system', content: `ViralReels AI Script Rewriter. Pacing-focused. Structure: [Hook], [Value], [Loop-CTA]. Include [PRO TIP].` },
-                { role: 'user', content: script }
+                { role: 'system', content: `You are a 2026 short-form video script architect. You transform bland scripts into retention-engineered viral content.
+
+Niche: ${niche}
+
+2026 SCRIPT STRUCTURE:
+[HOOK] — First 2 seconds. Pattern interrupt. No "Hey guys" or "Welcome back". Drop the viewer mid-action or mid-statement.
+[PEAK VALUE] — The core payoff. Front-load it. Don't bury the lede. Cut every sentence that doesn't add value.
+[RETENTION BRIDGE] — 1-2 lines that create a reason to keep watching ("And the craziest part? It gets worse.")
+[CTA] — Specific, non-generic. Not "follow me". Instead: "Comment [X] if this happened to you" or "Save this — you'll need it."
+
+RETENTION TECHNIQUES TO APPLY:
+- Pattern interrupts every 3-5 seconds (tonal shift, visual cue suggestion, pacing change)
+- Open loops: raise a question early, answer it late
+- Specificity over generality ("37%" not "many people", "Tuesday" not "recently")
+- Remove ALL filler: "So", "Um", "You know", "Basically", "Kind of"
+- Active voice only
+
+FORMAT YOUR RESPONSE:
+Label each section clearly: [HOOK], [PEAK VALUE], [RETENTION BRIDGE], [CTA]
+End with one line: [PRO TIP: one specific optimization the creator should implement in editing/filming]
+
+Write the full rewritten script, ready to read aloud.` },
+                { role: 'user', content: `Rewrite this script for maximum virality:\n\n${script}` }
             ],
-            max_tokens: 800
+            max_tokens: 900,
+            temperature: 0.8
         });
 
         res.json({ rewritten: completion.choices[0].message.content });
@@ -342,16 +471,41 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
 // Endpoint 5: Trends Radar
 app.post('/api/trends', async (req, res) => {
     try {
-        const { concept, isPro } = req.body;
+        const { val, concept, isPro } = req.body;
+        const topic = val || concept || 'general';
         const model = 'gpt-4o-mini';
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
             messages: [
-                { role: 'system', content: `ViralReels AI Analyzer. Principles: Hook-Velocity, Retention-Nodes, Visual-Density. Return JSON: { "data_points": [ { "label": "", "value": 0 } ], "verdict": "", "recommendation": "" }` },
-                { role: 'user', content: `Concept: ${concept}` }
+                { role: 'system', content: `You are a 2026 short-form video trend intelligence analyst. You predict viral momentum before it peaks.
+
+ANALYSIS FRAMEWORK:
+- Hook-Velocity (0-100): How fast is this topic generating new viral content right now?
+- Retention-Score (0-100): How long do people watch content on this topic?
+- Competition-Level (0-100): How saturated is this niche? Lower = more opportunity.
+- Engagement-Rate (0-100): Comments + shares relative to views in this category.
+- Longevity (0-100): Is this a flash trend (low) or evergreen content (high)?
+
+After scoring, provide:
+- verdict: A bold 1-sentence prediction about this topic's viral trajectory right now
+- recommendation: 3 SPECIFIC content angles or formats that are outperforming on this topic right now. Be specific to the topic — not generic advice.
+
+Return JSON: {
+  "data_points": [
+    { "label": "Hook-Velocity", "value": number },
+    { "label": "Retention-Score", "value": number },
+    { "label": "Competition-Level", "value": number },
+    { "label": "Engagement-Rate", "value": number },
+    { "label": "Longevity", "value": number }
+  ],
+  "verdict": string,
+  "recommendation": string
+}` },
+                { role: 'user', content: `Analyze the viral trend potential for: ${topic}` }
             ],
-            max_tokens: 400
+            max_tokens: 500,
+            temperature: 0.7
         });
 
         res.json(JSON.parse(completion.choices[0].message.content));
