@@ -2062,7 +2062,17 @@ const initApp = () => {
                     })
                     .catch((error) => {
                         console.error("Auth Error:", error);
-                        showToast("Auth Error: Check API Key or try again.");
+                        if (error.code === 'auth/email-already-in-use') {
+                            showToast("Incorrect password for this account.");
+                        } else if (error.code === 'auth/weak-password') {
+                            showToast("Password must be at least 6 characters.");
+                        } else if (error.code === 'auth/invalid-email') {
+                            showToast("Invalid email address format.");
+                        } else if (error.code && error.code.includes('too-many-requests')) {
+                            showToast("Too many attempts. Please try again later.");
+                        } else {
+                            showToast(error.message || "Authentication failed. Please try again.");
+                        }
                         authSubmitBtn.innerHTML = 'Sign In / Create Account';
                     });
                 });
