@@ -1775,17 +1775,21 @@ const initApp = () => {
                 });
 
                 const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || "Portal access denied.");
+                }
+
                 if (data.url) {
                     window.location.href = data.url;
                 } else {
-                    showToast("Could not open billing portal.");
+                    showToast("Stripe error: Redirect URL missing.");
                     manageBillingBtn.innerHTML = originalText;
                     manageBillingBtn.disabled = false;
                 }
             } catch (err) {
-                console.error(err);
-                const errorMsg = err.detail || "Server error. Try again later.";
-                showToast(errorMsg);
+                console.error("[ViralReels] Billing Portal Error:", err);
+                showToast(err.message || "Server connection failed.");
                 manageBillingBtn.innerHTML = originalText;
                 manageBillingBtn.disabled = false;
             }
@@ -1860,7 +1864,7 @@ const initApp = () => {
                 if (data.success) {
                     // UNLOCK PRO PERMANENTLY
                     localStorage.setItem('vr_pro_status', 'true');
-                    isPro = true;
+                    isPro = true; // Update global state
                     
                     verifyOverlay.innerHTML = `
                         <div class="card p-8 max-w-sm w-full animate-appear" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);">
@@ -1871,11 +1875,11 @@ const initApp = () => {
                         </div>
                     `;
                     
-                    triggerConfetti();
+                    window.vrCelebrate('viral');
                     
                     document.getElementById('closeVerifyBtn').addEventListener('click', () => {
                         verifyOverlay.remove();
-                        // Clean URL and reload
+                        // Clean URL and reload to ensure all Pro-gated features are hydrated
                         window.history.replaceState({}, document.title, window.location.pathname);
                         window.location.reload(); 
                     });
@@ -1951,11 +1955,34 @@ const initApp = () => {
             });
 
             // Check Auth State
-            auth.onAuthStateChanged((user) => {
+            auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     lucide.createIcons();
+                    
+                    // SYNC PRO STATUS FROM DB (The "Remember Me" Core Fix)
+                    try {
+                        const db = firebase.firestore();
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists) {
+                            const data = userDoc.data();
+                            if (data.isPro) {
+                                console.log("[ViralReels] Pro Status verified from Database.");
+                                localStorage.setItem('vr_pro_status', 'true');
+                                isPro = true;
+                                // Force hydration of premium features if they were hidden
+                                document.querySelectorAll('.crown-badge').forEach(b => b.classList.add('active'));
+                            } else {
+                                // Sync reverse (if subscription expired/cancelled but local storage is stale)
+                                localStorage.setItem('vr_pro_status', 'false');
+                                isPro = false;
+                            }
+                        }
+                    } catch (dbErr) {
+                        console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
+                    }
+
                     showToast("Logged in securely.");
                     if (!isOnboardingComplete) {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');

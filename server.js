@@ -342,13 +342,22 @@ app.post('/api/create-portal-session', async (req, res) => {
     
     try {
         // Step 1: Look up Stripe Customer by email
-        const customers = await stripe.customers.list({
+        let customers = await stripe.customers.list({
             email: email,
             limit: 1
         });
 
+        // Fallback: Search by metadata user_id if no email match
+        if (customers.data.length === 0 && uid) {
+            console.log(`[Stripe Portal] No email match for ${email}. Falling back to metadata search for uid: ${uid}`);
+            customers = await stripe.customers.search({
+                query: `metadata['user_id']:'${uid}'`,
+                limit: 1
+            });
+        }
+
         if (customers.data.length === 0) {
-            return res.status(400).json({ error: "No active subscription found for this email. Please upgrade first." });
+            return res.status(400).json({ error: "No active subscription found for this account. Please upgrade first." });
         }
 
         const customerId = customers.data[0].id;
