@@ -659,8 +659,9 @@ const initApp = () => {
     };
 
     window.copyHash = (text, el) => {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast(`Copied: ${text}`);
+        let tagText = text.startsWith('#') ? text : '#' + text;
+        navigator.clipboard.writeText(tagText).then(() => {
+            showToast(`Copied: ${tagText}`);
             const oldHtml = el.innerHTML;
             el.innerHTML = '<i data-lucide="check" style="width:12px;"></i> Copied';
             setTimeout(() => { el.innerHTML = oldHtml; lucide.createIcons(); }, 1500);
@@ -1116,6 +1117,32 @@ const initApp = () => {
             }
         }
     });
+
+    // -- COPY ALL TAGS --
+    const copyAllTagsBtn = document.getElementById('copyAllTagsBtn');
+    if (copyAllTagsBtn) {
+        copyAllTagsBtn.addEventListener('click', () => {
+            const tagElements = document.querySelectorAll('#dedTagsOutput .hashtag');
+            if (tagElements.length === 0) return;
+            
+            // Extract text, ensure # prefix for all
+            const allTags = Array.from(tagElements).map(el => {
+                let text = el.innerText.trim();
+                return text.startsWith('#') ? text : '#' + text;
+            }).join(' ');
+
+            navigator.clipboard.writeText(allTags).then(() => {
+                showToast("All Tags Copied!");
+                const oldHtml = copyAllTagsBtn.innerHTML;
+                copyAllTagsBtn.innerHTML = '<i data-lucide="check"></i> Copied!';
+                lucide.createIcons();
+                setTimeout(() => { 
+                    copyAllTagsBtn.innerHTML = oldHtml; 
+                    lucide.createIcons(); 
+                }, 2000);
+            });
+        });
+    }
 
     // -- 7. CHECKLIST VIEW --
     const checks = document.querySelectorAll('.task-check');
