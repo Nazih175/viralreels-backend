@@ -275,6 +275,70 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
     }
 });
 
+// Endpoint 4b: AI Chat — STREAMING (SSE) Version
+app.post('/api/chat-stream', async (req, res) => {
+    try {
+        const { message, persona, isPro } = req.body;
+        const niche = persona?.niche || 'general';
+        const toneValue = persona?.tone || 50;
+        let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
+
+        const systemPrompt = `You are the "2026 Algorithm Virality Architect" – the world's most optimized AI for short-form video growth.
+Role: Professional Strategist & Performance Expert.
+Current Niche Focus: ${niche} (Priority: Viral Retention Algorithms).
+
+VIRAL FRAMEWORK (2026):
+- SATISFACTION PER SWIPE: No intros. Lead with the payoff.
+- RETENTION ENGINEERING: Suggest cuts every 3 seconds.
+- REWATCH LOOPS: Advise on seamless transitions.
+- DEBATE-BAIT: Use specific statements that drive comment velocity.
+- ALGORITHM-SPECIFIC: Mention skill-caps, pattern-interrupts, and high-retention frameworks as requested.
+
+TONE: Human, direct, and professional. Zero AI fluff. Never say "I'm an AI" or "Hope this helps." Give specific, actionable blueprints.
+RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
+
+        // Set SSE headers
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+
+        const stream = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message }
+            ],
+            max_tokens: 400,
+            temperature: 0.8,
+            stream: true,
+        });
+
+        let fullReply = '';
+        for await (const chunk of stream) {
+            const token = chunk.choices[0]?.delta?.content || '';
+            if (token) {
+                fullReply += token;
+                res.write(`data: ${JSON.stringify({ token })}
+
+`);
+            }
+        }
+
+        res.write(`data: [DONE]
+
+`);
+        res.end();
+
+    } catch (e) {
+        console.error('Chat Stream Error:', e.message);
+        res.write(`data: ${JSON.stringify({ error: 'Consultant is offline.' })}
+
+`);
+        res.end();
+    }
+});
+
 // Endpoint 5: Trends Radar
 app.post('/api/trends', async (req, res) => {
     try {
@@ -321,6 +385,9 @@ app.post('/api/checkout', async (req, res) => {
                 quantity: 1,
             }],
             mode: 'subscription',
+            subscription_data: {
+                trial_period_days: 7,
+            },
             success_url: `${FRONTEND_URL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${FRONTEND_URL}/?checkout=canceled`,
         });

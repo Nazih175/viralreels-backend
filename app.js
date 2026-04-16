@@ -219,11 +219,28 @@ const initApp = () => {
     // == USAGE LIMIT ENGINE ==
     // =============================================
     const LIMITS = { analyze: 5, hooks: 5, captions: 5, trends: 3, rewrite: 3 };
+    const TRIAL_DAYS = 7;
+    const TRIAL_LIMIT = 50; // uses per tool during trial
     const AD_DURATION = 30; // seconds
     let adTimer = null;
-    let currentAdRechargeTarget = null; // which tool to recharge after ad
+    let currentAdRechargeTarget = null;
 
     const getToday = () => new Date().toISOString().split('T')[0];
+
+    // ── TRIAL ENGINE ──
+    const initTrial = () => {
+        if (!localStorage.getItem('vr_trial_start')) {
+            localStorage.setItem('vr_trial_start', new Date().toISOString());
+        }
+    };
+    const getTrialInfo = () => {
+        const start = localStorage.getItem('vr_trial_start');
+        if (!start) return { active: false, daysLeft: 0 };
+        const elapsed = (Date.now() - new Date(start).getTime()) / (1000 * 60 * 60 * 24);
+        const daysLeft = Math.max(0, TRIAL_DAYS - Math.floor(elapsed));
+        return { active: daysLeft > 0, daysLeft };
+    };
+    const isInTrial = () => getTrialInfo().active;
 
     const getUsage = () => {
         const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
@@ -238,10 +255,14 @@ const initApp = () => {
 
     const saveUsage = (usage) => localStorage.setItem('vr_usage', JSON.stringify(usage));
 
-    const getRemainingUses = (tool) => isPro ? 999 : (getUsage()[tool] ?? LIMITS[tool]);
+    const getRemainingUses = (tool) => {
+        if (isPro) return 999;
+        if (isInTrial()) return TRIAL_LIMIT;
+        return getUsage()[tool] ?? LIMITS[tool];
+    };
 
     const consumeUse = (tool) => {
-        if (isPro) return;
+        if (isPro || isInTrial()) return; // no consumption during trial or pro
         const usage = getUsage();
         if (usage[tool] > 0) usage[tool]--;
         saveUsage(usage);
@@ -266,6 +287,17 @@ const initApp = () => {
             el.className = `usage-badge plenty`;
             el.innerHTML = `<i data-lucide="infinity" style="width:12px; height:12px;"></i> Unlimited Uses`;
             lucide.createIcons();
+            return;
+        }
+
+        // Trial badge
+        const trial = getTrialInfo();
+        if (trial.active) {
+            el.className = `usage-badge plenty`;
+            el.style.background = 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(251,146,60,0.1))';
+            el.style.borderColor = 'rgba(234,179,8,0.3)';
+            el.style.color = '#fbbf24';
+            el.innerHTML = `🎁 ${trial.daysLeft}d free trial`;
             return;
         }
 
@@ -1528,16 +1560,43 @@ const initApp = () => {
                 const personaNiche = nicheInput ? nicheInput.value.trim() : 'General';
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetch(`${API_BASE}/chat`, {
+                const res = await fetch(`${API_BASE}/chat-stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
                 });
-                if (!res.ok) throw new Error("API Error");
-                const data = await res.json();
-                
-                aiDiv.textContent = data.reply || "Strategic advisor offline.";
-                if (data.reply) saveChatLog(msg, data.reply);
+
+                if (!res.ok || !res.body) throw new Error("API Error");
+
+                // Stream tokens in real-time
+                aiDiv.textContent = '';
+                let fullReply = '';
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // keep incomplete last line
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const raw = line.slice(6).trim();
+                        if (raw === '[DONE]') break;
+                        try {
+                            const parsed = JSON.parse(raw);
+                            if (parsed.token) {
+                                fullReply += parsed.token;
+                                aiDiv.textContent = fullReply;
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            }
+                        } catch {}
+                    }
+                }
+
+                if (fullReply) saveChatLog(msg, fullReply);
             } catch(e) {
                 console.error(e);
                 aiDiv.textContent = "I'm offline right now. Check your server connection.";
@@ -2030,7 +2089,9 @@ const initApp = () => {
                         console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
                     }
 
+                    initTrial(); // Start 7-day trial clock on first login
                     showToast("Logged in securely.");
+                    renderAllBadges();
                     if (!isOnboardingComplete) {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');
                     }
