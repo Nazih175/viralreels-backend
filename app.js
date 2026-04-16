@@ -227,7 +227,7 @@ const initApp = () => {
 
     const getUsage = () => {
         const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
-        if (!stored || stored.date !== getToday()) {
+        if (!stored || stored.date !== getToday() || typeof stored.analyze === 'undefined') {
             // New day — reset to full limits
             const fresh = { date: getToday(), ...LIMITS };
             localStorage.setItem('vr_usage', JSON.stringify(fresh));
@@ -680,6 +680,12 @@ const initApp = () => {
         const currentInputKey = `${idea}-${platform}-${length}`;
         if (lastUsedInputs.analyze === currentInputKey) {
             showToast("Change the input to generate a new analysis!");
+            return;
+        }
+
+        // --- EMPTY VALIDATION ---
+        if (!idea) {
+            showToast("Please enter an idea first!");
             return;
         }
 
@@ -2005,6 +2011,10 @@ const initApp = () => {
                                 localStorage.setItem('vr_pro_status', 'false');
                                 isPro = false;
                             }
+                        } else {
+                            // User document missing (New User) - Revert cache to free tier
+                            localStorage.setItem('vr_pro_status', 'false');
+                            isPro = false;
                         }
                     } catch (dbErr) {
                         console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
@@ -2106,3 +2116,4 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
