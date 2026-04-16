@@ -570,6 +570,15 @@ const initApp = () => {
     const navItems = document.querySelectorAll('.nav-item, .nav-btn');
     const tabViews = document.querySelectorAll('.tab-view');
 
+    // --- ELITE NAV PULSE HELPER ---
+    window.pulseNavItem = (id) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.classList.add('nav-pulse');
+            setTimeout(() => btn.classList.remove('nav-pulse'), 4500); // 1.5s * 3 cycles
+        }
+    };
+
     navItems.forEach(btn => {
         btn.addEventListener('click', async () => {
             const targetId = btn.getAttribute('data-tab');
@@ -754,6 +763,9 @@ const initApp = () => {
             consumeUse('analyze');
             addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
 
+            // --- CONTEXTUAL NAV PULSE ---
+            window.pulseNavItem('navHooks');
+
             // --- UI GATING: SKELETON OFF ---
             document.getElementById('analyzerSkeleton').classList.add('hidden');
             document.getElementById('resultsDashboard').classList.remove('hidden');
@@ -868,6 +880,10 @@ const initApp = () => {
             addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
 
             vrCelebrate('basic');
+
+            // --- CONTEXTUAL NAV PULSE ---
+            window.pulseNavItem('navTracker');
+            window.pulseNavItem('navCaptions');
 
             // --- UI GATING: SKELETON OFF ---
             document.getElementById('hooksSkeleton').classList.add('hidden');
@@ -1079,6 +1095,10 @@ const initApp = () => {
                 const html = toItemCard(txt, null);
                 return html.replace('class="item-card glass-card', 'class="item-card glass-card result-appear');
             }).join('');
+            
+            // --- CONTEXTUAL NAV PULSE ---
+            window.pulseNavItem('navTags');
+
             out.classList.remove('hidden');
         } catch (e) {
             console.error(e);
@@ -1353,6 +1373,10 @@ const initApp = () => {
                     <button class="btn-secondary w-full" onclick="copyToClipboard('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy"></i> Copy Script</button>
                 </div>
             `;
+            
+            // --- CONTEXTUAL NAV PULSE ---
+            window.pulseNavItem('navSaved');
+
             document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
         } catch(e) {
             console.error(e);

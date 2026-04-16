@@ -94,6 +94,23 @@ app.get('/api/health', (req, res) => {
 });
 
 // Endpoint 1: Analyzer (Predictor)
+// 2026 VIRAL PLAYBOOK: Expert Few-Shot Context
+const VIRAL_PLAYBOOK = `
+[ELITE HOOK EXAMPLES]
+- Negative Curiosity: "Stop using [X] for [Y]. Here is the 1% trick that actually works."
+- Identity Signal: "If you want to be [Identity], you need to see this."
+- Pattern Interrupt: "I spent 100 hours analyzing [Topic] so you don't have to."
+- Contrarian: "Everyone is lying to you about [Topic]. This is the real truth."
+- Loop Opener: "Most people fail at [Topic] because of one tiny mistake. Look at this."
+
+[RETENTION BLUEPRINTS]
+- 0-2s: The Hook (Immediate value drop)
+- 3-7s: The Reassurance (Explain the payoff)
+- 8-15s: The Narrative Bridge (Introduce a minor conflict or counterpoint)
+- 16-30s: The Resolution (Quick value density)
+- 31-45s: The Engagement Bait (Polarizing statement or CTA)
+`;
+
 app.post('/api/analyze', async (req, res) => {
     console.log(`[ViralReels Backend] POST /api/analyze - Idea: "${req.body.idea?.substring(0, 30)}..."`);
     try {
@@ -110,34 +127,38 @@ app.post('/api/analyze', async (req, res) => {
             all: 'Multi-platform: Optimize for broadest hook appeal, 15-30s sweet spot, universal entertainment value.'
         }[platform] || 'Multi-platform optimization.';
 
-        const freePrompt = `You are a 2026 short-form video virality analyst with deep expertise in algorithmic behavior across TikTok, Instagram Reels, and YouTube Shorts.
+        const freePrompt = `You are a 2026 short-form video virality analyst.
+
+[CONTEXT PLAYBOOK]
+${VIRAL_PLAYBOOK}
 
 Platform Context: ${platformContext}
 Content Niche: ${niche}
 Video Length: ${length}
 
 SCORING RUBRIC:
-- score (0-100): Viral probability. 90+ = algorithm-bait, 70-89 = strong potential, 50-69 = average, <50 = needs rework
-- hookStrength (0-10): How fast does the first frame grab attention? 9-10 = stops scroll instantly
-- retention (0-100): Estimated % of viewers who watch past the 50% mark
-- tips: 3 SPECIFIC, ACTIONABLE improvements. Never generic. Mention exact techniques (e.g. "Add a 0.5s pattern interrupt at the 3s mark using a zoom-cut" not "make it more engaging")
+- score (0-100): Viral probability.
+- hookStrength (0-10): How fast does the first frame grab attention?
+- retention (0-100): Estimated % of viewers who watch past the 50% mark.
+- tips: 3 SPECIFIC, ACTIONABLE improvements using the PLAYBOOK architecture.
 
-Return ONLY valid JSON matching this schema exactly: { "score": number, "hookStrength": number, "retention": number, "tips": [string, string, string] }`;
+Return ONLY valid JSON matching this schema: { "score": number, "hookStrength": number, "retention": number, "tips": [string, string, string] }`;
 
         const proPrompt = `You are an Elite 2026 Virality Architect — the top 0.1% of short-form video strategists.
 
+[CONTEXT PLAYBOOK]
+${VIRAL_PLAYBOOK}
+
 Platform Context: ${platformContext}
 Content Niche: ${niche}
 Video Length: ${length}
 
 SCORING RUBRIC:
-- score (0-100): True viral probability using 2026 algorithm signals
-- hookStrength (0-10): Pattern-interrupt power of the first 0.5 seconds
-- retention (0-100): Predicted mid-video retention rate
-- tips: 5 ELITE, highly-specific upgrade techniques with exact timestamps and psychological mechanisms
-- insight: 1 COUNTERINTUITIVE algorithm unlock specific to this niche+platform combo that most creators miss
-
-PSYCHOLOGICAL TRIGGERS TO APPLY: Curiosity Gap, Identity Confirmation, Controversy Bait, Nostalgia Loop, FOMO Amplification, Social Proof Stacking.
+- score (0-100): True viral probability using 2026 algorithm signals.
+- hookStrength (0-10): Pattern-interrupt power of the first 0.5 seconds.
+- retention (0-100): Predicted mid-video retention rate.
+- tips: 5 ELITE, highly-specific upgrade techniques with exact timestamps.
+- insight: 1 COUNTERINTUITIVE algorithm unlock.
 
 Return ONLY valid JSON: { "score": number, "hookStrength": number, "retention": number, "tips": [string×5], "insight": string }`;
 
@@ -182,37 +203,32 @@ PLATFORM RULES:
 - Reels: Visual-first. Text overlay must work without audio.
 - Shorts: Can be slightly longer (10-12 words). Educational tone allowed.`;
 
-        const freePrompt = `You are a 2026 viral hook specialist. Generate hooks that stop the scroll dead.
+        const freePrompt = `You are a 2026 viral hook specialist.
+
+[CONTEXT PLAYBOOK]
+${VIRAL_PLAYBOOK}
 
 Niche: ${niche}
 Topic: ${topic}
 
-${hookFormulas}
+Generate 4 scroll-stopping hooks and 2 companion captions using the formulas in the PLAYBOOK. Each hook must use a DIFFERENT formula.
 
-Generate 4 scroll-stopping hooks and 2 companion captions. Each hook must use a DIFFERENT formula. No filler words. No "Are you ready?" No generic openers.
-
-Return JSON: { "hooks": [4 strings, each starting with [FORMULA TYPE]], "captions": [2 platform-optimized strings] }`;
+Return JSON: { "hooks": [4 strings, formatted "[FORMULA] Hook text"], "captions": [2 platform-optimized strings] }`;
 
         const proPrompt = `You are an elite 2026 viral content architect. Your hooks have generated 100M+ views.
 
+[CONTEXT PLAYBOOK]
+${VIRAL_PLAYBOOK}
+
 Niche: ${niche}
 Topic: ${topic}
-
-${hookFormulas}
 
 Generate 6 elite hooks using 6 DIFFERENT formulas, + 3 platform-specific captions.
 
 HOOK REQUIREMENTS:
-- Each must be fundamentally mechanically different
-- Each must create immediate psychological engagement
-- Include the exact psychological mechanism in brackets: [CURIOSITY GAP], [IDENTITY], etc.
-- No repeated sentence structures
-- Average reading time under 3 seconds
-
-CAPTION REQUIREMENTS:
-- Label each by platform: [TikTok], [Reels], [Shorts]
-- Optimized character count per platform
-- Include strategic CTA
+- Land the hook in under 3 seconds
+- Use exact PLAYBOOK formulas
+- Include the psychological mechanism in brackets: [CURIOSITY GAP], [IDENTITY], etc.
 
 Return JSON: { "hooks": [6 strings], "captions": [3 strings] }`;
 
@@ -329,29 +345,16 @@ app.post('/api/rewrite', async (req, res) => {
         const completion = await openai.chat.completions.create({
             model,
             messages: [
-                { role: 'system', content: `You are a 2026 short-form video script architect. You transform bland scripts into retention-engineered viral content.
+                { role: 'system', content: `You are a 2026 short-form video script architect.
 
-Niche: ${niche}
+[CONTEXT PLAYBOOK]
+${VIRAL_PLAYBOOK}
 
-2026 SCRIPT STRUCTURE:
-[HOOK] — First 2 seconds. Pattern interrupt. No "Hey guys" or "Welcome back". Drop the viewer mid-action or mid-statement.
-[PEAK VALUE] — The core payoff. Front-load it. Don't bury the lede. Cut every sentence that doesn't add value.
-[RETENTION BRIDGE] — 1-2 lines that create a reason to keep watching ("And the craziest part? It gets worse.")
-[CTA] — Specific, non-generic. Not "follow me". Instead: "Comment [X] if this happened to you" or "Save this — you'll need it."
+Transform this script into retention-engineered viral content using the [RETENTION BLUEPRINTS]. 
 
-RETENTION TECHNIQUES TO APPLY:
-- Pattern interrupts every 3-5 seconds (tonal shift, visual cue suggestion, pacing change)
-- Open loops: raise a question early, answer it late
-- Specificity over generality ("37%" not "many people", "Tuesday" not "recently")
-- Remove ALL filler: "So", "Um", "You know", "Basically", "Kind of"
-- Active voice only
-
-FORMAT YOUR RESPONSE:
-Label each section clearly: [HOOK], [PEAK VALUE], [RETENTION BRIDGE], [CTA]
-End with one line: [PRO TIP: one specific optimization the creator should implement in editing/filming]
-
-Write the full rewritten script, ready to read aloud.` },
-                { role: 'user', content: `Rewrite this script for maximum virality:\n\n${script}` }
+Label sections: [HOOK], [PEAK VALUE], [RETENTION BRIDGE], [CTA]
+Include a [PRO TIP] for editing.` },
+                { role: 'user', content: `Rewrite this script:\n\n${script}` }
             ],
             max_tokens: 900,
             temperature: 0.8
