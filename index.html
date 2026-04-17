@@ -615,6 +615,9 @@
                                 <label>Video Idea / Topic</label>
                                 <textarea id="ideaInput" rows="3" ></textarea>
                             </div>
+                            <button type="button" class="icon-button tool-reset-btn" data-view="view-analyze" title="Reset Analyzer">
+                                <i data-lucide="trash-2"></i>
+                            </button>
                             <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('analyze')" title="Recent Ideas">
                                 <i data-lucide="history"></i>
                             </button>
@@ -739,6 +742,9 @@
                     <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
                 </div>
                 <form id="customHookForm" class="interactive-glow glass-card mt-4 mb-4 flex gap-2 w-full p-2">
+                    <button type="button" class="icon-button tool-reset-btn" data-view="view-hooks" title="Reset Engine">
+                        <i data-lucide="trash-2"></i>
+                    </button>
                     <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
                         <i data-lucide="history"></i>
                     </button>
@@ -831,6 +837,9 @@
                     <div class="form-group">
                         <div class="flex justify-between items-center mb-1">
                             <label>Topic / Concept</label>
+                            <button type="button" class="icon-button tool-reset-btn" data-view="view-captions" title="Reset Captions">
+                                <i data-lucide="trash-2"></i>
+                            </button>
                             <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('captions')" title="Recent Captions">
                                 <i data-lucide="history"></i>
                             </button>
@@ -865,6 +874,9 @@
                     <p>Optimized for 2026 Search Signals. Manifest 10-15 hyper-relevant tags to trigger reach velocity.</p>
                 </div>
                 <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
+                    <button type="button" class="icon-button tool-reset-btn" data-view="view-tags" title="Reset Tags">
+                        <i data-lucide="trash-2"></i>
+                    </button>
                     <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches" aria-label="View recent tag searches">
                         <i data-lucide="history"></i>
                     </button>
@@ -1063,6 +1075,9 @@
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
                 <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 w-full p-2">
+                    <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
+                        <i data-lucide="trash-2"></i>
+                    </button>
                     <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends" aria-label="View recent trending niches">
                         <i data-lucide="history"></i>
                     </button>
@@ -1091,6 +1106,9 @@
                 <div id="rewriteForm" class="mt-4 mb-4">
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-xs font-bold text-muted uppercase tracking-wide">Paste Your Script</label>
+                        <button type="button" class="icon-button tool-reset-btn" data-view="view-rewrite" title="Reset Rewrite">
+                            <i data-lucide="trash-2"></i>
+                        </button>
                         <button type="button" class="tool-history-link" onclick="cycleHistory('rewrite')" title="Recent Scripts" aria-label="View recent script rewrites">
                             <i data-lucide="history"></i> Recent
                         </button>
@@ -1106,6 +1124,15 @@
 
             <!-- 10. SAVED (Rewrites) -->
             <section id="view-saved" class="tab-view hidden scroll-container content-padding pb-heavy">
+                <div class="tab-header pt-4 pb-2">
+                    <div class="flex justify-between items-center w-full">
+                        <h2 class="flex items-center gap-2">Saved Vault</h2>
+                        <button type="button" class="icon-button tool-reset-btn" data-view="view-saved" title="Reset Vault">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                    <p>Your elite repository of generated hooks and scripts.</p>
+                </div>
                 <div class="tab-header pt-4">
                     <div class="flex justify-between items-center mb-2">
                         <h2>Saved Rewrites</h2>
@@ -1132,21 +1159,23 @@
 
             <!-- 11. VIDEO AI (PRO) -->
             <section id="view-videoai" class="tab-view hidden scroll-container content-padding pb-heavy">
-                <div class="tab-header pt-4 pb-2">
-                    <h2 class="flex items-center gap-2">Video AI <i data-lucide="crown" class="text-accent" style="display:inline; width:20px;"></i>
-                    </h2>
-                    <p>Upload files for deep algorithmic scanning.</p>
+                 <div class="tab-header pt-4 pb-2">
+                    <div class="flex justify-between items-center w-full">
+                        <h2 class="flex items-center gap-2">Video AI <i data-lucide="crown" class="text-accent" style="display:inline; width:20px;"></i></h2>
+                        <button type="button" class="icon-button tool-reset-btn" data-view="view-videoai" title="Reset Scanner">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                    <p>Holographic Neural Lab: Analyze visual resonance.</p>
                 </div>
 
                 <div id="videoAiUploadState">
                     <div class="glass-card mt-4 mb-4 upload-card interactive-glow text-center border-accent">
                         <input type="file" id="videoFileInput" accept="video/*" class="hidden">
-                        <div class="form-group mock-upload" id="mockUploadBtn"
-                            style="min-height: 150px; display:flex; padding-top: 2rem; cursor:pointer;">
+                        <div class="form-group mock-upload" id="mockUploadBtn" style="min-height: 150px; display:flex; padding-top: 2rem; cursor:pointer;">
                             <div class="upload-zone w-full flex-col">
-                                <i data-lucide="upload-cloud"
-                                    style="width:40px; height:40px; margin: 0 auto; color:var(--accent-blue-light)"></i>
-                                <span class="font-bold mt-2 text-primary">Tap to Select Video File</span>
+                                <i data-lucide="upload-cloud" style="width:40px; height:40px; margin: 0 auto; color:var(--accent-blue-light)"></i>
+                                <span class="font-bold mt-2 text-primary">Upload to Neural Mesh</span>
                                 <span class="text-xs text-secondary mt-1">MP4, MOV, WEBM (Max 300MB)</span>
                             </div>
                         </div>
@@ -1154,83 +1183,124 @@
                 </div>
 
                 <div id="videoAiResultState" class="hidden">
-                    <div class="video-preview-box interactive-glow">
+                    <div class="video-preview-box interactive-glow" id="hologramContainer">
                         <div class="scan-line" id="videoScanLine"></div>
-                        <div class="detection-grid">
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
-                            <div class="grid-cell"></div>
+                        <div class="anamorphic-flare"></div>
+                        <div class="hologram-mesh"></div>
+                        <div class="elite-scanner-grid" id="eliteGrid">
+                            <div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div>
+                            <div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div>
+                            <div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div>
+                            <div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div>
+                            <div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div><div class="elite-grid-cell"></div>
                         </div>
+                        <svg class="neural-map-svg" viewBox="0 0 100 100">
+                            <circle cx="20" cy="20" r="1" fill="cyan" />
+                            <circle cx="80" cy="20" r="1" fill="cyan" />
+                            <circle cx="50" cy="50" r="2" fill="white" />
+                            <circle cx="20" cy="80" r="1" fill="cyan" />
+                            <circle cx="80" cy="80" r="1" fill="cyan" />
+                            <line x1="20" y1="20" x2="50" y2="50" stroke="cyan" stroke-width="0.2" opacity="0.4" />
+                            <line x1="80" y1="20" x2="50" y2="50" stroke="cyan" stroke-width="0.2" opacity="0.4" />
+                            <line x1="20" y1="80" x2="50" y2="50" stroke="cyan" stroke-width="0.2" opacity="0.4" />
+                            <line x1="80" y1="80" x2="50" y2="50" stroke="cyan" stroke-width="0.2" opacity="0.4" />
+                        </svg>
                         <div id="videoAiLoadingOverlay" class="scan-overlay">
-                            <div class="loader mb-2" style="width:30px; height:30px;"></div>
-                            <span class="text-xs font-bold uppercase tracking-wide">Deep Scanning...</span>
+                            <div class="loader mb-2" style="width:30px; height:30px; border-top-color: var(--elite-cyan);"></div>
+                            <span class="text-xs font-bold uppercase tracking-wide neon-cyan">Deep Neural Scanning...</span>
                         </div>
                     </div>
 
                     <div class="mt-6 flex-col gap-2">
-                        <div class="pro-stat-row"><span class="pro-label">Aesthetic Brilliance</span><span
-                                class="pro-value" id="resVidAesthetic">Calculating...</span></div>
-                        <div class="pro-stat-row"><span class="pro-label">Color Vibrancy</span><span class="pro-value"
-                                id="resVidColor">Detecting...</span></div>
-                        <div class="pro-stat-row"><span class="pro-label">Native Resolution</span><span
-                                class="pro-value" id="resVidResolution">--</span></div>
-                        <div class="pro-stat-row"><span class="pro-label">Exact Duration</span><span class="pro-value"
-                                id="resVidDuration">--</span></div>
+                        <div class="elite-stat-card">
+                            <div class="flex-col">
+                                <span class="elite-stat-label">Aesthetic Intelligence <span class="pro-badge-mini">PRO</span></span>
+                                <span class="elite-stat-value" id="resVidAesthetic">Analyzing...</span>
+                            </div>
+                            <i data-lucide="sparkles" class="text-cyan" style="width:18px;"></i>
+                        </div>
+                        <div class="elite-stat-card">
+                            <div class="flex-col">
+                                <span class="elite-stat-label">Color Chromaticity</span>
+                                <span class="elite-stat-value" id="resVidColor">Detecting...</span>
+                            </div>
+                            <i data-lucide="palette" class="text-purple" style="width:18px;"></i>
+                        </div>
+                        <div class="elite-stat-card">
+                            <div class="flex-col">
+                                <span class="elite-stat-label">Technical Fidelity</span>
+                                <span class="elite-stat-value"><span id="resVidResolution">--</span> @ <span id="resVidDuration">--</span></span>
+                            </div>
+                            <i data-lucide="monitor" class="text-gold" style="width:18px;"></i>
+                        </div>
                     </div>
 
-                    <button class="btn-secondary w-full mt-4" id="restartVideoAiBtn"><i data-lucide="refresh-cw"></i>
-                        Scan New Video</button>
+                    <button class="btn-secondary w-full mt-4" id="restartVideoAiBtn" style="border-color: var(--elite-cyan); color: var(--elite-cyan);">
+                        <i data-lucide="refresh-cw"></i> New Algorithmic Scan
+                    </button>
                 </div>
             </section>
 
             <!-- 12. AI CHAT (PRO) -->
-            <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%;">
-                <div class="tab-header pt-4 content-padding border-bottom pb-2">
-                    <h2 class="flex items-center gap-2">Algorithm Architect <i data-lucide="sparkles" class="text-purple"></i></h2>
-                    <p>Elite algorithmic advisor active. Grounded in 2026 Viral Playbook.</p>
+            <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%; position: relative;">
+                <div class="neural-bg"></div>
+                <div class="tab-header pt-4 content-padding border-bottom pb-2" style="position: relative; z-index: 5;">
+                    <div class="flex justify-between items-center w-full">
+                        <h2 class="flex items-center gap-2">Architect <i data-lucide="sparkles" class="text-purple"></i></h2>
+                        <div class="flex gap-2">
+                            <button class="btn-text text-xs" id="chatHistoryBtn"><i data-lucide="history"></i> History</button>
+                            <button type="button" class="icon-button tool-reset-btn" data-view="view-chat" title="Reset Session">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="pill-tabs mb-2 sticky-pill interactive-glow mx-auto mt-2" style="max-width:240px;">
-                    <button class="pill active" data-subtab="sub-chat-live">Live Chat</button>
-                    <button class="pill" data-subtab="sub-chat-logs">History</button>
-                </div>
-
-                <!-- LIVE CHAT SUB-TAB -->
-                <div id="sub-chat-live" class="item-list-container active-subtab" style="display:flex; flex-direction:column; height: calc(100% - 140px);">
-
-                    <div class="chat-container" style="flex:1;">
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="chat-bubble bubble-ai">
-                                Hey! What are we working on today? Drop an idea, a hook, or a link and I'll give you a strategy for Reels, TikTok, or Shorts.
+                <div class="chat-container" style="position: relative; z-index: 5; height: calc(100% - 140px); display:flex; flex-direction:column;">
+                    <div id="chatMessages" class="chat-messages scroll-container" style="flex:1;">
+                        <!-- ARCHITECT INTRO STATE -->
+                        <div id="chatIntro" class="architect-intro">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="architect-logo">
+                                <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" />
+                                <rect x="22" y="55" width="12" height="25" rx="4" fill="#a855f7" />
+                                <rect x="44" y="35" width="12" height="45" rx="4" fill="#ec4899" />
+                                <rect x="66" y="15" width="12" height="65" rx="4" fill="#6366f1" />
+                            </svg>
+                            <h1 class="architect-title">ViralReels Architect</h1>
+                            <p class="architect-subtitle">Dominate the short-form algorithm with grounded AI strategy.</p>
+                            
+                            <div class="suggest-hub">
+                                <button class="suggest-chip" data-prompt="Analyze my current niche for viral gaps"><i data-lucide="search"></i> Niche Analysis</button>
+                                <button class="suggest-chip" data-prompt="Give me a retention blueprint for a 30s video"><i data-lucide="zap"></i> Retention Plan</button>
+                                <button class="suggest-chip" data-prompt="3 polarizing hooks for my next Reel"><i data-lucide="magnet"></i> Polarizing Hooks</button>
+                                <button class="suggest-chip" data-prompt="How do I double my engagement rate?"><i data-lucide="trending-up"></i> Boost Growth</button>
                             </div>
                         </div>
-                        <form class="chat-input-area" id="chatForm">
-                            <input type="text" class="chat-input text-input" id="chatInput"
-                                placeholder="Message your consultant..." >
-                            <button type="submit" class="btn-primary"
-                                style="padding: 10px; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0;"><i
-                                    data-lucide="send"></i></button>
-                        </form>
+                    </div>
+                    
+                    <div id="typingIndicator" class="hidden content-padding py-2"><span class="text-xs text-secondary italic flex items-center gap-2"><div class="loader" style="width:10px; height:10px;"></div> Architect is calculating...</span></div>
+
+                    <div class="chat-input-area content-padding">
+                        <div class="flex-grow relative">
+                            <input type="text" id="chatInput" class="chat-input elite-bubble" placeholder="Message the Architect..." style="width:100%;">
+                        </div>
+                        <button id="sendChatBtn" class="btn-primary rounded-pill" style="padding: 10px 18px; flex-shrink:0;">
+                            <i data-lucide="send"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- LOGS SUB-TAB -->
-                <div id="sub-chat-logs" class="item-list-container hidden content-padding pt-4">
+                <!-- HISTORY SUB-VIEW (OVERLAY STYLE) -->
+                <div id="chatHistoryView" class="hidden content-padding pt-4 absolute inset-0 glass-card z-nav" style="background: var(--bg-dark);">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-sm uppercase tracking-wide text-muted">Past Conversations</h3>
-                        <button class="btn-text text-red text-xs" id="clearChatLogsBtn"><i data-lucide="trash-2"></i> Clear All</button>
+                        <h3 class="font-bold text-sm uppercase tracking-wide text-muted">Past Archives</h3>
+                        <div class="flex gap-2">
+                             <button class="btn-text text-red text-xs" id="clearChatLogsBtn"><i data-lucide="trash-2"></i> Clear All</button>
+                             <button class="icon-button" id="closeChatHistoryBtn"><i data-lucide="x"></i></button>
+                        </div>
                     </div>
-                    <div id="chatLogsList" class="flex flex-col gap-3">
-                        <div class="empty-state glass-card py-10">
+                    <div id="chatLogsList" class="flex flex-col gap-3 scroll-container" style="height: 80vh;">
+                         <div class="empty-state">
                             <i data-lucide="history" class="lg-icon mb-2 opacity-20"></i>
                             <p class="text-xs text-muted">No past logs found.</p>
                         </div>

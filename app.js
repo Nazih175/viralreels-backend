@@ -101,6 +101,91 @@ const initApp = () => {
         modalConfirm.onclick = () => { modalOverlay.classList.add('hidden'); };
     };
 
+    window.resetToolState = (viewId) => {
+        if (!viewId) return;
+        const tool = viewId.replace('view-', '');
+        
+        // --- 1. CLEAR INPUTS ---
+        const inputs = {
+            'analyze': ['ideaInput', 'captionInput', 'hashtagInput'],
+            'hooks': ['customHookInput'],
+            'captions': ['dedCapInput'],
+            'tags': ['dedTagsInput'],
+            'trends': ['trendsInput'],
+            'rewrite': ['rewriteInput'],
+            'chat': ['chatInput']
+        };
+        (inputs[tool] || []).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // --- 2. HIDE/CLEAR OUTPUTS ---
+        if (tool === 'analyze') {
+            document.getElementById('resultsDashboard')?.classList.add('hidden');
+            const resTipsList = document.getElementById('resTipsList');
+            if (resTipsList) resTipsList.innerHTML = '';
+        } else if (tool === 'hooks') {
+            document.getElementById('hooksGeneratorsContent')?.classList.add('hidden');
+            document.getElementById('hooksGeneratorsEmpty')?.classList.remove('hidden');
+        } else if (tool === 'captions') {
+            const capOut = document.getElementById('dedCapOutput');
+            if (capOut) {
+                capOut.classList.add('hidden');
+                capOut.innerHTML = '';
+            }
+        } else if (tool === 'tags') {
+            document.getElementById('dedTagsOutput')?.classList.add('hidden');
+            const t1 = document.getElementById('tagsTrending'); if (t1) t1.innerHTML = '';
+            const t2 = document.getElementById('tagsNiche'); if (t2) t2.innerHTML = '';
+            const t3 = document.getElementById('tagsRecommended'); if (t3) t3.innerHTML = '';
+        } else if (tool === 'trends') {
+            const trendsOut = document.getElementById('trendsOutput');
+            if (trendsOut) {
+                trendsOut.classList.add('hidden');
+                trendsOut.innerHTML = '';
+            }
+            document.getElementById('trendsEmpty')?.classList.remove('hidden');
+    // -- 2. GLOBAL RESET ENGINE (Optimized for 12 Modules) --
+    window.resetToolState = (viewId) => {
+        // Module-specific internal state reset
+        if (viewId === 'view-check') {
+            document.querySelectorAll('#view-check input[type="checkbox"]').forEach(c => c.checked = false);
+        } else if (viewId === 'view-chat') {
+            const chatMessages = document.getElementById('chatMessages');
+            const chatIntro = document.getElementById('chatIntro');
+            const chatView = document.getElementById('view-chat');
+            if (chatMessages) chatMessages.innerHTML = '';
+            if (chatIntro) {
+                chatIntro.classList.remove('hidden');
+                chatMessages.appendChild(chatIntro);
+            }
+            if (chatView) chatView.classList.remove('neural-active');
+        } else if (viewId === 'view-videoai') {
+            document.getElementById('restartVideoAiBtn')?.click();
+        } else if (viewId === 'view-checklist') {
+            document.getElementById('resetChecklistBtn')?.click();
+        } else if (viewId === 'view-tracker') {
+            // NOTE: Only clears local log view, not global history
+            localStorage.setItem('vr_saved_hooks', '[]');
+            if (window.savedHooks) window.savedHooks = [];
+            window.renderTracker?.();
+        } else if (viewId === 'view-calendar') {
+            localStorage.setItem('vr_saved_events', '{}');
+            if (window.savedEvents) window.savedEvents = {};
+            window.renderCalendar?.();
+        } else if (viewId === 'view-saved') {
+            localStorage.setItem('vr_saved_rewrites', '[]');
+            localStorage.setItem('vr_saved_tags', '[]');
+            if (window.savedRewrites) window.savedRewrites = [];
+            if (window.savedTags) window.savedTags = [];
+            window.renderSavedRewrites?.();
+            window.renderSavedTags?.();
+        }
+
+        lucide.createIcons();
+    };
+
     // -- PREMIUM CELEBRATIONS --
     window.vrCelebrate = (type = 'basic') => {
         if (type === 'basic') {
@@ -587,12 +672,14 @@ const initApp = () => {
                 return;
             }
 
-            // --- PRESERVE STATE ON LEAVE (REMOVED AGGRESSIVE RESET) ---
-            const activeView = document.querySelector('.active-view');
-            // We no longer clear inputs or hide dashboards here to allow seamless multi-tasking.
-
-            // Identify current active view for exit animation
+            // --- CLEAN WORKSPACE: RESET ON LEAVE ---
             const currentView = document.querySelector('.tab-view.active-view');
+            // Auto-reset everything EXCEPT permanent user archives (Calendar, Tracker, Vault, Home)
+            if (currentView && !['view-calendar', 'view-tracker', 'view-saved', 'view-home'].includes(currentView.id)) {
+                window.resetToolState(currentView.id);
+            }
+
+            // Identify target view for entrance (animation)
             const targetView = document.getElementById(`view-${targetId}`);
 
             if (!targetView || (currentView && currentView.id === `view-${targetId}`)) return;
@@ -631,6 +718,23 @@ const initApp = () => {
 
             const tabName = btn.querySelector('span')?.innerText || 'Dashboard';
             document.title = `ViralReels | ${tabName}`;
+        });
+    });
+
+    // -- MANUAL RESET BUTTONS --
+    document.querySelectorAll('.tool-reset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const viewId = btn.getAttribute('data-view');
+            
+            // SECURITY PASS: Confirmation for Log modules
+            if (['view-calendar', 'view-tracker', 'view-saved'].includes(viewId)) {
+                if (!confirm("Wipe all saved logs in this module? This cannot be undone, though your tool history (last 10 searches) will remain safe.")) return;
+            }
+
+            window.resetToolState(viewId);
+            showToast("Workspace Cleared.");
         });
     });
 
@@ -1104,12 +1208,12 @@ const initApp = () => {
             console.error(e);
             showToast("Caption generation failed.");
         } finally {
-            btn.disabled = false;
             btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
             lucide.createIcons();
         }
     });
 
+    // -- STORAGE RECOVERY --
     // -- 6. TAGS VIEW --
     document.getElementById('dedTagsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1582,11 +1686,14 @@ const initApp = () => {
         if (!log) return;
         
         // Populate chat messages and switch tab
+        const intro = document.getElementById('chatIntro');
+        if (intro) intro.classList.add('hidden');
+        
         chatMessages.innerHTML = `
             <div class="chat-bubble bubble-user result-appear">${log.userMsg}</div>
-            <div class="chat-bubble bubble-ai result-appear">${log.aiMsg}</div>
+            <div class="chat-bubble bubble-ai elite-bubble result-appear">${log.aiMsg}</div>
         `;
-        document.querySelector('[data-subtab="sub-chat-live"]').click();
+        document.getElementById('chatHistoryView')?.classList.add('hidden');
         lucide.createIcons();
     };
 
@@ -1602,12 +1709,39 @@ const initApp = () => {
     // Initial render
     renderChatLogs();
 
-    if (chatForm) {
-        const chatSubmit = chatForm.querySelector('button[type="submit"]');
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // -- AI CHAT ELITE OVERLAYS --
+    document.getElementById('chatHistoryBtn')?.addEventListener('click', () => {
+        document.getElementById('chatHistoryView')?.classList.remove('hidden');
+        renderChatLogs();
+    });
+    document.getElementById('closeChatHistoryBtn')?.addEventListener('click', () => {
+        document.getElementById('chatHistoryView')?.classList.add('hidden');
+    });
+
+    // -- SUGGESTION CHIPS --
+    document.querySelectorAll('.suggest-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const prompt = chip.getAttribute('data-prompt');
+            if (prompt && chatInput) {
+                chatInput.value = prompt;
+                document.getElementById('sendChatBtn')?.click();
+            }
+        });
+    });
+
+    const sendChatBtn = document.getElementById('sendChatBtn');
+    if (sendChatBtn) {
+        sendChatBtn.addEventListener('click', async () => {
             const msg = chatInput.value.trim();
             if (!msg) return;
+
+            // Hide Intro
+            const intro = document.getElementById('chatIntro');
+            if (intro) intro.classList.add('hidden');
+            
+            // Toggle Neurals
+            const chatView = document.getElementById('view-chat');
+            chatView.classList.add('neural-active');
 
             // Add user bubble
             const uEl = document.createElement('div');
@@ -1617,12 +1751,12 @@ const initApp = () => {
             chatInput.value = '';
             chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
 
-            chatSubmit.disabled = true;
-            chatSubmit.innerHTML = '<div class="loader"></div>';
+            sendChatBtn.disabled = true;
+            sendChatBtn.innerHTML = '<div class="loader"></div>';
 
             // AI thinking
             const aiDiv = document.createElement('div');
-            aiDiv.className = 'chat-bubble bubble-ai result-appear';
+            aiDiv.className = 'chat-bubble bubble-ai elite-bubble result-appear';
             aiDiv.innerHTML = '<div class="loader" style="width:12px; height:12px;"></div>';
             chatMessages.appendChild(aiDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1718,6 +1852,15 @@ const initApp = () => {
             videoAiUploadState.classList.add('hidden');
             videoAiResultState.classList.remove('hidden');
             videoAiLoadingOverlay.classList.remove('hidden');
+            
+            // Elite: Holographic Mesh Pulse
+            const gridCells = document.querySelectorAll('.elite-grid-cell');
+            const flashInterval = setInterval(() => {
+                const rand = Math.floor(Math.random() * gridCells.length);
+                gridCells[rand].style.background = 'rgba(34, 211, 238, 0.4)';
+                setTimeout(() => gridCells[rand].style.background = 'transparent', 400);
+            }, 100);
+            setTimeout(() => clearInterval(flashInterval), 5000);
 
             // 3. Technical Analysis
             const videoUrl = URL.createObjectURL(file);
