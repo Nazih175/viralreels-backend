@@ -139,8 +139,6 @@ const initApp = () => {
             if (chatView) chatView.classList.remove('neural-active');
         } else if (tool === 'videoai') {
             document.getElementById('restartVideoAiBtn')?.click();
-        } else if (tool === 'checklist') {
-            document.getElementById('resetChecklistBtn')?.click();
         }
 
         lucide.createIcons();
@@ -300,6 +298,22 @@ const initApp = () => {
             showToast("System Share not supported. Copied to clipboard!");
         }
     };
+
+    // -- MOBILE KEYBOARD MANAGEMENT (AI CHAT) --
+    const chatInputEl = document.getElementById('chatInput');
+    const bNav = document.querySelector('.bottom-nav');
+    if (chatInputEl && bNav) {
+        chatInputEl.addEventListener('focus', () => {
+            if (window.innerWidth < 768) {
+                bNav.style.display = 'none';
+                document.body.classList.add('keyboard-open');
+            }
+        });
+        chatInputEl.addEventListener('blur', () => {
+            bNav.style.display = 'grid';
+            document.body.classList.remove('keyboard-open');
+        });
+    }
 
     // =============================================
     // == USAGE LIMIT ENGINE ==
