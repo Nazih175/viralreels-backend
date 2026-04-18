@@ -2110,7 +2110,14 @@ const initApp = () => {
                     manageBillingBtn.disabled = false;
                     return;
                 }
+                
+                if (!isPro) {
+                    // Start Checkout for Free users
+                    initiateCheckout();
+                    return;
+                }
 
+                // Create Portal for Pro users
                 const response = await fetchWithTimeout(`${API_BASE}/create-portal-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2303,30 +2310,32 @@ const initApp = () => {
                     appContainer.classList.remove('hidden');
                     lucide.createIcons();
                     
-                    // SYNC PRO STATUS FROM DB (The "Remember Me" Core Fix)
+                    // SYNC PRO STATUS FROM DB (HARD-SYNC SOURCE OF TRUTH)
                     try {
                         const db = firebase.firestore();
                         const userDoc = await db.collection('users').doc(user.uid).get();
                         if (userDoc.exists) {
                             const data = userDoc.data();
-                            if (data.isPro) {
-                                console.log("[ViralReels] Pro Status verified from Database.");
-                                localStorage.setItem('vr_pro_status', 'true');
-                                isPro = true;
-                                // Force hydration of premium features if they were hidden
-                                document.querySelectorAll('.crown-badge').forEach(b => b.classList.add('active'));
-                            } else {
-                                // Sync reverse (if subscription expired/cancelled but local storage is stale)
-                                localStorage.setItem('vr_pro_status', 'false');
-                                isPro = false;
+                            // Update global state immediately
+                            isPro = !!data.isPro; 
+                            localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
+                            
+                            console.log(`[ViralReels] Pro Status: ${isPro ? 'Verified (PRO)' : 'Standard (FREE)'}`);
+                            
+                            // Re-render UI based on fresh status
+                            renderAllBadges();
+                            
+                            // Active portal button state
+                            const proManageBtn = document.getElementById('manageBillingBtn');
+                            if (proManageBtn) {
+                                proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
+                                proManageBtn.querySelector('i')?.setAttribute('data-lucide', isPro ? 'credit-card' : 'zap');
+                                lucide.createIcons();
                             }
-                        } else {
-                            // User document missing (New User) - Revert cache to free tier
-                            localStorage.setItem('vr_pro_status', 'false');
-                            isPro = false;
                         }
                     } catch (dbErr) {
                         console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
+                        isPro = localStorage.getItem('vr_pro_status') === 'true';
                     }
 
                     initTrial(); // Start 7-day trial clock on first login

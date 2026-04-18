@@ -77,26 +77,47 @@ app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => 
         }
     }
 
+    // --- CASE 1: INITIAL SUBSCRIPTION SUCCESS ---
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        console.log(`✅ Payment received! Session ID: ${session.id}`);
-        
         const uid = session.client_reference_id;
+        const customerId = session.customer;
+
         if (uid) {
             try {
-                // Update Firestore User Record
                 const db = admin.firestore();
-                db.collection('users').doc(uid).set({
+                await db.collection('users').doc(uid).set({
                     isPro: true,
+                    stripeCustomerId: customerId,
                     proActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                    stripeSessionId: session.id
+                    stripeSubscriptionId: session.subscription
                 }, { merge: true });
-                console.log(`✅ Successfully upgraded Firebase User [${uid}] to Pro!`);
+                console.log(`✅ [Webhook] Upgraded User [${uid}] to Pro. Saved CustomerID: ${customerId}`);
             } catch (err) {
-                console.error(`❌ Failed to update Firebase for user ${uid}: ${err.message}`);
+                console.error(`❌ [Webhook] Firestore upgrade error for ${uid}:`, err.message);
             }
-        } else {
-            console.warn("⚠️ No client_reference_id found. Cannot upgrade anonymous checkout.");
+        }
+    }
+
+    // --- CASE 2: SUBSCRIPTION REVOKED / CANCELED ---
+    if (event.type === 'customer.subscription.deleted' || event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object;
+        const customerId = subscription.customer;
+        
+        // If the subscription is no longer active/trialing, revoke access
+        if (subscription.status !== 'active' && subscription.status !== 'trialing') {
+            try {
+                const db = admin.firestore();
+                const userQuery = await db.collection('users').where('stripeCustomerId', '==', customerId).limit(1).get();
+                
+                if (!userQuery.empty) {
+                    const userDoc = userQuery.docs[0];
+                    await userDoc.ref.update({ isPro: false });
+                    console.log(`📉 [Webhook] Revoked Pro for ${userDoc.id} (Subscription Status: ${subscription.status})`);
+                }
+            } catch (err) {
+                console.error(`❌ [Webhook] Revoke error for customer ${customerId}:`, err.message);
+            }
         }
     }
 
@@ -631,29 +652,35 @@ app.post('/api/checkout', async (req, res) => {
 app.post('/api/create-portal-session', async (req, res) => {
     const { uid, email } = req.body;
     
-    try {
-        // Step 1: Look up Stripe Customer by email
-        let customers = await stripe.customers.list({
-            email: email,
-            limit: 1
-        });
+        // Step 1: Check Firestore for a pre-saved Stripe Customer ID (FASTEST)
+        const db = admin.firestore();
+        const userDoc = await db.collection('users').doc(uid).get();
+        let customerId = userDoc.exists ? userDoc.data().stripeCustomerId : null;
 
-        // Fallback: Search by metadata user_id if no email match
-        if (customers.data.length === 0 && uid) {
-            console.log(`[Stripe Portal] No email match for ${email}. Falling back to metadata search for uid: ${uid}`);
-            customers = await stripe.customers.search({
-                query: `metadata['user_id']:'${uid}'`,
-                limit: 1
-            });
+        // Step 2: Fallback to Search if not in DB yet
+        if (!customerId) {
+            console.log(`[Portal] CustomerID not in DB. Searching Strike...`);
+            let customers = await stripe.customers.list({ email: email, limit: 1 });
+            
+            if (customers.data.length === 0 && uid) {
+                customers = await stripe.customers.search({
+                    query: `metadata['user_id']:'${uid}'`,
+                    limit: 1
+                });
+            }
+
+            if (customers.data.length > 0) {
+                customerId = customers.data[0].id;
+                // Proactively save it for next time
+                await db.collection('users').doc(uid).update({ stripeCustomerId: customerId });
+            }
         }
 
-        if (customers.data.length === 0) {
-            return res.status(400).json({ error: "No active subscription found for this account. Please upgrade first." });
+        if (!customerId) {
+            return res.status(400).json({ error: "No active subscription found. Please upgrade first." });
         }
 
-        const customerId = customers.data[0].id;
-
-        // Step 2: Create a billing portal session
+        // Step 3: Create portal session
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: customerId,
             return_url: req.headers.origin || 'https://nazih175.github.io/viralreels-backend/',
