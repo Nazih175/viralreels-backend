@@ -1094,20 +1094,23 @@ body.light-theme .sticky-score {
     bottom: 0px;
     left: 0;
     right: 0;
-    padding: 10px 1.5rem 24px 1.5rem;
-    background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    padding: 10px 1.5rem 10px 1.5rem;
+    background: linear-gradient(to top, var(--bg-dark) 90%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 20;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chat-input-anchored .chat-input-area {
     padding: 0 !important;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 #chatMessages {
-    padding-bottom: 120px !important;
+    padding-bottom: 80px !important;
 }
 
 /* Ensure bottom nav is always centered */

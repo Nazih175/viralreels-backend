@@ -1244,7 +1244,7 @@
             </section>
 
             <!-- 12. AI CHAT (PRO) -->
-            <section id="view-chat" class="tab-view hidden flush-container pb-heavy" style="height: 100%; position: relative;">
+            <section id="view-chat" class="tab-view hidden flush-container" style="position: relative; flex: 1; display: flex; flex-direction: column;">
                 <div class="neural-bg"></div>
                 <div class="tab-header pt-4 content-padding border-bottom pb-2" style="position: relative; z-index: 5;">
                     <div class="flex justify-between items-center w-full">
@@ -1258,7 +1258,7 @@
                     </div>
                 </div>
 
-                <div class="chat-container" style="position: relative; z-index: 5; height: calc(100% - 70px); display:flex; flex-direction:column;">
+                <div class="chat-container" style="position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
                     <div id="chatMessages" class="chat-messages scroll-container" style="flex:1;">
                         <!-- ARCHITECT INTRO STATE -->
                         <div id="chatIntro" class="architect-intro">
