@@ -101,12 +101,13 @@ const initApp = () => {
         modalConfirm.onclick = () => { modalOverlay.classList.add('hidden'); };
     };
 
+
     window.resetToolState = (viewId) => {
         if (!viewId) return;
         const tool = viewId.replace('view-', '');
         
         // --- 1. CLEAR INPUTS ---
-        const inputs = {
+        const inputMap = {
             'analyze': ['ideaInput', 'captionInput', 'hashtagInput'],
             'hooks': ['customHookInput'],
             'captions': ['dedCapInput'],
@@ -115,43 +116,18 @@ const initApp = () => {
             'rewrite': ['rewriteInput'],
             'chat': ['chatInput']
         };
-        (inputs[tool] || []).forEach(id => {
+        (inputMap[tool] || []).forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
 
-        // --- 2. HIDE/CLEAR OUTPUTS ---
+        // --- 2. CLEAR OUTPUTS ---
         if (tool === 'analyze') {
             document.getElementById('resultsDashboard')?.classList.add('hidden');
-            const resTipsList = document.getElementById('resTipsList');
-            if (resTipsList) resTipsList.innerHTML = '';
         } else if (tool === 'hooks') {
             document.getElementById('hooksGeneratorsContent')?.classList.add('hidden');
             document.getElementById('hooksGeneratorsEmpty')?.classList.remove('hidden');
-        } else if (tool === 'captions') {
-            const capOut = document.getElementById('dedCapOutput');
-            if (capOut) {
-                capOut.classList.add('hidden');
-                capOut.innerHTML = '';
-            }
-        } else if (tool === 'tags') {
-            document.getElementById('dedTagsOutput')?.classList.add('hidden');
-            const t1 = document.getElementById('tagsTrending'); if (t1) t1.innerHTML = '';
-            const t2 = document.getElementById('tagsNiche'); if (t2) t2.innerHTML = '';
-            const t3 = document.getElementById('tagsRecommended'); if (t3) t3.innerHTML = '';
-        } else if (tool === 'trends') {
-            const trendsOut = document.getElementById('trendsOutput');
-            if (trendsOut) {
-                trendsOut.classList.add('hidden');
-                trendsOut.innerHTML = '';
-            }
-            document.getElementById('trendsEmpty')?.classList.remove('hidden');
-    // -- 2. GLOBAL RESET ENGINE (Optimized for 12 Modules) --
-    window.resetToolState = (viewId) => {
-        // Module-specific internal state reset
-        if (viewId === 'view-check') {
-            document.querySelectorAll('#view-check input[type="checkbox"]').forEach(c => c.checked = false);
-        } else if (viewId === 'view-chat') {
+        } else if (tool === 'chat') {
             const chatMessages = document.getElementById('chatMessages');
             const chatIntro = document.getElementById('chatIntro');
             const chatView = document.getElementById('view-chat');
@@ -161,26 +137,10 @@ const initApp = () => {
                 chatMessages.appendChild(chatIntro);
             }
             if (chatView) chatView.classList.remove('neural-active');
-        } else if (viewId === 'view-videoai') {
+        } else if (tool === 'videoai') {
             document.getElementById('restartVideoAiBtn')?.click();
-        } else if (viewId === 'view-checklist') {
+        } else if (tool === 'checklist') {
             document.getElementById('resetChecklistBtn')?.click();
-        } else if (viewId === 'view-tracker') {
-            // NOTE: Only clears local log view, not global history
-            localStorage.setItem('vr_saved_hooks', '[]');
-            if (window.savedHooks) window.savedHooks = [];
-            window.renderTracker?.();
-        } else if (viewId === 'view-calendar') {
-            localStorage.setItem('vr_saved_events', '{}');
-            if (window.savedEvents) window.savedEvents = {};
-            window.renderCalendar?.();
-        } else if (viewId === 'view-saved') {
-            localStorage.setItem('vr_saved_rewrites', '[]');
-            localStorage.setItem('vr_saved_tags', '[]');
-            if (window.savedRewrites) window.savedRewrites = [];
-            if (window.savedTags) window.savedTags = [];
-            window.renderSavedRewrites?.();
-            window.renderSavedTags?.();
         }
 
         lucide.createIcons();
@@ -238,7 +198,21 @@ const initApp = () => {
             });
     })();
 
-    // -- FETCH WITH TIMEOUT (25s) --
+    // --- ANALYTICS UTILITY ---
+    async function logUsage(toolName) {
+        try {
+            const user = firebase.auth().currentUser;
+            await fetch(`${API_BASE}/log-usage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tool: toolName, uid: user ? user.uid : null })
+            });
+        } catch (e) {
+            console.warn(`[Analytics] Silent failure: ${e.message}`);
+        }
+    }
+
+    // --- FETCH WITH TIMEOUT WRAPPER ---
     // Every API call goes through this. If the server hangs, it fails fast with a clear error.
     const fetchWithTimeout = (url, options = {}, ms = 25000) => {
         const controller = new AbortController();
@@ -891,6 +865,7 @@ const initApp = () => {
             
             // --- USAGE & HISTORY (Move here to prevent bug) ---
             consumeUse('analyze');
+            logUsage('analyze');
             addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
 
             // --- CONTEXTUAL NAV PULSE ---
@@ -913,6 +888,11 @@ const initApp = () => {
 
             if (score >= 80) {
                 setTimeout(() => vrCelebrate('viral'), 500);
+            }
+            if (data.script) {
+                renderState('rewrite', 'result');
+                logUsage('rewrite'); // Log success
+                document.getElementById('rewriteResultText').innerText = data.script;
             }
             document.getElementById('resScoreText').innerText = score > 80 ? "Viral Potential 🔥" : "Solid 📈";
             document.getElementById('resHookBar').style.width = `${(data.hookStrength / 10) * 100}%`;
@@ -1007,6 +987,7 @@ const initApp = () => {
             const data = await res.json();
             
             consumeUse('hooks');
+            logUsage('hooks');
             addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
 
             vrCelebrate('basic');
@@ -1017,6 +998,11 @@ const initApp = () => {
 
             // --- UI GATING: SKELETON OFF ---
             document.getElementById('hooksSkeleton').classList.add('hidden');
+            if (data.hooks) {
+                renderState('hooks', 'result');
+                logUsage('hooks'); // Log success
+                const grid = document.getElementById('hookResultsGrid');
+            }
             document.getElementById('hooksGeneratorsContent').classList.remove('hidden');
             
             btn.disabled = false;
@@ -1205,6 +1191,7 @@ const initApp = () => {
 
         btn.disabled = true; // LOCK
         consumeUse('captions');
+        logUsage('captions');
         lastUsedInputs.captions = currentKey;
         addToHistory('captions', { text: topic, style, timestamp: Date.now() });
         
@@ -1271,6 +1258,12 @@ const initApp = () => {
 
             const output = document.getElementById('dedTagsOutput');
             if (output) output.classList.remove('hidden');
+
+            if (data.tags) {
+                renderState('tags', 'result');
+                logUsage('tags'); // Log success
+                const grid = document.getElementById('tagResultsGrid');
+            }
 
             // 1. Trending (Viral Momentum)
             const trendingEl = document.getElementById('tagsTrending');
@@ -1528,6 +1521,7 @@ const initApp = () => {
 
         btn.disabled = true; // LOCK
         consumeUse('rewrite');
+        logUsage('rewrite');
         lastUsedInputs.rewrite = val;
         addToHistory('rewrite', { text: val, timestamp: Date.now() });
         
@@ -1803,6 +1797,9 @@ const initApp = () => {
                 // Stream tokens in real-time
                 aiDiv.textContent = '';
                 let fullReply = '';
+                // Log chat usage once
+                logUsage('chat');
+                
                 const reader = res.body.getReader();
                 const decoder = new TextDecoder();
                 let buffer = '';
@@ -1833,8 +1830,8 @@ const initApp = () => {
                 console.error(e);
                 aiDiv.textContent = "I'm offline right now. Check your server connection.";
             } finally {
-                chatSubmit.disabled = false;
-                chatSubmit.innerHTML = '<i data-lucide="send"></i>';
+                sendChatBtn.disabled = false;
+                sendChatBtn.innerHTML = '<i data-lucide="send"></i>';
                 chatInput.focus();
                 chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
                 lucide.createIcons();
@@ -1930,6 +1927,7 @@ const initApp = () => {
                     resVidAesthetic.textContent = `${Math.min(10, (lum/25.5) + (vibrance/12.8)).toFixed(1)}/10`;
                     
                     triggerSuccess("Deep Scan Complete");
+                    logUsage('videoai');
                     document.body.removeChild(tempVid);
                     URL.revokeObjectURL(videoUrl);
                 }, 2000);
@@ -2345,7 +2343,7 @@ const initApp = () => {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');
                     }
                 } else {
-                    authOverlay.classList.remove('hidden');
+                    authOverlay.classList.add('hidden');
                     appContainer.classList.add('hidden');
                 }
             });

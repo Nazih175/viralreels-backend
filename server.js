@@ -45,6 +45,38 @@ app.use((req, res, next) => {
     next();
 });
 
+// -- USAGE ANALYTICS ENDPOINT --
+// Tracks which tools are most popular (Hooks, Chat, Tags, etc.)
+app.post('/api/log-usage', async (req, res) => {
+    const { tool, uid } = req.body;
+    if (!tool) return res.status(400).json({ error: 'Missing tool name' });
+
+    try {
+        const db = admin.firestore();
+        const statsRef = db.collection('system_stats').doc('usage');
+        
+        await statsRef.set({
+            total_generations: admin.firestore.FieldValue.increment(1),
+            [`tools.${tool}`]: admin.firestore.FieldValue.increment(1),
+            last_activity: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        // Optional: Log per-user activity in the user's document
+        if (uid) {
+            await db.collection('users').doc(uid).update({
+                totalUsed: admin.firestore.FieldValue.increment(1),
+                lastUsedAt: admin.firestore.FieldValue.serverTimestamp(),
+                [`stats.${tool}`]: admin.firestore.FieldValue.increment(1)
+            }).catch(() => {}); // Ignore if user doc doesn't exist yet
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.warn(`[Analytics] Minimal logging error: ${err.message}`);
+        res.status(500).json({ error: 'Failed to log usage' });
+    }
+});
+
 // -- GLOBAL REQUEST TIMEOUT MIDDLEWARE (25 seconds) --
 // Kills any request that hasn't responded within 25s to prevent indefinite hangs.
 app.use((req, res, next) => {
