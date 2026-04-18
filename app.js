@@ -121,6 +121,15 @@ const initApp = () => {
             if (el) el.value = '';
         });
 
+        // -- Mobile Keyboard Support --
+        if (tool === 'chat') {
+            const chatIn = document.getElementById('chatInput');
+            if (chatIn) {
+                chatIn.addEventListener('focus', () => document.body.classList.add('keyboard-mobile'));
+                chatIn.addEventListener('blur', () => document.body.classList.remove('keyboard-mobile'));
+            }
+        }
+
         // --- 2. CLEAR OUTPUTS ---
         if (tool === 'analyze') {
             document.getElementById('resultsDashboard')?.classList.add('hidden');
@@ -139,8 +148,6 @@ const initApp = () => {
             if (chatView) chatView.classList.remove('neural-active');
         } else if (tool === 'videoai') {
             document.getElementById('restartVideoAiBtn')?.click();
-        } else if (tool === 'checklist') {
-            document.getElementById('resetChecklistBtn')?.click();
         }
 
         lucide.createIcons();

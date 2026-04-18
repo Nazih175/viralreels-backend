@@ -271,44 +271,9 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 }
 .stripe-secure-msg i { color: #6772e5; } /* Stripe Blue */
 
-/* Real-time Status Indicator */
-.system-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(6, 214, 160, 0.08);
-    padding: 4px 10px;
-    border-radius: 50px;
-    border: 1px solid rgba(6, 214, 160, 0.2);
-}
-.system-status.inline-status {
-    padding: 2px 6px;
-    gap: 5px;
-    margin: 0;
-    opacity: 0.9;
-    scale: 0.9;
-    transform-origin: left center;
-}
-.status-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--accent-green);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent-green);
-    animation: statusPulse 1.5s infinite;
-}
-.status-text {
-    font-size: 0.6rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent-green);
-}
-@keyframes statusPulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.4); opacity: 0.6; }
-    100% { transform: scale(1); opacity: 1; }
-}
+/* Top Nav Branded Finish */
+.brand-text { font-weight: 800; letter-spacing: -0.5px; color: white; }
+
 
 /* About Tool Grid */
 .about-tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -634,7 +599,19 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .cal-container { padding: 1rem; border: var(--glass-border); box-shadow: var(--shadow-soft); max-width: 100%; }
 .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; font-size: 0.75rem; color: var(--accent-blue-light); font-weight: 600; text-transform: uppercase; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.cal-day { aspect-ratio: 9 / 16; border-radius: 8px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; border: 1px solid rgba(255,255,255,0.03); transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+.cal-day { 
+    aspect-ratio: 1 / 1; 
+    border-radius: 12px; 
+    background: rgba(255, 255, 255, 0.03); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    position: relative; 
+    border: 1px solid rgba(255,255,255,0.05); 
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+}
 .cal-day.empty { background: none; border: none; cursor: default; }
 .day-num { font-size: 0.9rem; font-weight: 600; }
 .cal-day.is-today { background: rgba(67, 97, 238, 0.2); border-color: var(--accent-blue); }
@@ -1110,6 +1087,20 @@ body.light-theme .sticky-score {
 }
 
 #chatMessages {
+    padding-bottom: 110px !important;
+}
+
+body.keyboard-mobile .bottom-nav {
+    display: none !important;
+}
+
+body.keyboard-mobile .chat-input-anchored {
+    bottom: 0px !important;
+    background: var(--bg-dark);
+    padding-bottom: 10px;
+}
+
+body.keyboard-mobile #chatMessages {
     padding-bottom: 80px !important;
 }
 
