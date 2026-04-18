@@ -413,8 +413,8 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .scroll-container { overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
 .scroll-container::-webkit-scrollbar { width: 4px; }
 .scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-.tab-view { flex: 1; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; display: none; padding: 0 1.5rem; }
-.active-view { display: block; }
+.tab-view { flex: 1; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; display: none; height: 100%; }
+.active-view { display: flex !important; flex-direction: column; }
 
 .tab-view::-webkit-scrollbar { width: 4px; } 
 .tab-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
