@@ -1,0 +1,22 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Runs every 10 minutes, 24/7
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping ViralReels Backend
+        run: |
+          echo "Pinging backend to prevent Render cold start..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://viralreels-ai-backend.onrender.com/api/health)
+          echo "Response status: $STATUS"
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Backend is alive and healthy."
+          else
+            echo "⚠️ Backend returned status $STATUS — may be waking up."
+          fi
