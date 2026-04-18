@@ -1258,7 +1258,7 @@
                     </div>
                 </div>
 
-                <div class="chat-container" style="position: relative; z-index: 5; height: calc(100% - 140px); display:flex; flex-direction:column;">
+                <div class="chat-container" style="position: relative; z-index: 5; height: calc(100% - 70px); display:flex; flex-direction:column;">
                     <div id="chatMessages" class="chat-messages scroll-container" style="flex:1;">
                         <!-- ARCHITECT INTRO STATE -->
                         <div id="chatIntro" class="architect-intro">
@@ -1279,10 +1279,12 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div id="typingIndicator" class="hidden content-padding py-2"><span class="text-xs text-secondary italic flex items-center gap-2"><div class="loader" style="width:10px; height:10px;"></div> Architect is calculating...</span></div>
+                </div>
 
-                    <div class="chat-input-area content-padding">
+                <!-- PERFECTLY ANCHORED TYPING AREA -->
+                <div class="chat-input-anchored">
+                    <div id="typingIndicator" class="hidden py-2"><span class="text-xs text-secondary italic flex items-center gap-2"><div class="loader" style="width:10px; height:10px;"></div> Architect is calculating...</span></div>
+                    <div class="chat-input-area">
                         <div class="flex-grow relative">
                             <input type="text" id="chatInput" class="chat-input elite-bubble" placeholder="Message the Architect..." style="width:100%;">
                         </div>

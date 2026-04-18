@@ -1087,3 +1087,31 @@ body.light-theme .sticky-score {
 }
 .architect-title { font-size: 1.75rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff, var(--elite-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .architect-subtitle { font-size: 0.95rem; color: var(--text-secondary); max-width: 300px; line-height: 1.5; }
+
+/* Perfected Anchored Input Bar */
+.chat-input-anchored {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    padding: 10px 1.5rem 24px 1.5rem;
+    background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 20;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chat-input-anchored .chat-input-area {
+    padding: 0 !important;
+}
+
+#chatMessages {
+    padding-bottom: 120px !important;
+}
+
+/* Ensure bottom nav is always centered */
+.bottom-nav {
+    width: 100%;
+    margin: 0 auto;
+}
