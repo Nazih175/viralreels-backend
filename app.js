@@ -238,6 +238,15 @@ const initApp = () => {
             });
     })();
 
+    // -- FETCH WITH TIMEOUT (25s) --
+    // Every API call goes through this. If the server hangs, it fails fast with a clear error.
+    const fetchWithTimeout = (url, options = {}, ms = 25000) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), ms);
+        return fetch(url, { ...options, signal: controller.signal })
+            .finally(() => clearTimeout(timer));
+    };
+
     // -- HISTORY MANAGEMENT --
     let histories = safeGet('vr_tool_histories', {
         analyze: [], hooks: [], captions: [], tags: [], trends: [], rewrite: []
@@ -603,11 +612,10 @@ const initApp = () => {
         this.disabled = true;
 
         try {
-            const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
-            const res = await fetch(`${API_BASE}/checkout`, {
+            const res = await fetchWithTimeout(`${API_BASE}/checkout`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: bodyData
+                body: JSON.stringify({ uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null })
             });
             const data = await res.json();
             if (data.url) {
@@ -872,7 +880,7 @@ const initApp = () => {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
             
-            const res = await fetch(`${API_BASE}/analyze`, {
+            const res = await fetchWithTimeout(`${API_BASE}/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idea, platform, length, isPro, niche: persona.niche })
@@ -989,7 +997,7 @@ const initApp = () => {
         document.getElementById('hooksSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
-            const res = await fetch(`${API_BASE}/generate-hooks`, {
+            const res = await fetchWithTimeout(`${API_BASE}/generate-hooks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: inputStr, isPro, niche: persona.niche })
@@ -1203,7 +1211,7 @@ const initApp = () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch(`${API_BASE}/generate-captions`, {
+            const res = await fetchWithTimeout(`${API_BASE}/generate-captions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic, isPro, niche: persona.niche })
@@ -1252,7 +1260,7 @@ const initApp = () => {
         addToHistory('tags', { text: topic, timestamp: Date.now() });
 
         try {
-            const res = await fetch(`${API_BASE}/generate-tags`, {
+            const res = await fetchWithTimeout(`${API_BASE}/generate-tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic, isPro, niche: persona.niche })
@@ -1411,7 +1419,7 @@ const initApp = () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch(`${API_BASE}/trends`, {
+            const res = await fetchWithTimeout(`${API_BASE}/trends`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche: val, isPro })
@@ -1526,7 +1534,7 @@ const initApp = () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetch(`${API_BASE}/rewrite`, {
+            const res = await fetchWithTimeout(`${API_BASE}/rewrite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ script: val, isPro, niche: persona.niche })
@@ -1784,7 +1792,7 @@ const initApp = () => {
                 const personaNiche = nicheInput ? nicheInput.value.trim() : 'General';
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetch(`${API_BASE}/chat-stream`, {
+                const res = await fetchWithTimeout(`${API_BASE}/chat-stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
@@ -2103,7 +2111,7 @@ const initApp = () => {
                     return;
                 }
 
-                const response = await fetch(`${API_BASE}/create-portal-session`, {
+                const response = await fetchWithTimeout(`${API_BASE}/create-portal-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid: user.uid, email: user.email })
@@ -2143,11 +2151,10 @@ const initApp = () => {
                 btn.innerHTML = '<div class="loader"></div>';
                 btn.disabled = true;
                 try {
-                    const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
-                    const res = await fetch(`${API_BASE}/checkout`, {
+                    const res = await fetchWithTimeout(`${API_BASE}/checkout`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: bodyData
+                        body: JSON.stringify({ uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null })
                     });
                     const data = await res.json();
                     if (data.url) {
@@ -2189,7 +2196,7 @@ const initApp = () => {
             document.body.appendChild(verifyOverlay);
 
             try {
-                const response = await fetch(`${API_BASE}/verify-session`, {
+                const response = await fetchWithTimeout(`${API_BASE}/verify-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: sessionId })

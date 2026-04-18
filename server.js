@@ -45,6 +45,20 @@ app.use((req, res, next) => {
     next();
 });
 
+// -- GLOBAL REQUEST TIMEOUT MIDDLEWARE (25 seconds) --
+// Kills any request that hasn't responded within 25s to prevent indefinite hangs.
+app.use((req, res, next) => {
+    const timeout = setTimeout(() => {
+        if (!res.headersSent) {
+            console.warn(`[Timeout] ${req.method} ${req.url} timed out after 25s`);
+            res.status(503).json({ error: 'Request timed out. The AI is busy — please try again.' });
+        }
+    }, 25000);
+    res.on('finish', () => clearTimeout(timeout));
+    res.on('close', () => clearTimeout(timeout));
+    next();
+});
+
 // Endpoint 7: Stripe Webhook Listener (Must be before express.json to get raw body)
 app.post('/api/webhook', express.raw({type: 'application/json'}), (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -187,6 +201,8 @@ app.post('/api/generate-hooks', async (req, res) => {
     try {
         const { topic, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         const hookFormulas = `
 PROVEN 2026 HOOK FORMULAS — use these as your architecture:
@@ -242,12 +258,13 @@ Return JSON: { "hooks": [6 strings], "captions": [3 strings] }`;
             ],
             max_tokens: 900,
             temperature: 0.9
-        });
+        }, { signal: controller.signal });
 
+        clearTimeout(timeoutId);
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
         console.error('Hooks Error:', e.message);
-        res.status(500).json({ error: 'Failed to generate hooks.' });
+        res.status(500).json({ error: 'Hook generator timed out. Please try again.' });
     }
 });
 
@@ -256,6 +273,8 @@ app.post('/api/generate-captions', async (req, res) => {
     try {
         const { topic, isPro, niche = 'general', style = 'engaging' } = req.body;
         const model = 'gpt-4o-mini';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         const completion = await openai.chat.completions.create({
             model,
@@ -287,12 +306,13 @@ Return JSON: { "captions": [5 ready-to-post strings, each labeled with [TYPE]] }
             temperature: 0.85
         });
 
+        clearTimeout(timeoutId);
         const parsed = JSON.parse(completion.choices[0].message.content);
         if (!parsed.captions) throw new Error("Invalid Format");
         res.json(parsed);
     } catch (e) {
         console.error('Captions Error:', e.message);
-        res.status(500).json({ error: 'Generation failed. Try a simpler topic.' });
+        res.status(500).json({ error: 'Caption generator timed out. Please try again.' });
     }
 });
 
@@ -301,6 +321,8 @@ app.post('/api/generate-tags', async (req, res) => {
     try {
         const { topic, isPro, niche = 'general' } = req.body;
         const model = 'gpt-4o-mini';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
         const completion = await openai.chat.completions.create({
             model,
             response_format: { type: 'json_object' },
@@ -328,12 +350,13 @@ Return JSON: { "viral": [8 strings], "niche": [8 strings], "recommended": [8 str
             temperature: 0.7
         });
 
+        clearTimeout(timeoutId);
         const parsed = JSON.parse(completion.choices[0].message.content);
         if (!parsed.viral || !parsed.niche) throw new Error("Invalid Schema");
         res.json(parsed);
     } catch (e) {
         console.error('Tags Error:', e.message);
-        res.status(500).json({ error: 'Hashtag engine stalled. Check topic.' });
+        res.status(500).json({ error: 'Hashtag generator timed out. Please try again.' });
     }
 });
 
@@ -342,6 +365,8 @@ app.post('/api/rewrite', async (req, res) => {
     try {
         const { script, isPro, niche = 'general' } = req.body;
         const model = isPro ? 'gpt-4o' : 'gpt-4o-mini';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         const completion = await openai.chat.completions.create({
             model,
@@ -361,10 +386,11 @@ Include a [PRO TIP] for editing.` },
             temperature: 0.8
         });
 
+        clearTimeout(timeoutId);
         res.json({ rewritten: completion.choices[0].message.content });
     } catch (e) {
         console.error('Rewrite Error:', e.message);
-        res.status(500).json({ error: 'Failed to rewrite script.' });
+        res.status(500).json({ error: 'Rewriter timed out. Please try again.' });
     }
 });
 
@@ -376,6 +402,8 @@ app.post('/api/chat', async (req, res) => {
         const niche = persona?.niche || 'general';
         const toneValue = persona?.tone || 50;
         let toneDesc = toneValue < 30 ? 'Soft and relatable.' : toneValue > 70 ? 'Aggressive and direct.' : 'Balanced and sharp.';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
         const systemPrompt = `You are the "2026 Algorithm Virality Architect" – the world's most optimized AI for short-form video growth.
 Role: Professional Strategist & Performance Expert.
@@ -399,12 +427,13 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
             ],
             max_tokens: 400,
             temperature: 0.8
-        });
+        }, { signal: controller.signal });
 
+        clearTimeout(timeoutId);
         res.json({ reply: completion.choices[0].message.content });
     } catch (e) {
         console.error('Chat Error:', e.message);
-        res.status(500).json({ error: 'Consultant is offline. Try again.' });
+        res.status(500).json({ error: 'AI consultant timed out. Please try again.' });
     }
 });
 
@@ -436,6 +465,9 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
         res.setHeader('Connection', 'keep-alive');
         res.flushHeaders();
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => { controller.abort(); }, 20000);
+
         const stream = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
@@ -445,7 +477,7 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
             max_tokens: 400,
             temperature: 0.8,
             stream: true,
-        });
+        }, { signal: controller.signal });
 
         let fullReply = '';
         for await (const chunk of stream) {
@@ -456,13 +488,14 @@ RULES: Max 5 sentences. Use emojis sparingly but impactfully.`;
             }
         }
 
+        clearTimeout(timeoutId);
         res.write(`data: [DONE]\n\n`);
         res.end();
 
     } catch (e) {
         console.error('Chat Stream Error:', e.message);
-        res.write(`data: ${JSON.stringify({ error: 'Consultant is offline.' })}\n\n`);
-        res.end();
+        if (!res.headersSent) res.status(503).json({ error: 'Stream timed out.' });
+        else { res.write(`data: ${JSON.stringify({ error: 'Connection lost. Please retry.' })}\n\n`); res.end(); }
     }
 });
 
@@ -497,6 +530,8 @@ app.post('/api/trends', async (req, res) => {
         const { val, concept, isPro } = req.body;
         const topic = val || concept || 'general';
         const model = 'gpt-4o-mini';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 22000);
 
         // 1. Fetch Real-time Context
         console.log(`[Trends Bridge] Fetching live data for: ${topic}...`);
@@ -542,10 +577,11 @@ Return JSON: {
             temperature: 0.7
         });
 
+        clearTimeout(timeoutId);
         res.json(JSON.parse(completion.choices[0].message.content));
     } catch (e) {
         console.error('Trends Error:', e.message);
-        res.status(500).json({ error: 'Failed to fetch trends.' });
+        res.status(500).json({ error: 'Trends radar timed out. Please try again.' });
     }
 });
 
