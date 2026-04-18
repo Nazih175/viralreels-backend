@@ -220,6 +220,24 @@ const initApp = () => {
         : 'https://viralreels-ai-backend.onrender.com/api';
     console.log("[ViralReels] Booting with API_BASE:", API_BASE);
 
+    // -- COLD-START DETECTION --
+    // Silently pings the backend on load. If it takes > 4s (Render sleeping),
+    // shows a friendly banner so users know to wait rather than thinking it's broken.
+    (() => {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+        let warned = false;
+        const warmTimer = setTimeout(() => {
+            warned = true;
+            showToast("⏳ AI server is warming up — ready in ~30 seconds. Please wait!", 8000);
+        }, 4000);
+        fetch(`${API_BASE}/health`, { method: 'GET', cache: 'no-store' })
+            .then(() => clearTimeout(warmTimer))
+            .catch(() => {
+                clearTimeout(warmTimer);
+                if (!warned) showToast("⏳ AI server starting up, please wait a moment...", 8000);
+            });
+    })();
+
     // -- HISTORY MANAGEMENT --
     let histories = safeGet('vr_tool_histories', {
         analyze: [], hooks: [], captions: [], tags: [], trends: [], rewrite: []
@@ -458,7 +476,7 @@ const initApp = () => {
     };
 
     // Toast notification
-    const showToast = (msg) => {
+    const showToast = (msg, duration = 3000) => {
         const t = document.createElement('div');
         t.className = 'toast';
         t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
@@ -468,7 +486,7 @@ const initApp = () => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
             setTimeout(() => t.remove(), 300);
-        }, 3000);
+        }, duration);
     };
 
     // -- AD MODAL ENGINE (REWARD VIDEO ADS) --

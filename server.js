@@ -658,4 +658,22 @@ app.post('/api/verify-session', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 ViralReels AI Backend running on port ${PORT}`);
     console.log(`🔐 AI Connected: ${process.env.OPENAI_API_KEY ? 'Yes' : 'No'}`);
+
+    // -- KEEP-ALIVE PING (prevents Render free tier from sleeping) --
+    // Pings itself every 10 minutes to stay warm.
+    const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    setInterval(async () => {
+        try {
+            const https = require('https');
+            const http = require('http');
+            const client = SELF_URL.startsWith('https') ? https : http;
+            client.get(`${SELF_URL}/api/health`, (res) => {
+                console.log(`[KeepAlive] Ping OK — Status: ${res.statusCode}`);
+            }).on('error', (e) => {
+                console.warn('[KeepAlive] Ping failed:', e.message);
+            });
+        } catch (e) {
+            console.warn('[KeepAlive] Error:', e.message);
+        }
+    }, 10 * 60 * 1000); // Every 10 minutes
 });
