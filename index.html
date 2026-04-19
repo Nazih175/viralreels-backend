@@ -866,7 +866,7 @@
                 </div>
                 
                 <div class="content-padding">
-                    <div class="cal-container glass-card cal-bg-gradient interactive-glow flush-card" style="padding-top:1rem; padding-bottom:1.5rem;">
+                    <div id="calendarContent" class="cal-content-wrapper" style="padding-top:1rem; padding-bottom:1.5rem;">
                         <div class="cal-header flex justify-between items-center mb-4 px-2">
                             <button class="icon-button glow-hover" id="prevMonthBtn"><i data-lucide="chevron-left"></i></button>
                             <h3 id="calMonthDisplay" class="font-bold text-xl gradient-text">Current Month</h3>
@@ -1213,15 +1213,6 @@
                 <div class="tab-header pt-4 pb-2">
                     <div class="flex justify-between items-center w-full">
                         <h2 class="flex items-center gap-2">Saved Vault</h2>
-                        <button type="button" class="icon-button tool-reset-btn" data-view="view-saved" title="Reset Vault">
-                            <i data-lucide="trash-2"></i>
-                        </button>
-                    </div>
-                    <p>Your elite repository of generated hooks and scripts.</p>
-                </div>
-                <div class="tab-header pt-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2>Saved Rewrites</h2>
                         <div class="flex gap-2 items-center">
                             <div class="custom-select-wrapper" style="width: 110px;">
                                 <select id="sortSavedSelect" class="text-xs bg-card-dark" style="padding: 6px;">
@@ -1234,16 +1225,15 @@
                             <button class="btn-text text-red" style="font-size:0.7rem;" id="clearSavedBtn"><i data-lucide="trash-2" style="width:12px;"></i> Clear Vault</button>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-4 mt-4" id="vaultContentPlaceholder"></div>
-
-                    </div>
-                    <p>Your library of optimized scripts.</p>
+                    <p>Your library of optimized scripts and viral hooks.</p>
                 </div>
-                <div id="savedEmpty" class="empty-state glass-card mt-4"><i data-lucide="save" class="lg-icon mb-2"></i>
+
+                <div id="savedEmpty" class="empty-state glass-card mt-4">
+                    <i data-lucide="save" class="lg-icon mb-2"></i>
                     <h3>No Saved Scripts</h3>
                     <p>Use the Rewrite engine to save templates here.</p>
                 </div>
-                <div id="savedList" class="flex-col gap-2 mt-4"></div>
+                <div id="savedList" class="flex flex-col gap-2 mt-4"></div>
             </section>
 
             <!-- 11. VIDEO AI (PRO) -->
