@@ -32,6 +32,43 @@ if ('serviceWorker' in navigator) {
 const initApp = () => {
     if (window.VR_INIT_DONE) return;
     window.VR_INIT_DONE = true;
+
+    // -- Aurora Elite: Floating Particles --
+    const initAuroraParticles = () => {
+        const container = document.getElementById('auroraParticles');
+        if (!container) return;
+        
+        // Inject Mouse Spotlight (Restoring Elite Magnetic Aura)
+        const spotlight = document.createElement('div');
+        spotlight.className = 'mouse-spotlight';
+        spotlight.id = 'mouseSpotlight';
+        document.body.appendChild(spotlight);
+
+        window.addEventListener('mousemove', (e) => {
+            spotlight.style.left = e.clientX + 'px';
+            spotlight.style.top = e.clientY + 'px';
+        });
+
+        const particleCount = 20;
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            const left = Math.random() * 100;
+            const delay = Math.random() * 15;
+            const duration = 12 + Math.random() * 20;
+            const opacity = 0.2 + Math.random() * 0.4;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${left}%`;
+            p.style.bottom = `-20px`;
+            p.style.opacity = opacity;
+            p.style.animationDuration = `${duration}s`;
+            p.style.animationDelay = `${delay}s`;
+            container.appendChild(p);
+        }
+    };
+    initAuroraParticles();
     
     // 1. Immediate UI Reveal (Dismiss Splash)
     const splash = document.getElementById('splashScreen');
