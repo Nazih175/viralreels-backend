@@ -56,7 +56,7 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=v3.7.2">
+    <link rel="stylesheet" href="styles.css?v=v3.8.2-peak">
 
     <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="qeTX-PqqrETEAihNDcIaqUUe2FClsHVoWwxoX5Uxy5M" />
@@ -73,10 +73,6 @@
 </head>
 
 <body class="dark-theme no-scroll">
-    <!-- Aurora Backdrop Engine: immersive depth layer -->
-    <div class="aurora-container">
-        <div class="particles" id="auroraParticles"></div>
-    </div>
 
     <!-- Splash Screen -->
     <div id="splashScreen" class="splash-screen">
@@ -1400,7 +1396,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=v3.8.1-final"></script>
+    <script src="app.js?v=v3.8.2-peak"></script>
 
 
     <!-- PWA Service Worker KILL SWITCH -->
@@ -1427,6 +1423,11 @@
             <button id="acceptCookiesBtn" class="btn-primary header-btn" style="padding: 6px 16px; margin-left:12px; flex-shrink: 0;">Accept</button>
         </div>
     </div>
+    <!-- Aurora Backdrop Engine: immersive depth layer (Bottom-relative for zero layout displacement) -->
+    <div class="aurora-container">
+        <div class="particles" id="auroraParticles"></div>
+    </div>
+
 </body>
 
 </html>
