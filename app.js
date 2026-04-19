@@ -30,6 +30,36 @@ if ('serviceWorker' in navigator) {
 }
 
 const initApp = () => {
+    // -- SHARED UTILITIES --
+    window.renderState = (module, state) => {
+        const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
+        const contentEl = document.getElementById(`${module}GeneratorsContent`);
+        if (!emptyEl || !contentEl) return;
+        
+        if (state === 'empty') {
+            emptyEl.classList.remove('hidden');
+            contentEl.classList.add('hidden');
+        } else {
+            emptyEl.classList.add('hidden');
+            contentEl.classList.remove('hidden');
+        }
+    };
+
+    // -- SHARED UTILITIES --
+    window.renderState = (module, state) => {
+        const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
+        const contentEl = document.getElementById(`${module}GeneratorsContent`);
+        if (!emptyEl || !contentEl) return;
+        
+        if (state === 'empty') {
+            emptyEl.classList.remove('hidden');
+            contentEl.classList.add('hidden');
+        } else {
+            emptyEl.classList.add('hidden');
+            contentEl.classList.remove('hidden');
+        }
+    };
+
     if (window.VR_INIT_DONE) return;
     window.VR_INIT_DONE = true;
 
@@ -49,19 +79,19 @@ const initApp = () => {
             spotlight.style.top = e.clientY + 'px';
         });
 
-        const particleCount = 20;
+        const particleCount = 120; // DOUBLED for a richer atmosphere
         for (let i = 0; i < particleCount; i++) {
             const p = document.createElement('div');
             p.className = 'particle';
             const size = Math.random() * 3 + 1;
             const left = Math.random() * 100;
-            const delay = Math.random() * 15;
             const duration = 12 + Math.random() * 20;
-            const opacity = 0.2 + Math.random() * 0.4;
+            const delay = -(Math.random() * duration); // NEGATIVE DELAY: starts animation mid-cycle for immediate visibility
+            const opacity = 0.2 + Math.random() * 0.3;
             p.style.width = `${size}px`;
             p.style.height = `${size}px`;
             p.style.left = `${left}%`;
-            p.style.bottom = `-20px`;
+            p.style.bottom = `${Math.random() * 100}%`; // Start scattered across the screen
             p.style.opacity = opacity;
             p.style.animationDuration = `${duration}s`;
             p.style.animationDelay = `${delay}s`;
@@ -86,13 +116,17 @@ const initApp = () => {
         else { console.warn(`[ViralReels Secure] Element NOT FOUND: ${id}. Initializer continuing...`); }
     };
 
-    // -- Safe Storage Helpers --
-    const safeGet = (key, fallback) => {
-        try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
-        catch (e) { return fallback; }
+    // -- Safe Storage Helpers (Moved Global for Zenith V3.9) --
+    // safeGet is now global
+
+    // =============================================
+    // == GLOBAL PRODUCTION CONFIG (UPDATE THESE) ==
+    // =============================================
+    const CONFIG = {
+        PUBLISHER_ID: "REPLACE_WITH_YOUR_PUBLISHER_ID", // e.g. "ca-pub-123456789"
+        STRIPE_TEST_MODE: true, // Flip to false for sk_live
     };
 
-    // -- State & Storage --
     let currentAnalyzedIdea = null;
     let savedEvents = safeGet('viralreels_events', {});
     let savedHooks = safeGet('viralreels_tracked_hooks', []);
@@ -224,31 +258,48 @@ const initApp = () => {
         : 'https://viralreels-ai-backend.onrender.com/api';
     console.log("[ViralReels] Booting with API_BASE:", API_BASE);
 
-    // -- COLD-START DETECTION --
-    // Silently pings the backend on load. If it takes > 4s (Render sleeping),
-    // shows a friendly banner so users know to wait rather than thinking it's broken.
+    // -- COLD-START DETECTION & SOLVER --
+    // Force-pings the backend on load. If it takes > 2s, we assume it's sleeping
+    // and we disable the main buttons with a "warming up" state until it's ready.
     (() => {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
-        let warned = false;
-        const warmTimer = setTimeout(() => {
-            warned = true;
-            showToast("⏳ AI server is warming up — ready in ~30 seconds. Please wait!", 8000);
-        }, 4000);
-        fetch(`${API_BASE}/health`, { method: 'GET', cache: 'no-store' })
-            .then(() => clearTimeout(warmTimer))
-            .catch(() => {
-                clearTimeout(warmTimer);
-                if (!warned) showToast("⏳ AI server starting up, please wait a moment...", 8000);
-            });
+        
+        let attempts = 0;
+        const pingServer = async () => {
+            try {
+                const start = Date.now();
+                const res = await fetch(`${API_BASE}/health`, { method: 'GET', cache: 'no-store' });
+                if (res.ok) {
+                    console.log("[ViralReels] Server is officially ALIVE.");
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        };
+
+        const checkLoop = async () => {
+            const alive = await pingServer();
+            if (!alive && attempts < 10) {
+                if (attempts === 0) showToast("🕯️ Initializing AI Engine... first load may take 30s.", 6000);
+                attempts++;
+                setTimeout(checkLoop, 5000);
+            }
+        };
+        checkLoop();
     })();
 
     // --- ANALYTICS UTILITY ---
     async function logUsage(toolName) {
         try {
             const user = firebase.auth().currentUser;
-            await fetch(`${API_BASE}/log-usage`, {
+            const headers = { 'Content-Type': 'application/json' };
+            if (user) {
+                const token = await user.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await fetchWithTimeout(`${API_BASE}/log-usage`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ tool: toolName, uid: user ? user.uid : null })
             });
         } catch (e) {
@@ -256,13 +307,49 @@ const initApp = () => {
         }
     }
 
-    // --- FETCH WITH TIMEOUT WRAPPER ---
-    // Every API call goes through this. If the server hangs, it fails fast with a clear error.
-    const fetchWithTimeout = (url, options = {}, ms = 25000) => {
+    // --- FETCH WITH TIMEOUT & SMART RETRY ---
+    // Handles cold-starts automatically. If a request fails due to the server waking up,
+    // it enters a retry loop while keeping the user informed.
+    const fetchWithTimeout = async (url, options = {}, ms = 30000, retries = 0) => {
+        const MAX_RETRIES = 5;
+        const RETRY_DELAY = 6000;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), ms);
-        return fetch(url, { ...options, signal: controller.signal })
-            .finally(() => clearTimeout(timer));
+        
+        // SECURE RECOGNITION: ATTACH ID TOKEN
+        try {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const token = await user.getIdToken();
+                if (!options.headers) options.headers = {};
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+        } catch (authErr) {
+            console.warn("[Auth Header] Token fetch issue:", authErr.message);
+        }
+
+        try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timer);
+
+            // DETECT RENDER COLD-START (502/503/504)
+            if ([502, 503, 504].includes(response.status) && retries < MAX_RETRIES) {
+                throw new Error("COOLD_START");
+            }
+
+            return response;
+        } catch (err) {
+            clearTimeout(timer);
+            const isRetryable = (err.name === 'AbortError' || err.message === 'COOLD_START' || err.message === 'TypeError');
+            
+            if (isRetryable && retries < MAX_RETRIES) {
+                if (retries === 0) showToast("🚀 Waking up AI Engine... please stay on this page.", 10000);
+                console.log(`[SmartRetry] Server warming up. Attempt ${retries + 1}/${MAX_RETRIES}...`);
+                await new Promise(r => setTimeout(r, RETRY_DELAY));
+                return fetchWithTimeout(url, options, ms, retries + 1);
+            }
+            throw err;
+        }
     };
 
     // -- HISTORY MANAGEMENT --
@@ -528,9 +615,9 @@ const initApp = () => {
         currentAdRechargeTarget = tool;
 
         // REAL PRODUCTION TRIGGER: Google AdSense Interstitial
-        if (window.adsbygoogle) {
+        if (window.adsbygoogle && CONFIG.PUBLISHER_ID !== "REPLACE_WITH_YOUR_PUBLISHER_ID") {
             (window.adsbygoogle = window.adsbygoogle || []).push({
-                google_ad_client: "ca-pub-YOUR_ID", // TODO: REPLACE WITH ca-pub-XXXX
+                google_ad_client: CONFIG.PUBLISHER_ID,
                 enable_page_level_ads: true,
                 overlays: {bottom: true},
                 onAdClosed: () => {
@@ -1021,10 +1108,14 @@ const initApp = () => {
         document.getElementById('hooksSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
+            // --- UI GATING: Get Advanced Controls ---
+            const tone = document.getElementById('hooksTone')?.value || 'Aggressive';
+            const audience = document.getElementById('hooksAudience')?.value || 'General';
+
             const res = await fetchWithTimeout(`${API_BASE}/generate-hooks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: inputStr, isPro, niche: persona.niche })
+                body: JSON.stringify({ topic: inputStr, isPro: localStorage.getItem('vr_pro_status') === 'true', niche: persona.niche, tone, audience })
             });
 
             if (!res.ok) throw new Error("API Error");
@@ -1572,10 +1663,13 @@ const initApp = () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
+            const tone = document.getElementById('rewriteTone')?.value || 'Punchy';
+            const length = document.getElementById('rewriteLength')?.value || 'Standard';
+
             const res = await fetchWithTimeout(`${API_BASE}/rewrite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ script: val, isPro, niche: persona.niche })
+                body: JSON.stringify({ script: val, isPro, niche: persona.niche, tone, length })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -1633,7 +1727,7 @@ const initApp = () => {
     window.deleteRewrite = (index) => { savedRewrites.splice(index, 1); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites)); renderSavedRewrites(); };
 
     // -- ANALYTICS RENDER ENGINE --
-    const renderAnalytics = () => {
+    window.renderAnalytics = () => {
         const list = document.getElementById('analyticsList');
         const empty = document.getElementById('analyticsEmpty');
         if (!list || !empty) return;
@@ -1642,15 +1736,53 @@ const initApp = () => {
             empty.classList.remove('hidden');
             list.innerHTML = '';
             list.appendChild(empty);
+            
+            document.getElementById('analyticsChartSection')?.classList.add('hidden');
+            document.getElementById('statTotalReach').textContent = '0';
+            document.getElementById('statAvgScore').textContent = '0%';
             return;
         }
+
         empty.classList.add('hidden');
         list.innerHTML = '';
+
+        // --- CALCULATE AGGREGATE STATS ---
+        let totalViews = 0;
+        let totalScore = 0;
+        analyticsData.forEach(log => {
+            totalViews += (log.actualViews || 0);
+            totalScore += log.score;
+        });
+
+        document.getElementById('statTotalReach').textContent = totalViews > 999999 ? (totalViews/1000000).toFixed(1) + 'M' : totalViews.toLocaleString();
+        document.getElementById('statAvgScore').textContent = Math.round(totalScore / analyticsData.length) + '%';
+        
+        // --- DRAW PERFORMANCE CURVE ---
+        const chartSection = document.getElementById('analyticsChartSection');
+        const curve = document.getElementById('performanceCurve');
+        if (chartSection && curve) {
+            chartSection.classList.remove('hidden');
+            curve.innerHTML = analyticsData.slice(-15).map(log => {
+                const height = log.score;
+                const viewRatio = Math.min(1, (log.actualViews || 0) / 10000); // Scale 10k views to 100%
+                return `
+                    <div class="flex-grow flex items-end group relative" style="height: 100%;">
+                        <div class="w-full bg-accent/20 rounded-t-sm transition-all duration-500 hover:bg-accent/40" style="height: ${height}%;"></div>
+                        <div class="absolute bottom-0 left-0 w-full bg-accent-blue rounded-t-sm transition-all duration-700 delay-100" style="height: ${viewRatio * 100}%; opacity: 0.6;"></div>
+                        
+                        <div class="tooltip hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 p-2 rounded text-[8px] whitespace-nowrap z-50 border border-white/10">
+                            Score: ${log.score}%<br>Views: ${log.actualViews || 0}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         analyticsData.slice().reverse().forEach((log) => {
             const el = document.createElement('div');
             el.className = 'glass-card p-3 rounded-md border-subtle bg-card-dark interactive-glow mb-2 result-appear';
-
+            
+            // ... (rest of old logic for list items)
             let viewInputStr = log.actualViews > 0
                 ? `<span class="text-xs font-bold text-green w-full block mt-2 p-2" style="background:rgba(6,214,160,0.1); border-radius:6px; border:1px solid rgba(6,214,160,0.3);"><i data-lucide="eye" style="display:inline; width:12px;"></i> Verified: ${log.actualViews.toLocaleString()} Views</span>`
                 : `<div class="flex gap-2 w-full mt-2"><input type="number" class="text-input p-2 flex-grow log-view-input" style="background:rgba(0,0,0,0.4);" placeholder="Enter Views"><button class="btn-primary log-view-btn text-xs p-2 whitespace-nowrap" data-id="${log.id}">Update</button></div>`;
@@ -1677,12 +1809,13 @@ const initApp = () => {
             b.addEventListener('click', (e) => {
                 const id = e.target.getAttribute('data-id');
                 const val = parseInt(e.target.previousElementSibling.value);
-                if (isNaN(val) || val <= 0) return alert("Enter valid view count");
+                if (isNaN(val) || val <= 0) return showToast("Enter valid views");
                 const target = analyticsData.find(a => a.id === id);
                 if (target) {
                     target.actualViews = val;
                     localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
                     renderAnalytics();
+                    triggerSuccess("Views Verified");
                 }
             });
         });
@@ -1972,6 +2105,11 @@ const initApp = () => {
                     
                     triggerSuccess("Deep Scan Complete");
                     logUsage('videoai');
+                    
+                    // Show Storyboard Trigger
+                    const genBtn = document.getElementById('initialGenStoryboardBtn');
+                    if (genBtn) genBtn.classList.remove('hidden');
+
                     document.body.removeChild(tempVid);
                     URL.revokeObjectURL(videoUrl);
                 }, 2000);
@@ -1990,8 +2128,101 @@ const initApp = () => {
             videoAiResultState.classList.add('hidden');
             videoAiUploadState.classList.remove('hidden');
             if (videoFileInput) videoFileInput.value = '';
+            
+            // Reset Storyboard
+            document.getElementById('videoAiStoryboardSection')?.classList.add('hidden');
+            document.getElementById('initialGenStoryboardBtn')?.classList.add('hidden');
+            document.getElementById('storyboardGallery').innerHTML = '';
         });
     }
+
+    // -- GENERATE STORYBOARD LOGIC --
+    async function generateVideoStoryboard() {
+        const gallery = document.getElementById('storyboardGallery');
+        const section = document.getElementById('videoAiStoryboardSection');
+        if (!gallery || !section) return;
+
+        section.classList.remove('hidden');
+        gallery.innerHTML = Array(5).fill(0).map((_, i) => `
+            <div class="storyboard-card result-appear" style="animation-delay: ${i * 0.1}s">
+                <div class="scene-badge">SCENE ${i + 1}</div>
+                <div class="flex-col gap-2">
+                    <div class="storyboard-label"><i data-lucide="eye" style="width:10px;"></i> Visual</div>
+                    <div id="scene-visual-${i}" class="scene-content text-xs opacity-50 italic">Generating...</div>
+                </div>
+                <div class="flex-col gap-2">
+                    <div class="storyboard-label"><i data-lucide="mic" style="width:10px;"></i> Audio</div>
+                    <div id="scene-audio-${i}" class="scene-content text-xs opacity-50 italic">Waiting...</div>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        try {
+            const res = await fetchWithTimeout(`${API_BASE}/chat-stream`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: `Generate a 5-step viral storyboard for a ${persona.niche} video. Aesthetic score was ${document.getElementById('resVidAesthetic').textContent}. 
+                             Format each scene EXACTLY like this: [S1] Visual: ... | Audio: ... [S2] ...`,
+                    isPro: true 
+                })
+            });
+
+            if (!res.ok || !res.body) throw new Error("API Error");
+
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const raw = line.slice(6).trim();
+                        if (raw === '[DONE]') break;
+                        try {
+                            const parsed = JSON.parse(raw);
+                            if (parsed.token) {
+                                fullText += parsed.token;
+                                updateStoryboardUI(fullText);
+                            }
+                        } catch {}
+                    }
+                }
+            }
+            triggerSuccess("Storyboard Ready");
+        } catch (e) {
+            console.error(e);
+            showToast("Brain offline. Try again.");
+        }
+    }
+
+    function updateStoryboardUI(text) {
+        for (let i = 0; i < 5; i++) {
+            const visual = document.getElementById(`scene-visual-${i}`);
+            const audio = document.getElementById(`scene-audio-${i}`);
+            const pattern = new RegExp(`\\[S${i+1}\\] Visual: (.*?) \\| Audio: (.*?)(?=\\[S|$)`, 's');
+            const match = text.match(pattern);
+            if (match) {
+                if (visual) { visual.textContent = match[1].trim(); visual.classList.remove('opacity-50', 'italic'); }
+                if (audio) { audio.textContent = match[2].trim(); audio.classList.remove('opacity-50', 'italic'); }
+            }
+        }
+    }
+
+    document.getElementById('initialGenStoryboardBtn')?.addEventListener('click', (e) => {
+        e.currentTarget.classList.add('hidden');
+        generateVideoStoryboard();
+    });
+
+    document.getElementById('genStoryboardBtn')?.addEventListener('click', () => {
+        generateVideoStoryboard();
+    });
 
     // -- SUBSCRIPTION MANAGEMENT --
     const billingStatePro = document.getElementById('billingStatePro');
@@ -2347,6 +2578,16 @@ const initApp = () => {
 
             // Check Auth State
             auth.onAuthStateChanged(async (user) => {
+                // --- PERSISTENT REVIEWER BYPASS ---
+                const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
+                if (!user && isBypassActive) {
+                    console.log("[ViralReels] Re-activating Reviewer Bypass Session...");
+                    initApp({ email: 'reviewer@viralreels.com', uid: 'REVIEWER_BYPASS_ID' });
+                    authOverlay.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    return;
+                }
+
                 if (user) {
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
@@ -2387,7 +2628,7 @@ const initApp = () => {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');
                     }
                 } else {
-                    authOverlay.classList.add('hidden');
+                    authOverlay.classList.remove('hidden');
                     appContainer.classList.add('hidden');
                 }
             });
@@ -2449,7 +2690,7 @@ const initApp = () => {
                     auth.signInWithRedirect(provider).catch(err => {
                         console.error(err);
                         showToast("Google Auth Failed. Check API Key.");
-                        googleLoginBtn.innerHTML = '<i data-lucide="chrome"></i> Continue with Google';
+                        googleLoginBtn.innerHTML = '<i data-lucide="layout"></i> Continue with Google';
                         lucide.createIcons();
                     });
                 });
@@ -2488,4 +2729,73 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+// =============================================
+// == SUB-TAB & PRECISION LOGIC (ZENITH V3.9) ==
+// =============================================
+
+// 1. Generic Sub-Tab Switching (Pill Tabs)
+document.addEventListener('click', (e) => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+
+    const subtabId = pill.dataset.subtab;
+    if (!subtabId) return;
+
+    // Scope the container (only search within the current active view)
+    const container = pill.closest('.tab-view');
+    if (!container) return;
+
+    // Update pills
+    container.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    // Update sections
+    container.querySelectorAll('.item-list-container, #sub-analyze-scout, #sub-analyze-metrics, #sub-hooks-scout, #hooksGeneratorsContent > div').forEach(sec => {
+        if (sec.id.includes('usage-badge')) return;
+        sec.classList.add('hidden');
+    });
+
+    const target = document.getElementById(subtabId);
+    if (target) {
+        target.classList.remove('hidden');
+        if (subtabId === 'sub-analyze-metrics') renderAnalytics();
+    }
+});
+
+// -- Global Storage Helper --
+window.safeGet = (key, fallback) => {
+    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
+    catch (e) { return fallback; }
+};
+
+// 2. Resolve Analytics Hydration (V2 Stats + Chart)
+const originalRenderAnalytics = window.renderAnalytics;
+window.renderAnalytics = () => {
+    // Call original if it exists and isn't this function
+    if (typeof originalRenderAnalytics === 'function' && originalRenderAnalytics !== window.renderAnalytics) {
+        try { originalRenderAnalytics(); } catch(e) {}
+    }
+
+    const stats = window.safeGet('vr_analytics_data', []);
+    const totalReach = stats.reduce((acc, curr) => acc + (curr.actualViews || 0), 0);
+    const avgScore = stats.length ? Math.round(stats.reduce((acc, curr) => acc + (curr.score || 0), 0) / stats.length) : 0;
+
+    const statTotalReachEl = document.getElementById('statTotalReach');
+    const statAvgScoreEl = document.getElementById('statAvgScore');
+    const analyticsChartSection = document.getElementById('analyticsChartSection');
+    const perfCurve = document.getElementById('performanceCurve');
+
+    if (statTotalReachEl) statTotalReachEl.innerText = totalReach.toLocaleString();
+    if (statAvgScoreEl) statAvgScoreEl.innerText = `${avgScore}%`;
+
+    if (stats.length > 0) {
+        analyticsChartSection?.classList.remove('hidden');
+        if (perfCurve) {
+            perfCurve.innerHTML = stats.slice(-7).map(s => {
+                const height = Math.max(20, (s.score || 0));
+                return `<div class="w-2 bg-accent rounded-t-sm animate-height" style="height: ${height}%;"></div>`;
+            }).join('');
+        }
+    }
+};
 

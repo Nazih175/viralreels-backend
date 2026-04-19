@@ -7,10 +7,11 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>ViralReels AI - Dominate the Algorithm</title>
-    <meta name="title" content="ViralReels AI - Dominate the Algorithm">
+    <title>ViralReels AI | The #1 AI Social Media Creator Suite</title>
+    <meta name="title" content="ViralReels AI | The #1 AI Social Media Creator Suite">
     <meta name="description"
-        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+        content="ViralReels AI: The all-in-one suite for short-form creators. Generate viral hooks, rewrite scripts, and track trends to explode your reach on TikTok, Reels, and Shorts.">
+    <link rel="canonical" href="https://nazih175.github.io/viralreels-backend/" />
     <meta name="theme-color" content="#0a0a0f">
 
     <meta name="apple-mobile-web-app-title" content="ViralReels AI">
@@ -31,17 +32,17 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nazih175.github.io/viralreels-backend/">
-    <meta property="og:title" content="ViralReels AI - Dominate the Algorithm">
+    <meta property="og:title" content="ViralReels AI | The #1 AI Social Media Creator Suite">
     <meta property="og:description"
-        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+        content="Explode your reach with ViralReels AI. The all-in-one suite for viral hooks, script rewriting, and social media trends.">
     <meta property="og:image" content="https://nazih175.github.io/viralreels-backend/assets/social_preview.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://nazih175.github.io/viralreels-backend/">
-    <meta property="twitter:title" content="ViralReels AI - Dominate the Algorithm">
+    <meta property="twitter:title" content="ViralReels AI | The #1 AI Social Media Creator Suite">
     <meta property="twitter:description"
-        content="The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers to explode your reach.">
+        content="Explode your reach with ViralReels AI. The all-in-one suite for viral hooks, script rewriting, and social media trends.">
     <meta property="twitter:image" content="https://nazih175.github.io/viralreels-backend/assets/social_preview.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,13 +57,15 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=v3.8.3-chroma">
+    <link rel="stylesheet" href="styles.css?v=v3.9.0-zenith">
 
-    <!-- Google Search Console Verification -->
+    <!-- 
+        GOOGLE VERIFICATION CONFIG 
+        Follow the PRODUCTION_HANDOVER.md guide to replace the values below.
+    -->
     <meta name="google-site-verification" content="qeTX-PqqrETEAihNDcIaqUUe2FClsHVoWwxoX5Uxy5M" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=REPLACE_WITH_YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
 
-    <!-- Google AdSense Official Integration -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script>
 
     <!-- App Store / Play Store Readiness Meta -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -148,7 +151,7 @@
                 <button type="button" class="btn-secondary w-full text-xs" id="backToMethodsBtn"
                     style="background:transparent; border:none;">← Back</button>
             </form>
-            <p class="auth-footer mt-2 text-xs text-muted">By continuing, you agree with our <a href="terms.html" target="_blank" class="underline">Terms and Services</a>.</p>
+            <p class="auth-footer mt-2 text-xs text-muted">By continuing, you acknowledge that you have read and agree to our <a href="terms.html" target="_blank" class="underline">Terms of Service</a> and <a href="privacy.html" target="_blank" class="underline">Privacy Policy</a>.</p>
         </div>
     </div>
 
@@ -715,19 +718,38 @@
 
                 <!-- ANALYTICS METRICS SUB-TAB -->
                 <div id="sub-analyze-metrics" class="item-list-container hidden w-full content-padding">
-                    <div class="glass-card mb-4 interactive-glow mt-2 border-accent text-center bg-card-dark">
-                        <i data-lucide="activity" class="text-gold lg-icon mx-auto mb-2"></i>
-                        <h3 class="font-bold">Real-World Validations</h3>
-                        <p class="text-xs text-secondary mt-1">Cross-reference your Video AI scores with the absolute
-                            real views you achieved to reveal the true matrix.</p>
+                    <!-- Neural Stats Header -->
+                    <div id="analyticsStatsGrid" class="grid grid-cols-2 gap-3 mt-2">
+                        <div class="glass-card p-4 border-accent flex-col gap-1">
+                            <span class="text-[10px] uppercase tracking-tighter text-muted">Total Predicted Reach</span>
+                            <span id="statTotalReach" class="text-lg font-bold text-accent">--</span>
+                        </div>
+                        <div class="glass-card p-4 border-subtle flex-col gap-1">
+                            <span class="text-[10px] uppercase tracking-tighter text-muted">Avg Viral Score</span>
+                            <span id="statAvgScore" class="text-lg font-bold text-primary">--%</span>
+                        </div>
                     </div>
 
-                    <div id="analyticsList" class="flex-col gap-3 mt-4">
-                        <div id="analyticsEmpty" class="empty-state bg-card-dark rounded-md"><i data-lucide="slash"
-                                class="lg-icon mb-2"></i>
-                            <h4>No Data Logged</h4>
-                            <p class="text-xs">Run a video idea through the Scout, then click "Log Prediction" to drop
-                                it here.</p>
+                    <!-- Retention Curve Chart -->
+                    <div id="analyticsChartSection" class="hidden mt-4 glass-card p-4 border-subtle bg-black/40 overflow-hidden relative" style="height: 180px;">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-bold text-muted uppercase tracking-widest"><i data-lucide="trending-up" class="inline" style="width:10px;"></i> Viral Momentum Curve</span>
+                            <span class="text-[9px] text-accent-cyan px-2 py-0.5 bg-accent-cyan/10 rounded">Pro Insights</span>
+                        </div>
+                        <div id="performanceCurve" class="w-full h-24 relative flex items-end gap-1">
+                            <!-- Chart bars will be injected here -->
+                        </div>
+                        <div class="flex justify-between mt-2 pt-2 border-top border-white/5">
+                            <span class="text-[8px] text-muted">Historical Baseline</span>
+                            <span class="text-[8px] text-accent">Predicted Peak</span>
+                        </div>
+                    </div>
+
+                    <div id="analyticsList" class="flex flex-col gap-3 mt-4">
+                        <div id="analyticsEmpty" class="empty-state glass-card py-10">
+                            <i data-lucide="bar-chart-2" class="lg-icon mb-2"></i>
+                            <h3>Neural Vault Empty</h3>
+                            <p>Generate hooks or run scans to see your predicted performance here.</p>
                         </div>
                     </div>
                 </div>
@@ -740,19 +762,52 @@
                     <p>Payoff-first hook architecture grounded in premium retention math.</p>
                     <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
                 </div>
-                <form id="customHookForm" class="interactive-glow glass-card mt-4 mb-4 flex gap-2 w-full p-2">
-                    <button type="button" class="icon-button tool-reset-btn" data-view="view-hooks" title="Reset Engine">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
-                        <i data-lucide="history"></i>
-                    </button>
-                    <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
-                        class="w-full flex-grow text-input"
-                        style="border:none; background:transparent; box-shadow:none;" >
-                    <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
-                            data-lucide="zap"></i></button>
-                </form>
+                <div id="hooksGeneratorCard" class="glass-card interactive-glow p-4 border-accent mt-4">
+                    <form id="customHookForm" class="flex gap-2 w-full mb-4">
+                        <button type="button" class="icon-button tool-reset-btn" data-view="view-hooks" title="Reset Engine">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                        <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
+                            <i data-lucide="history"></i>
+                        </button>
+                        <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
+                            class="w-full flex-grow text-input"
+                            style="border:none; background:transparent; box-shadow:none;" >
+                        <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
+                                data-lucide="zap"></i></button>
+                    </form>
+
+                    <!-- Advanced AI Controls for Hooks -->
+                    <div class="flex flex-col gap-3">
+                        <div class="flex justify-between items-center px-1">
+                            <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Adv. AI Controls</span>
+                            <button type="button" class="btn-text text-[10px]" onclick="this.closest('.glass-card').querySelector('.advanced-ai-panel').classList.toggle('hidden')">
+                                <i data-lucide="settings-2" style="width:12px;"></i> Customize
+                            </button>
+                        </div>
+                        <div class="advanced-ai-panel hidden grid grid-cols-2 gap-3 p-3 bg-black/20 rounded-xl border border-white/5">
+                            <div class="flex-col">
+                                <label class="text-[9px] font-bold text-muted uppercase mb-1 block">Tone</label>
+                                <select id="hooksTone" class="text-xs w-full bg-card-dark p-2 border-subtle" style="border-radius:6px;">
+                                    <option value="Aggressive">Aggressive</option>
+                                    <option value="Professional">Professional</option>
+                                    <option value="Humorous">Humorous</option>
+                                    <option value="Analytical">Analytical</option>
+                                    <option value="Storytelling">Storytelling</option>
+                                </select>
+                            </div>
+                            <div class="flex-col">
+                                <label class="text-[9px] font-bold text-muted uppercase mb-1 block">Audience</label>
+                                <select id="hooksAudience" class="text-xs w-full bg-card-dark p-2 border-subtle" style="border-radius:6px;">
+                                    <option value="General">General</option>
+                                    <option value="Gen Z">Gen Z</option>
+                                    <option value="Business Pros">Business Pros</option>
+                                    <option value="Creators">Creators</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="hooksGeneratorsEmpty" class="empty-state glass-card mt-2">
                     <i data-lucide="pen-tool" class="lg-icon mb-2" style="color:var(--accent-purple); opacity:0.5;"></i>
                     <h3>Type a Topic Above</h3>
@@ -1115,6 +1170,35 @@
                     <form id="rewriteFormEl" class="glass-card interactive-glow p-4 border-accent">
                         <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
                             rows="6" class="w-full text-input mb-4 bg-card-dark" ></textarea>
+                        
+                        <div class="flex flex-col gap-3 mb-4">
+                            <div class="flex justify-between items-center px-1">
+                                <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Adv. AI Controls</span>
+                                <button type="button" class="btn-text text-[10px]" onclick="this.closest('.glass-card').querySelector('.advanced-ai-panel').classList.toggle('hidden')">
+                                    <i data-lucide="settings-2" style="width:12px;"></i> Customize
+                                </button>
+                            </div>
+                            <div class="advanced-ai-panel hidden grid grid-cols-2 gap-3 p-3 bg-black/20 rounded-xl border border-white/5">
+                                <div class="flex-col">
+                                    <label class="text-[9px] font-bold text-muted uppercase mb-1 block">Rewrite Tone</label>
+                                    <select id="rewriteTone" class="text-xs w-full bg-card-dark p-2 border-subtle" style="border-radius:6px;">
+                                        <option value="Punchy">Punchy</option>
+                                        <option value="Educational">Educational</option>
+                                        <option value="Story-driven">Story-driven</option>
+                                        <option value="Suspenseful">Suspenseful</option>
+                                    </select>
+                                </div>
+                                <div class="flex-col">
+                                    <label class="text-[9px] font-bold text-muted uppercase mb-1 block">Output Length</label>
+                                    <select id="rewriteLength" class="text-xs w-full bg-card-dark p-2 border-subtle" style="border-radius:6px;">
+                                        <option value="Short (15s)">Short (15s)</option>
+                                        <option value="Standard (30s)">Standard (30s)</option>
+                                        <option value="Long (60s+)">Long (60s+)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn-primary w-full"><i data-lucide="file-text"></i> Rewrite Script</button>
                     </form>
                 </div>
@@ -1146,6 +1230,9 @@
                             </div>
                             <button class="btn-text text-red" style="font-size:0.7rem;" id="clearSavedBtn"><i data-lucide="trash-2" style="width:12px;"></i> Clear Vault</button>
                         </div>
+                    </div>
+                    <div class="flex flex-col gap-4 mt-4" id="vaultContentPlaceholder"></div>
+
                     </div>
                     <p>Your library of optimized scripts.</p>
                 </div>
@@ -1234,9 +1321,29 @@
                         </div>
                     </div>
 
-                    <button class="btn-secondary w-full mt-4" id="restartVideoAiBtn" style="border-color: var(--elite-cyan); color: var(--elite-cyan);">
-                        <i data-lucide="refresh-cw"></i> New Algorithmic Scan
-                    </button>
+                    <!-- AI Storyboard Section -->
+                    <div id="videoAiStoryboardSection" class="hidden mt-8 pt-6 border-top border-subtle">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-sm font-bold text-accent flex items-center gap-2"><i data-lucide="layout"></i> AI Storyboard Blueprint</h4>
+                            <button id="genStoryboardBtn" class="btn-text text-cyan text-[10px] uppercase font-bold tracking-widest"><i data-lucide="wand-2"></i> Regenerate</button>
+                        </div>
+                        <div id="storyboardGallery" class="storyboard-gallery flex gap-4 overflow-x-auto pb-4 px-1" style="scroll-snap-type: x mandatory;">
+                            <!-- Cards will be injected here -->
+                            <div class="storyboard-skeleton-card w-64 h-80 flex-shrink-0 glass-card bg-card-dark flex-col items-center justify-center border-dashed border-white/10">
+                                <div class="loader mb-2"></div>
+                                <span class="text-[10px] text-muted uppercase tracking-tighter">Calculating Narrative...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="videoAiActions" class="flex flex-col gap-2 mt-6">
+                        <button class="btn-primary w-full hidden" id="initialGenStoryboardBtn">
+                            <i data-lucide="rocket"></i> Generate AI Storyboard
+                        </button>
+                        <button class="btn-secondary w-full" id="restartVideoAiBtn" style="border-color: var(--elite-cyan); color: var(--elite-cyan);">
+                            <i data-lucide="refresh-cw"></i> New Algorithmic Scan
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -1396,23 +1503,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=v3.8.2-peak"></script>
+    <script src="app.js?v=v3.9.0-zenith"></script>
 
 
-    <!-- PWA Service Worker KILL SWITCH -->
+    <!-- PWA Service Worker Ready -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('ViralReels SW: Active', reg.scope))
+                    .catch(err => console.error('ViralReels SW: Offline Mode Disabled', err));
             });
-        }
-        // Force cold reload if it's the first visit of the recovery
-        if (!localStorage.getItem('vr_recovery_clean')) {
-            localStorage.setItem('vr_recovery_clean', 'true');
-            // Give SW 500ms to unregister before reload
-            setTimeout(() => { window.location.reload(true); }, 500);
         }
     </script>
 
