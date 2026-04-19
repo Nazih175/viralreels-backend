@@ -83,6 +83,8 @@ body {
     transition: background-color 0.3s, color 0.3s;
     position: relative;
     overflow-x: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Premium Mesh Background Overlay */
