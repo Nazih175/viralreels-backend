@@ -461,10 +461,10 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .brand { display: flex; align-items: center; gap: 6px; }
 
 .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-.scroll-container { overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; }
+.scroll-container { overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 .scroll-container::-webkit-scrollbar { width: 4px; }
 .scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-.tab-view { flex: 1; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; display: none; height: 100%; }
+.tab-view { flex: 1; overflow: hidden; display: none; height: 100%; position: relative; }
 .active-view { display: flex !important; flex-direction: column; }
 
 .tab-view::-webkit-scrollbar { width: 4px; } 
