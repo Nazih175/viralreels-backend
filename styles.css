@@ -407,27 +407,28 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .nav-item span { font-size: 8.5px; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.7; }
 .nav-item i { width: 18px; height: 18px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0.8; }
 
-/* Chroma-Nav: Unique Identity Colors */
-.nav-item[data-tab="analyze"] i { color: #00f5d4; }
-.nav-item[data-tab="hooks"] i { color: #ff006e; }
-.nav-item[data-tab="tracker"] i { color: #fb5607; }
-.nav-item[data-tab="calendar"] i { color: #3a86ff; }
-.nav-item[data-tab="captions"] i { color: #00bbf9; }
-.nav-item[data-tab="tags"] i { color: #fee440; }
-.nav-item[data-tab="checklist"] i { color: #ef476f; }
-.nav-item[data-tab="trends"] i { color: #aacc00; }
-.nav-item[data-tab="rewrite"] i { color: #ffbe0b; }
-.nav-item[data-tab="saved"] i { color: #4361ee; }
-.nav-item[data-tab="videoai"] i { color: #9d4edd; }
-.nav-item[data-tab="chat"] i { color: #b79ced; }
+/* Chroma-Nav: Unique Identity Colors (Persistent & Vibrant) */
+.nav-item[data-tab="analyze"] { color: #00f5d4 !important; }
+.nav-item[data-tab="hooks"] { color: #ff006e !important; }
+.nav-item[data-tab="tracker"] { color: #fb5607 !important; }
+.nav-item[data-tab="calendar"] { color: #3a86ff !important; }
+.nav-item[data-tab="captions"] { color: #00bbf9 !important; }
+.nav-item[data-tab="tags"] { color: #fee440 !important; }
+.nav-item[data-tab="checklist"] { color: #ef476f !important; }
+.nav-item[data-tab="trends"] { color: #aacc00 !important; }
+.nav-item[data-tab="rewrite"] { color: #ffbe0b !important; }
+.nav-item[data-tab="saved"] { color: #4361ee !important; }
+.nav-item[data-tab="videoai"] { color: #9d4edd !important; }
+.nav-item[data-tab="chat"] { color: #b79ced !important; }
 
-/* Professional Symbol Enlargement */
+/* Professional Symbol Enlargement & Vibrant Hover */
+.nav-item i { opacity: 0.9; filter: drop-shadow(0 0 2px currentColor); }
 .nav-item:hover i { 
-    transform: scale(1.25) translateY(-3px); 
+    transform: scale(1.3) translateY(-4px); 
     opacity: 1 !important;
-    filter: drop-shadow(0 0 8px currentColor);
+    filter: drop-shadow(0 0 12px currentColor);
 }
-.nav-item:hover span { opacity: 1; transform: scale(1.1); color: #fff; }
+.nav-item:hover span { opacity: 1; transform: scale(1.1); color: #fff; text-shadow: 0 0 8px currentColor; }
 
 .nav-item.active { background: rgba(255,255,255,0.06); }
 .nav-item.active i { transform: scale(1.2) translateY(-2px); opacity: 1; filter: drop-shadow(0 0 12px currentColor); }
