@@ -407,24 +407,39 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .nav-item span { font-size: 8.5px; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.7; }
 .nav-item i { width: 18px; height: 18px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0.8; }
 
-/* Category Zone Colors */
-.nav-strategy.active { color: var(--accent-green) !important; }
-.nav-creation.active { color: var(--accent-cyan) !important; }
-.nav-workflow.active { color: var(--accent-blue-light) !important; }
-.nav-premium.active { color: var(--accent-purple) !important; }
+/* Chroma-Nav: Unique Identity Colors */
+.nav-item[data-tab="analyze"] i { color: #00f5d4; }
+.nav-item[data-tab="hooks"] i { color: #ff006e; }
+.nav-item[data-tab="tracker"] i { color: #fb5607; }
+.nav-item[data-tab="calendar"] i { color: #3a86ff; }
+.nav-item[data-tab="captions"] i { color: #00bbf9; }
+.nav-item[data-tab="tags"] i { color: #fee440; }
+.nav-item[data-tab="checklist"] i { color: #ef476f; }
+.nav-item[data-tab="trends"] i { color: #aacc00; }
+.nav-item[data-tab="rewrite"] i { color: #ffbe0b; }
+.nav-item[data-tab="saved"] i { color: #4361ee; }
+.nav-item[data-tab="videoai"] i { color: #9d4edd; }
+.nav-item[data-tab="chat"] i { color: #b79ced; }
 
-/* Active Focus Glow */
-.nav-item.active { background: rgba(255,255,255,0.05); }
-.nav-item.active i { transform: scale(1.15) translateY(-2px); opacity: 1; }
-.nav-item.active span { opacity: 1; transform: scale(1.05); }
+/* Professional Symbol Enlargement */
+.nav-item:hover i { 
+    transform: scale(1.25) translateY(-3px); 
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+.nav-item:hover span { opacity: 1; transform: scale(1.1); color: #fff; }
+
+.nav-item.active { background: rgba(255,255,255,0.06); }
+.nav-item.active i { transform: scale(1.2) translateY(-2px); opacity: 1; filter: drop-shadow(0 0 12px currentColor); }
+.nav-item.active span { opacity: 1; font-weight: 800; color: #fff; }
 
 .nav-item.active::after {
-    content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 2px;
+    content: ''; position: absolute; bottom: 2px; left: 25%; right: 25%; height: 2px;
     background: currentColor; border-radius: 10px; box-shadow: 0 0 10px currentColor;
     animation: glowPulse 2s infinite ease-in-out;
 }
 
-@keyframes glowPulse { 0%, 100% { opacity: 0.5; filter: blur(2px); } 50% { opacity: 1; filter: blur(4px); } }
+@keyframes glowPulse { 0%, 100% { opacity: 0.6; filter: blur(1px); } 50% { opacity: 1; filter: blur(3px); } }
 
 /* Contextual Pulse */
 .nav-pulse { animation: navPulse 1.5s ease-out 3; }
