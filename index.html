@@ -7,7 +7,10 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>ViralReels AI | The #1 AI Social Media Creator Suite</title>
+    <title>ViralReels AI | Premium Creator Suite</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;700&display=swap');
+    </style>
     <meta name="title" content="ViralReels AI | The #1 AI Social Media Creator Suite">
     <meta name="description"
         content="ViralReels AI: The all-in-one suite for short-form creators. Generate viral hooks, rewrite scripts, and track trends to explode your reach on TikTok, Reels, and Shorts.">
@@ -975,15 +978,15 @@
                 <div class="tab-header pt-4 content-padding sticky-score" style="margin-bottom: 0; border-bottom: var(--glass-border);">
                     <div class="flex justify-between items-center w-full">
                         <div>
-                            <h2 style="font-size: 1.2rem;" class="flex items-center gap-2">Total Checklist</h2>
-                            <p class="text-xs">Clear 100% before publishing.</p>
+                            <h2 style="font-size: 1.2rem; font-family: 'Outfit', sans-serif;" class="flex items-center gap-2 font-bold uppercase tracking-tight">Strategy Checklist</h2>
+                            <p class="text-xs text-secondary">Achieve 100% quality before publishing.</p>
                         </div>
                         <div class="text-right">
-                            <span id="checklistScore" class="gradient-text font-bold text-2xl">0%</span>
+                            <span id="checklistScore" class="font-bold text-2xl" style="background: linear-gradient(to right, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">0%</span>
                         </div>
                     </div>
-                    <div class="stat-bar-container w-full mt-3" style="height: 4px;">
-                        <div class="stat-bar" id="checklistScoreBar" style="width: 0%;"></div>
+                    <div class="stat-bar-container w-full mt-3" style="height: 6px; background: rgba(255,255,255,0.03); border-radius: 20px;">
+                        <div class="stat-bar stat-bar-elite" id="checklistScoreBar" style="width: 0%;"></div>
                     </div>
                 </div>
 
@@ -1484,8 +1487,8 @@
     </div>
 
     <!-- Success Animation Overlay -->
-    <div id="successOverlay" class="success-overlay hidden">
-        <div class="success-pop">
+    <div id="successOverlay" class="success-overlay hidden" style="z-index: 10000 !important;">
+        <div class="success-pop interactive-glow">
             <div class="success-icon-wrap">
                 <i data-lucide="check-circle" class="success-icon"></i>
             </div>

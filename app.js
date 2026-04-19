@@ -1709,10 +1709,13 @@ const initApp = () => {
         const empty = document.getElementById('savedEmpty');
         if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
             empty.classList.add('hidden');
-            list.innerHTML = savedRewrites.map((r, i) => `
-                <div class="item-card border-subtle bg-card-dark interactive-glow result-appear">
+            list.innerHTML = savedRewrites.map((r, i) => {
+                const colorRotation = ['emerald', 'blue', 'purple', 'cyan'];
+                const color = colorRotation[i % colorRotation.length];
+                return `
+                <div class="item-card vault-${color} border-subtle bg-card-dark interactive-glow result-appear" style="animation-delay: ${i * 0.1}s">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] bg-purple/20 text-purple font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
+                        <span class="text-[10px] vault-badge-${color} font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
                         <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
                     <p class="item-text text-sm mb-4" style="white-space:pre-wrap; line-height:1.6;">${r}</p>
@@ -1720,7 +1723,8 @@ const initApp = () => {
                         <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             lucide.createIcons();
         }
     };

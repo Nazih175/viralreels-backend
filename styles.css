@@ -38,9 +38,10 @@
     --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.4);
     
     --z-base: 10;
-    --z-nav: 100;
-    --z-paywall: 999;
-    --z-auth: 3000;
+    --z-nav: 9000; /* Standardized high z-index for nav */
+    --z-paywall: 9500;
+    --z-modal: 9999; /* Top level for alerts/confirms */
+    --z-auth: 9999;
 }
 
 /* LIGHT MODE OVERRIDES */
@@ -144,8 +145,21 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 .interactive-glow:focus-within, .interactive-glow:hover { 
     box-shadow: 0 0 45px rgba(157, 78, 221, 0.4) !important; 
     border-color: rgba(157, 78, 221, 0.9) !important; 
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.02);
 }
+
+/* --- DYNAMIC VAULT ACCENTS --- */
+.vault-cyan { border-left: 4px solid var(--accent-cyan) !important; background: linear-gradient(to right, rgba(0, 245, 212, 0.05), transparent) !important; }
+.vault-purple { border-left: 4px solid var(--accent-purple) !important; background: linear-gradient(to right, rgba(157, 78, 221, 0.05), transparent) !important; }
+.vault-blue { border-left: 4px solid var(--accent-blue) !important; background: linear-gradient(to right, rgba(67, 97, 238, 0.05), transparent) !important; }
+.vault-emerald { border-left: 4px solid var(--accent-green) !important; background: linear-gradient(to right, rgba(6, 214, 160, 0.05), transparent) !important; }
+
+.vault-badge-cyan { background: rgba(0, 245, 212, 0.15); color: var(--accent-cyan); }
+.vault-badge-purple { background: rgba(157, 78, 221, 0.15); color: var(--accent-purple); }
+.vault-badge-blue { background: rgba(67, 97, 238, 0.15); color: var(--accent-blue); }
+.vault-badge-emerald { background: rgba(6, 214, 160, 0.15); color: var(--accent-green); }
+
+.modal-overlay { z-index: var(--z-modal) !important; }
 .gold-glow { box-shadow: 0 0 30px rgba(255, 183, 3, 0.3) !important; border-color: var(--accent-gold) !important; }
 
 /* Core Layout Utils */
@@ -615,7 +629,8 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 .stat-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .stat-mini-grid .stat-card { padding: 1rem; display: flex; flex-direction: column; gap: 6px; }
 .stat-bar-container { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; }
-.stat-bar { height: 100%; background: var(--gradient-primary); border-radius: 10px; transition: width 1s ease; }
+.stat-bar { height: 100%; background: var(--gradient-primary); border-radius: 10px; transition: width 1s cubic-bezier(0.65, 0, 0.35, 1); }
+.stat-bar-elite { background: linear-gradient(to right, var(--accent-purple), var(--accent-cyan), var(--accent-green)); box-shadow: 0 0 15px rgba(0, 245, 212, 0.3); }
 
 .checklist-items { display: flex; flex-direction: column; gap: 8px; padding-left: 0; }
 .check-category { margin-top: 0.5rem; margin-bottom: 0.1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:4px; }
@@ -948,10 +963,13 @@ body.light-theme .sticky-score {
 
 .success-pop {
     background: var(--bg-card);
-    border: 1px solid var(--accent-green);
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-image: linear-gradient(var(--bg-card), var(--bg-card)), linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
     padding: 2.5rem;
     border-radius: var(--border-radius-lg);
     display: flex;
+    box-shadow: 0 0 50px rgba(157, 78, 221, 0.2);
     flex-direction: column;
     align-items: center;
     animation: successPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
