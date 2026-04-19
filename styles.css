@@ -1263,8 +1263,10 @@ body.light-theme .sticky-score {
     background: linear-gradient(to top, var(--bg-dark) 95%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    z-index: 9500 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 10005 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex !important;
+    flex-direction: column;
 }
 
 .chat-input-anchored .chat-input-area {
