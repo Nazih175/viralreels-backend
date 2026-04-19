@@ -38,11 +38,11 @@ const initApp = () => {
         const container = document.getElementById('auroraParticles');
         if (!container) return;
         
-        // Inject Mouse Spotlight (Restoring Elite Magnetic Aura)
+        // Inject Mouse Spotlight (Elite Magnetic Aura)
         const spotlight = document.createElement('div');
         spotlight.className = 'mouse-spotlight';
         spotlight.id = 'mouseSpotlight';
-        document.body.appendChild(spotlight);
+        container.appendChild(spotlight); // Append inside Aurora Container for perfect layering
 
         window.addEventListener('mousemove', (e) => {
             spotlight.style.left = e.clientX + 'px';
