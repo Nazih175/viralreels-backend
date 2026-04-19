@@ -1,5 +1,5 @@
 /**
- * ViralReels AI - App Logic (V3.1-PWA Pro Active)
+ * ViralReels AI - App Logic (V3.2-PRO-RESTORED)
  */
 
 // Service Worker Registration (PWA)
@@ -104,7 +104,12 @@ const initApp = () => {
     const splash = document.getElementById('splashScreen');
     if (splash) {
         splash.style.opacity = '0';
-        setTimeout(() => { splash.style.visibility = 'hidden'; splash.style.display = 'none'; }, 500);
+        setTimeout(() => { 
+            splash.style.visibility = 'hidden'; 
+            splash.style.display = 'none'; 
+            // Fallback: if it's still there, force removal
+            if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 500);
     }
 
     console.log("ViralReels AI System: V3.1 Global Optimization Active");
