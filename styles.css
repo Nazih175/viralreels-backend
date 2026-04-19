@@ -1254,7 +1254,7 @@ body.light-theme .sticky-score {
 /* Perfected Anchored Input Bar */
 .chat-input-anchored {
     position: fixed;
-    bottom: 74px; /* Above nav */
+    bottom: 90px; /* Elevated above navigation matrix */
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -1277,7 +1277,7 @@ body.light-theme .sticky-score {
 }
 
 #chatMessages {
-    padding-bottom: 110px !important;
+    padding-bottom: 130px !important;
 }
 
 body.keyboard-mobile .bottom-nav {
