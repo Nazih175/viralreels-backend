@@ -82,9 +82,16 @@ body {
     color: var(--text-primary); 
     transition: background-color 0.3s, color 0.3s;
     position: relative;
-    overflow-x: hidden;
+    overflow: hidden;
     margin: 0 !important;
     padding: 0 !important;
+    height: 100%;
+    width: 100%;
+}
+
+html {
+    height: 100%;
+    overflow: hidden;
 }
 
 /* Premium Mesh Background Overlay */
@@ -378,7 +385,7 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 
 /* APP LAYOUT - ELITE INTERACTIVE ENGINE */
 .app-layout { 
-    display: flex; flex-direction: column; height: 100vh; height: 100dvh; 
+    display: flex; flex-direction: column; height: 100%; height: 100dvh; 
     max-width: 600px; margin: 0 auto; 
     background: rgba(10, 10, 15, 0.25); /* Ultra-Transparent for Maximum Particle Depth */
     position: relative; overflow: hidden;
