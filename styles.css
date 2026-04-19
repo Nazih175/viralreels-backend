@@ -1235,15 +1235,17 @@ body.light-theme .sticky-score {
 
 /* Perfected Anchored Input Bar */
 .chat-input-anchored {
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    right: 0;
-    padding: 10px 1.5rem 10px 1.5rem;
-    background: linear-gradient(to top, var(--bg-dark) 90%, transparent);
+    position: fixed;
+    bottom: 74px; /* Above nav */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    padding: 10px 1.5rem 15px 1.5rem;
+    background: linear-gradient(to top, var(--bg-dark) 95%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    z-index: 20;
+    z-index: 9500 !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
