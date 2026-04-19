@@ -1926,6 +1926,81 @@ const initApp = () => {
         });
     });
 
+    // -- AI VOICE CHAT (SPEECH-TO-TEXT) --
+    function initVoiceChat() {
+        const voiceChatBtn = document.getElementById('voiceChatBtn');
+        const chatInput = document.getElementById('chatInput');
+        if (!voiceChatBtn || !chatInput) return;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            voiceChatBtn.style.opacity = '0.3';
+            voiceChatBtn.style.cursor = 'not-allowed';
+            voiceChatBtn.title = "Voice not supported in this browser";
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        let isRecording = false;
+
+        voiceChatBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                try {
+                    recognition.start();
+                    isRecording = true;
+                    voiceChatBtn.classList.add('recording');
+                    voiceChatBtn.innerHTML = '<i data-lucide="mic-off"></i>';
+                    lucide.createIcons();
+                } catch (err) {
+                    console.error("Speech Recognition Error:", err);
+                }
+            } else {
+                recognition.stop();
+                isRecording = false;
+                voiceChatBtn.classList.remove('recording');
+                voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
+                lucide.createIcons();
+            }
+        });
+
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            if (finalTranscript) {
+                const currentVal = chatInput.value.trim();
+                chatInput.value = currentVal ? currentVal + ' ' + finalTranscript : finalTranscript;
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech Recognition Error Event:", event.error);
+            isRecording = false;
+            voiceChatBtn.classList.remove('recording');
+            voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
+            lucide.createIcons();
+            if (event.error === 'not-allowed') {
+                window.vrAlert("Mic Permission Denied", "Please allow microphone access in your browser settings to use voice chat.");
+            }
+        };
+
+        recognition.onend = () => {
+            isRecording = false;
+            voiceChatBtn.classList.remove('recording');
+            voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
+            lucide.createIcons();
+        };
+    }
+    // Initialize Voice Chat
+    initVoiceChat();
+
     const sendChatBtn = document.getElementById('sendChatBtn');
     if (sendChatBtn) {
         sendChatBtn.addEventListener('click', async () => {
