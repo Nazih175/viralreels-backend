@@ -30,22 +30,6 @@ if ('serviceWorker' in navigator) {
 }
 
 const initApp = () => {
-    // -- SHARED UTILITIES --
-    window.renderState = (module, state) => {
-        const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
-        const contentEl = document.getElementById(`${module}GeneratorsContent`);
-        if (!emptyEl || !contentEl) return;
-        
-        if (state === 'empty') {
-            emptyEl.classList.remove('hidden');
-            contentEl.classList.add('hidden');
-        } else {
-            emptyEl.classList.add('hidden');
-            contentEl.classList.remove('hidden');
-        }
-    };
-
-    // -- SHARED UTILITIES --
     window.renderState = (module, state) => {
         const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
         const contentEl = document.getElementById(`${module}GeneratorsContent`);
@@ -79,7 +63,7 @@ const initApp = () => {
             spotlight.style.top = e.clientY + 'px';
         });
 
-        const particleCount = 120; // DOUBLED for a richer atmosphere
+        const particleCount = 80; // Optimized for performance while maintaining premium aesthetic
         for (let i = 0; i < particleCount; i++) {
             const p = document.createElement('div');
             p.className = 'particle';
@@ -914,14 +898,19 @@ const initApp = () => {
 
     const toItemCard = (text, type) => {
         const escapedText = text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        const typeClass = type === 'hook' ? 'type-hook' : (type === 'rewrite' ? 'type-rewrite' : '');
+        const tagLabel = type === 'hook' ? 'REEL HOOK' : (type === 'rewrite' ? 'AI REWRITE' : 'SUGGESTION');
+        
         return `
-            <div class="item-card glass-card result-appear">
-                <p class="item-text" style="white-space:pre-wrap;">${text}</p>
-                <div class="item-actions">
-                    <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i> Copy</button>
-                    <button class="action-btn btn-share" onclick="nativeShare('${escapedText}')" title="Share Content"><i data-lucide="share-2"></i> Share</button>
-                    ${type === 'hook' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'hook', this)" title="Save to Ledger"><i data-lucide="archive"></i> Save</button>` : ''}
-                    ${type === 'rewrite' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'rewrite', this)" title="Save to Vault"><i data-lucide="archive"></i> Save</button>` : ''}
+            <div class="saved-item-card ${typeClass} result-appear">
+                <div class="saved-card-header">
+                    <span class="saved-tag">${tagLabel}</span>
+                    <button class="icon-button" onclick="copyToClipboard('${escapedText}', this)" title="Copy"><i data-lucide="copy"></i></button>
+                </div>
+                <p class="saved-content-text" style="white-space:pre-wrap;">${text}</p>
+                <div class="saved-card-actions">
+                    <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
+                    ${(type === 'hook' || type === 'rewrite') ? `<button class="action-btn-mini" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i> Save to Vault</button>` : ''}
                 </div>
             </div>
         `;
@@ -1172,26 +1161,30 @@ const initApp = () => {
     const renderTracker = () => {
         const list = document.getElementById('trackerList');
         const empty = document.getElementById('trackerEmpty');
-        if (savedHooks.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
-            empty.classList.add('hidden');
+        if (!list) return;
+
+        if (savedHooks.length === 0) { 
+            list.innerHTML = ''; 
+            empty?.classList.remove('hidden'); 
+        } else {
+            empty?.classList.add('hidden');
             list.innerHTML = savedHooks.map((h, i) => {
+                const escapedText = h.replace(/'/g, "\\'").replace(/\n/g, "\\n");
                 const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
+                
                 return `
-                <div class="item-card flex-col border-subtle bg-card-dark interactive-glow result-appear">
-                    <div class="flex justify-between items-start mb-3">
+                <div class="saved-item-card type-hook result-appear" style="animation-delay: ${i * 0.05}s">
+                    <div class="saved-card-header">
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] bg-accent/20 text-accent font-bold px-2 py-0.5 rounded">HOOK #${savedHooks.length - i}</span>
+                            <span class="saved-tag">SAVED HOOK #${savedHooks.length - i}</span>
+                            ${isVerified ? '<span class="text-[8px] bg-green/20 text-green font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">Verified</span>' : ''}
                         </div>
-                        <button class="icon-button flex-shrink-0" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                        <button class="icon-button" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--accent-red)"></i></button>
                     </div>
-                    <p class="item-text mb-4 w-full text-sm" style="line-height:1.6; white-space:pre-wrap;">${h}</p>
-                    <div class="flex justify-between items-center pt-3 border-top border-subtle">
-                        ${isVerified ? `
-                        <div class="flex items-center gap-1 text-green font-bold uppercase" style="font-size:0.6rem; letter-spacing:1px;">
-                            <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
-                        </div>` : `
-                        <div class="text-[10px] text-muted uppercase tracking-wider">Unverified Prediction</div>`}
-                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${h.replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy</button>
+                    <p class="saved-content-text mb-4" style="white-space:pre-wrap;">${h}</p>
+                    <div class="saved-card-actions">
+                        <button class="action-btn-mini" onclick="copyToClipboard('${escapedText}', this)"><i data-lucide="copy"></i> Copy</button>
+                        <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
                     </div>
                 </div>
                 `;
@@ -1707,20 +1700,25 @@ const initApp = () => {
     const renderSavedRewrites = () => {
         const list = document.getElementById('savedList');
         const empty = document.getElementById('savedEmpty');
-        if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
-            empty.classList.add('hidden');
+        if (!list) return;
+
+        if (savedRewrites.length === 0) { 
+            list.innerHTML = ''; 
+            empty?.classList.remove('hidden'); 
+        } else {
+            empty?.classList.add('hidden');
             list.innerHTML = savedRewrites.map((r, i) => {
-                const colorRotation = ['emerald', 'blue', 'purple', 'cyan'];
-                const color = colorRotation[i % colorRotation.length];
+                const escapedText = r.replace(/'/g, "\\'").replace(/\n/g, "\\n");
                 return `
-                <div class="item-card vault-${color} border-subtle bg-card-dark interactive-glow result-appear" style="animation-delay: ${i * 0.1}s">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] vault-badge-${color} font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
-                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
+                <div class="saved-item-card type-rewrite result-appear" style="animation-delay: ${i * 0.05}s">
+                    <div class="saved-card-header">
+                        <span class="saved-tag">SCRIPTS VAULT #${savedRewrites.length - i}</span>
+                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--accent-red)"></i></button>
                     </div>
-                    <p class="item-text text-sm mb-4" style="white-space:pre-wrap; line-height:1.6;">${r}</p>
-                    <div class="flex justify-end pt-3 border-top border-subtle">
-                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
+                    <p class="saved-content-text mb-4" style="white-space:pre-wrap;">${r}</p>
+                    <div class="saved-card-actions">
+                        <button class="action-btn-mini" onclick="copyToClipboard('${escapedText}', this)"><i data-lucide="copy"></i> Copy</button>
+                        <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
                     </div>
                 </div>
                 `;
@@ -1859,6 +1857,20 @@ const initApp = () => {
         if (chatHistory.length > 20) chatHistory.pop();
         localStorage.setItem('vr_chat_history', JSON.stringify(chatHistory));
         renderChatLogs();
+    }
+
+    // --- ELITE KEYBOARD AWARENESS (V3.7) ---
+    if (chatInput) {
+        chatInput.addEventListener('focus', () => {
+            if (window.innerWidth < 768) {
+                document.body.classList.add('keyboard-mobile');
+                // Auto-scroll to bottom of chat
+                setTimeout(() => chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' }), 300);
+            }
+        });
+        chatInput.addEventListener('blur', () => {
+            document.body.classList.remove('keyboard-mobile');
+        });
     }
 
     function renderChatLogs() {
