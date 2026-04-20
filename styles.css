@@ -1266,33 +1266,8 @@ body.light-theme .sticky-score {
 .architect-title { font-size: 1.75rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff, var(--elite-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .architect-subtitle { font-size: 0.95rem; color: var(--text-secondary); max-width: 300px; line-height: 1.5; }
 
-/* Perfected Anchored Input Bar */
-.chat-input-anchored {
-    position: fixed;
-    bottom: 90px; /* Elevated above navigation matrix */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 600px;
-    padding: 10px 1.5rem 15px 1.5rem;
-    background: linear-gradient(to top, var(--bg-dark) 95%, transparent);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    z-index: 10005 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    display: flex !important;
-    flex-direction: column;
-}
-
-.chat-input-anchored .chat-input-area {
-    padding: 0 !important;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
 #chatMessages {
-    padding-bottom: 130px !important;
+    padding-bottom: 250px !important;
 }
 
 body.keyboard-mobile .bottom-nav {
@@ -1306,7 +1281,7 @@ body.keyboard-mobile .chat-input-anchored {
 }
 
 body.keyboard-mobile #chatMessages {
-    padding-bottom: 80px !important;
+    padding-bottom: 100px !important;
 }
 
 /* Ensure bottom nav is always centered */
@@ -1397,8 +1372,37 @@ body.keyboard-mobile #chatMessages {
 #auroraParticles {
     position: absolute;
     inset: 0;
-    opacity: 0.5; /* Requested: 50-75% transparency */
+    opacity: 0.5;
     transition: opacity 2s ease;
+}
+
+.particle {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+.mouse-spotlight {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(157, 78, 221, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease;
+    mix-blend-mode: screen;
 }
 
 /* --- ELITE SAVED MODULE (VIBRANCY V3.7) --- */
@@ -1425,22 +1429,22 @@ body.keyboard-mobile #chatMessages {
 /* --- AI CHAT ANCHORED INPUT (ZENITH V3.7) --- */
 .chat-input-anchored {
     position: fixed;
-    bottom: 90px;
+    bottom: 180px; /* Elevated further to fully clear the 12-icon dual-row menu */
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 32px);
     max-width: 600px;
-    background: rgba(15, 15, 25, 0.8);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(157, 78, 221, 0.2);
-    border-radius: 20px;
-    padding: 12px;
-    display: flex !important; /* Force visible in Chat Tab */
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(157, 78, 221, 0.4);
+    border-radius: 28px;
+    padding: 16px;
+    display: flex !important;
     flex-direction: column;
     z-index: 10005;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(157, 78, 221, 0.1);
-    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(157, 78, 221, 0.25);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Handle Mobile Keyboard States */
