@@ -1267,7 +1267,7 @@ body.light-theme .sticky-score {
 .architect-subtitle { font-size: 0.95rem; color: var(--text-secondary); max-width: 300px; line-height: 1.5; }
 
 #chatMessages {
-    padding-bottom: 250px !important;
+    padding-bottom: 210px !important;
 }
 
 body.keyboard-mobile .bottom-nav {
@@ -1429,7 +1429,7 @@ body.keyboard-mobile #chatMessages {
 /* --- AI CHAT ANCHORED INPUT (ZENITH V3.7) --- */
 .chat-input-anchored {
     position: fixed;
-    bottom: 180px; /* Elevated further to fully clear the 12-icon dual-row menu */
+    bottom: 125px; /* Precision Alignment: ~15px above the 110px dual-row menu */
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 32px);
