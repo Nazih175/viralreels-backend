@@ -1249,17 +1249,16 @@ body.light-theme .sticky-score {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 3rem 1.5rem;
-    min-height: 450px;
+    padding: 2rem 1.5rem;
     width: 100%;
 }
 .architect-logo {
     display: block;
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
     flex-shrink: 0;
-    margin: 0 auto 2rem auto;
-    filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7));
+    margin: 0 auto 1.5rem auto;
+    filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
     animation: architectFloat 4s infinite ease-in-out;
 }
 @keyframes architectFloat {
