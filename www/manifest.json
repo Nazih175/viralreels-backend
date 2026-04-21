@@ -1,0 +1,82 @@
+{
+  "name": "ViralReels AI",
+  "short_name": "ViralReels",
+  "id": "viralreels-ai-pwa",
+  "lang": "en-US",
+  "dir": "ltr",
+  "description": "The all-in-one AI suite for short-form creators. Hook generators, script rewriters, and viral trackers.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "categories": ["productivity", "social"],
+  "icons": [
+    {
+      "src": "assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot_mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Accurate UI Dashboard and Analysis"
+    },
+    {
+      "src": "assets/screenshot_desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Full Creator Workspace"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Analyze Concept",
+      "url": "./index.html#view-analyze",
+      "icons": [{ "src": "assets/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Chat Consultant",
+      "url": "./index.html#view-chat",
+      "icons": [{ "src": "assets/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
