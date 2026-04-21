@@ -59,12 +59,17 @@ function sanitizeAiResponse(raw, requiredKeys) {
 // -- SECURE PRO RECOGNITION MIDDLEWARE --
 const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        req.isPro = false; // Default to free if no token
+    
+    // 1. Definite Guest/Missing Token (Allow as Free)
+    if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader === 'Bearer guest-token') {
+        req.isPro = false;
+        console.log(`[Auth Bridge] Accepted GUEST (Mode: Free)`);
         return next();
     }
 
     const token = authHeader.split('Bearer ')[1];
+    
+    // 2. Token Provided - Attempt Firebase Verification
     try {
         const decodedToken = await admin.auth().verifyIdToken(token);
         const db = admin.firestore();
@@ -73,10 +78,10 @@ const authenticate = async (req, res, next) => {
         req.user = decodedToken;
         req.isPro = userDoc.exists ? (userDoc.data().isPro || false) : false;
         
-        console.log(`[Auth] Verified User: ${decodedToken.email} | Status: ${req.isPro ? 'PRO' : 'FREE'}`);
+        console.log(`[Auth Zenith] Verified User: ${decodedToken.email} | Status: ${req.isPro ? 'PRO' : 'FREE'}`);
         next();
     } catch (error) {
-        console.error('[Auth Warning] Token verification failed:', error.message);
+        console.warn(`[Auth Warning] Token verification failed [${error.message}]. Defaulting to Free.`);
         req.isPro = false;
         next();
     }

@@ -388,6 +388,10 @@ const initApp = () => {
                 const token = await user.getIdToken();
                 if (!options.headers) options.headers = {};
                 options.headers['Authorization'] = `Bearer ${token}`;
+            } else if (window.isGuestMode) {
+                // Bridge: Send guest token to allow trials without account
+                if (!options.headers) options.headers = {};
+                options.headers['Authorization'] = `Bearer guest-token`;
             }
         } catch (authErr) {
             console.warn("[Auth Header] Token fetch issue:", authErr.message);
