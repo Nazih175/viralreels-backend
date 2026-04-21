@@ -176,7 +176,7 @@ const initApp = () => {
     // =============================================
     const CONFIG = {
         PUBLISHER_ID: "REPLACE_WITH_YOUR_PUBLISHER_ID", // e.g. "ca-pub-123456789"
-        STRIPE_TEST_MODE: true, // Flip to false for sk_live
+        STRIPE_TEST_MODE: false, // Flip to false for sk_live
     };
 
     let currentAnalyzedIdea = null;
