@@ -687,39 +687,6 @@ const initApp = () => {
         return `${h}h ${m}m`;
     };
 
-    // Show limit block inside a target container element
-    const showLimitBlock = (containerEl, tool) => {
-        const block = document.createElement('div');
-        block.className = 'limit-block-card content-padding mb-6';
-        block.id = `limit-block-${tool}`;
-        block.innerHTML = `
-            <div class="limit-icon"><i data-lucide="lock" style="width:22px; color:var(--text-danger);"></i></div>
-            <h3 class="font-bold text-lg mb-1" style="color:var(--text-danger);">Daily Limit Reached</h3>
-            <p class="text-secondary text-sm mb-1">You've used all <strong>${LIMITS[tool]}</strong> free ${tool} uses today.</p>
-            <p class="text-xs text-muted">Resets in <strong style="color:var(--accent-gold);">${getResetIn()}</strong></p>
-            <div class="limit-block-actions">
-                <button class="btn-watch-ad watch-ad-btn" data-tool="${tool}">
-                    <i data-lucide="play" style="width:16px;"></i> Watch a 30s Ad → Get +2 Uses
-                </button>
-                <button class="btn-primary w-full open-paywall-btn" style="background:var(--gradient-premium); color:black;">
-                    <i data-lucide="crown" style="width:16px;"></i> Go Pro for Unlimited Access
-                </button>
-                <p class="text-xs text-muted" style="margin-top:4px;">⏰ Or wait for the automatic reset in ${getResetIn()}</p>
-            </div>
-        `;
-        // Remove any existing block first
-        const existing = containerEl.querySelector('.limit-block-card');
-        if (existing) existing.remove();
-        containerEl.prepend(block);
-        updateIcons();
-
-        // Wire up buttons
-        block.querySelector('.watch-ad-btn').addEventListener('click', () => startAd(tool));
-        block.querySelector('.open-paywall-btn').addEventListener('click', () => {
-            document.getElementById('paywallOverlay').classList.remove('hidden');
-        });
-    };
-
     // Clipboard helper
     window.copyToClipboard = (text, btn) => {
         navigator.clipboard.writeText(text).then(() => {
