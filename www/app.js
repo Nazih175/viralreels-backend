@@ -9,7 +9,7 @@ window.VR_BOOT_TIME = Date.now();
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI System: V4.6-ULTIMATE Active");
+            console.log("ViralReels AI System: Zenith V4.6.8-ULTIMATE Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
@@ -159,7 +159,7 @@ const initApp = () => {
         }, 500);
     }
 
-    console.log("ViralReels AI System: V3.1 Global Optimization Active");
+    console.log("ViralReels AI System: Zenith V4.6.8 Global Optimization Active");
         
     // -- Hardening Helper: safeListen --
     const safeListen = (id, event, callback) => {
