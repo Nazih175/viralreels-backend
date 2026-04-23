@@ -7,13 +7,13 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>ViralReels AI | The #1 Short-Form Video Creator Suite</title>
+    <title>ViralReels AI | Zenith V3.7-ULTIMATE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;700&display=swap');
     </style>
-    <meta name="title" content="ViralReels AI | The #1 Short-Form Video Creator Suite">
+    <meta name="title" content="ViralReels AI | Zenith V3.7-ULTIMATE">
     <meta name="description"
-        content="Explode your reach with ViralReels AI. Generate viral hooks, rewrite scripts with AI, and track trending hashtags for TikTok, Instagram Reels, and YouTube Shorts.">
+        content="ViralReels AI: The all-in-one suite for short-form creators. Generate viral hooks, rewrite scripts, and track trends to explode your reach on TikTok, Reels, and Shorts.">
     <link rel="canonical" href="https://nazih175.github.io/viralreels-backend/" />
     <meta name="theme-color" content="#0a0a0f">
 
@@ -60,14 +60,14 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=4.6.0">
+    <link rel="stylesheet" href="styles.css?v=3.7.2">
 
     <!-- 
         GOOGLE VERIFICATION CONFIG 
         Follow the PRODUCTION_HANDOVER.md guide to replace the values below.
     -->
     <meta name="google-site-verification" content="qeTX-PqqrETEAihNDcIaqUUe2FClsHVoWwxoX5Uxy5M" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-PROD_ID_PENDING" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=REPLACE_WITH_YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
 
 
     <!-- App Store / Play Store Readiness Meta -->
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Auth Overlay (Reverted/Standardized) -->
-    <div id="authOverlay" class="fullscreen-overlay z-auth hidden">
+    <div id="authOverlay" class="fullscreen-overlay z-auth">
         <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border);">
             <div class="certified-badge"><i data-lucide="shield-check"></i> Certified 2026 AI Engine</div>
             <div class="auth-logo-bg mb-2">
@@ -123,18 +123,10 @@
             <h2 class="auth-subtitle">Creator Intelligence <span class="text-accent">•</span> Algorithm Grounded</h2>
             <p class="auth-desc text-xs mb-3">Gain the ultimate advantage with the 2026 AI creator suite. Analyze, engineer, and dominate the digital meta with precision-tuned logic.</p>
             <div class="auth-actions" id="authBaseActions">
-                <button class="btn-primary w-full" id="googleLoginBtn"><i data-lucide="globe"></i> Continue with Google</button>
-                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:var(--bg-card-dark);"><i data-lucide="mail"></i> Continue with Email</button>
-                
-                <div class="flex items-center gap-2 my-2 opacity-30">
-                    <div class="h-[1px] flex-1 bg-white/20"></div>
-                    <span class="text-[10px] uppercase tracking-widest font-bold">Or Open Access</span>
-                    <div class="h-[1px] flex-1 bg-white/20"></div>
-                </div>
-
-                <button class="btn-secondary w-full border-accent/20" id="guestLoginBtn" style="background:rgba(168,85,247,0.05); color:var(--text-primary);">
-                    <i data-lucide="zap"></i> Browse as Guest (Instant Access)
-                </button>
+                <button class="btn-primary w-full" id="googleLoginBtn"><i data-lucide="chrome"></i> Continue with
+                    Google</button>
+                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn"
+                    style="background:var(--bg-card-dark);"><i data-lucide="mail"></i> Continue with Email</button>
             </div>
 
             <div class="social-proof">
@@ -169,7 +161,7 @@
     <!-- Premium Paywall Overlay -->
     <div id="paywallOverlay" class="fullscreen-overlay z-paywall hidden">
         <div class="paywall-card glass-card interactive-glow flex-col premium-glow">
-            <button class="close-btn modal-closer" id="closePaywallBtn" aria-label="Close Premium Upgrade" title="Close"><i data-lucide="x"></i></button>
+            <button class="close-btn modal-closer" id="closePaywallBtn"><i data-lucide="x"></i></button>
 
             <div class="hero-premium-bg mb-2">
                 <div class="pro-badge mb-1 mx-auto" style="padding: 4px 10px; font-size: 0.7rem;"><i
@@ -265,7 +257,7 @@
                 <p class="text-secondary text-sm">Your ad is playing...</p>
                 <p class="text-xs text-muted mt-1">Sponsored by ViralReels AI Partners</p>
                 <button id="adSkipBtn" class="btn-secondary text-xs mt-4"
-                    style="padding:6px 16px; opacity:0.4; cursor:not-allowed;" disabled aria-label="Skip Advertisement" title="Skip Ad">Skip Ad</button>
+                    style="padding:6px 16px; opacity:0.4; cursor:not-allowed;" disabled>Skip Ad</button>
             </div>
             <!-- Progress Bar -->
             <div class="stat-bar-container mb-3" style="height:4px;">
@@ -284,7 +276,7 @@
     <div id="aboutModal" class="fullscreen-overlay z-paywall hidden">
         <div class="glass-card about-card text-left scroll-container"
             style="max-height: 85vh; width:100%; max-width:450px;">
-            <button class="close-btn modal-closer" id="closeAboutBtn" aria-label="Close About Modal" title="Close"><i data-lucide="x"></i></button>
+            <button class="close-btn modal-closer" id="closeAboutBtn"><i data-lucide="x"></i></button>
             <div class="about-hero text-center mb-6 mt-4">
                 <div class="auth-logo-bg mb-2 flex justify-center mx-auto" style="background: none;">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
@@ -402,23 +394,12 @@
                             placeholder="e.g. AI / Tech, Fitness, Cooking...">
                     </div>
                     <div class="persona-stat-box">
-                        <label class="persona-label">Strategy Architect</label>
-                        <div class="custom-select-wrapper">
-                            <select id="personaArchitect" class="text-sm border-none p-0 bg-transparent text-primary">
-                                <option value="disruptor" selected>The Creative Disruptor (Aggressive)</option>
-                                <option value="expert">The Growth Expert (Analytical)</option>
-                                <option value="minimalist">The Minimalist (Clean/Quiet)</option>
-                            </select>
-                            <i data-lucide="chevron-down" class="select-icon" style="right:0;"></i>
-                        </div>
-                    </div>
-                    <div class="persona-stat-box">
-                        <label class="persona-label">Brand Voice Intensity</label>
+                        <label class="persona-label">Brand Voice (Relatable ↔ Aggressive)</label>
                         <input type="range" id="personaTone" class="tone-slider" min="1" max="100" value="50">
                         <div class="flex justify-between text-xs text-muted mt-2">
-                            <span>Relatable</span>
+                            <span>Soft</span>
                             <span>Neutral</span>
-                            <span>High-Energy</span>
+                            <span>Hype</span>
                         </div>
                     </div>
                 </div>
@@ -435,16 +416,6 @@
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="themeToggle" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <div class="flex items-center justify-between p-2 mb-2">
-                    <div>
-                        <strong class="text-primary font-bold text-sm block">Neural Soundscapes</strong>
-                        <span class="text-xs text-secondary">High-tech audio cues & haptics</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="audioToggle" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -608,17 +579,13 @@
                     <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGrad)" />
                     <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGrad)" />
                 </svg>
-                <div class="flex-col">
-                    <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
-                    <div id="nicheTicker" class="text-[8px] font-black uppercase tracking-[0.2em] text-accent opacity-60 ml-1 hidden" style="line-height: 1;">Algorithm Syncing...</div>
-                </div>
+                <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
+
             </div>
             <div class="flex gap-2">
-                <button class="btn-primary header-btn hidden" id="guestJoinBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
-                    <i data-lucide="user-plus"></i> <span>Join Now</span>
-                </button>
-                <button class="btn-text header-btn" id="aboutBtn" aria-label="About ViralReels AI" title="Learn more about tools"><i data-lucide="info"></i></button>
-                <button class="btn-text header-btn" id="settingsBtn" aria-label="App Settings and Profile" title="Manage account and data"><i data-lucide="settings"></i></button>
+                <button class="btn-text header-btn" id="aboutBtn"><i data-lucide="info"></i> <span>About</span></button>
+                <button class="btn-text header-btn" id="settingsBtn"><i data-lucide="settings"></i>
+                    <span>Settings</span></button>
             </div>
         </header>
 
@@ -630,7 +597,7 @@
                 <div class="tab-header pt-4 content-padding">
                     <div class="flex items-center justify-between gap-4 mb-2">
                         <h2 class="text-xl font-bold flex items-center gap-2">Analyzer Pro</h2>
-                        <button class="btn-export" id="exportAnalyzeBtn" aria-label="Export Analysis as CSV" title="Download data"><i data-lucide="download"></i> CSV</button>
+                        <button class="btn-export" id="exportAnalyzeBtn"><i data-lucide="download"></i> CSV</button>
                     </div>
                     <p class="text-sm text-secondary">Predict satisfaction-per-swipe and engineer high-retention gaming hits.</p>
                     <div id="usage-badge-analyze" class="usage-badge mt-2"></div>
@@ -693,8 +660,7 @@
                     </div>
 
                     <div id="resultsDashboard"
-                        class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4" style="position:relative; overflow:hidden;">
-                        <div id="analyzerScanner" class="elite-scanner hidden"></div>
+                        class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4">
                         <h3 class="font-bold text-lg mb-2">Viral Readiness</h3>
                         <div class="stats-grid">
                             <div class="stat-card standout-card primary-stat"><span class="stat-label">Viral
@@ -987,7 +953,8 @@
                 </form>
                 <div id="dedTagsOutput" class="glass-card hidden glow-box interactive-glow">
                     <h4 class="mb-3 text-sm font-bold uppercase tracking-wide neon-text" style="color:var(--accent-red)"><i
-                            data-lucide="flame" style="display:inline; width:14px; margin-bottom:-2px;"></i> Viral Trending Tags</h4>
+                            data-lucide="fire" style="display:inline; width:14px; margin-bottom:-2px;"></i> Viral
+                        Trending Tags</h4>
                     <div id="tagsTrending" class="hashtag-grid mb-6"></div>
 
                     <h4 class="mb-3 text-sm font-bold uppercase tracking-wide neon-cyan" style="color:var(--accent-cyan)"><i
@@ -1403,10 +1370,7 @@
                 </div>
 
                 <div class="chat-container" style="position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-                    <button id="newChatBtn" class="btn-new-chat hidden" title="Start a fresh conversation">
-                        <i data-lucide="plus" style="width:12px;"></i> New Chat
-                    </button>
-                    <div id="chatMessages" class="chat-messages scroll-container locked-intro" style="flex:1;">
+                    <div id="chatMessages" class="chat-messages scroll-container" style="flex:1;">
                         <!-- ARCHITECT INTRO STATE -->
                         <div id="chatIntro" class="architect-intro">
                             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="architect-logo">
@@ -1549,18 +1513,27 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=4.6.8"></script>
+    <script src="app.js?v=3.7.0"></script>
     
     <!-- Zenith Certification Footer -->
     <footer class="version-badge-footer">
-        <div class="flex items-center gap-2" style="opacity: 0.8;">
-            <div class="w-1.5 h-1.5 bg-green rounded-full animate-pulse"></div>
-            <p class="text-xs text-muted mb-6 tracking-widest opacity-30">ZENITH V4.6.8-ULTIMATE (IRON LOCK SECURED)</p>
+        <div class="seal-wrap">
+            <div class="zenith-seal">Zenith V3.7-ULTIMATE Certified</div>
+            <p class="text-[9px] text-muted uppercase tracking-widest mt-2">Algorithm Grounded • 2026 Production Build</p>
         </div>
     </footer>
 
 
-
+    <!-- PWA Service Worker Ready -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('ViralReels SW: Active', reg.scope))
+                    .catch(err => console.error('ViralReels SW: Offline Mode Disabled', err));
+            });
+        }
+    </script>
 
     <!-- Cookie Banner -->
     <div id="cookieBanner" class="cookie-banner hidden">

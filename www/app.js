@@ -2,32 +2,16 @@
  * ViralReels AI - App Logic (V3.2-PRO-RESTORED)
  */
 
-// ViralReels System Boot (Auth Protection)
-window.VR_BOOT_TIME = Date.now();
-
 // Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI System: Zenith V4.6.8-ULTIMATE Active");
+            console.log("ViralReels AI System: V3.1-PWA Pro Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // --- THE IRON LOCK (Zenith V4.5) ---
-                        // 1. Temporal Shield: No reloads in first 5s (Extended for Auth stability)
-                        const isBooting = (Date.now() - window.VR_BOOT_TIME) < 5000;
-                        // 2. Redirect Awareness: No reloads during Firebase Redirect return
-                        const isRedirect = window.location.search.includes('apiKey') || window.location.search.includes('mode') || window.location.hash.includes('access_token');
-                        // 3. Activity Shield: No reloads during active auth
-                        const isAuthVisible = !document.getElementById('authOverlay')?.classList.contains('hidden');
-                        const isLoginSpinning = document.getElementById('authSubmitBtn')?.innerHTML.includes('loader');
-
-                        if (isBooting || isRedirect || isAuthVisible || isLoginSpinning) {
-                            console.log("ViralReels AI: SW Update ready but system is locked. Delaying reload.");
-                            return;
-                        }
-                        
+                        // New version available! Force reload.
                         console.log("New version detected, refreshing...");
                         window.location.reload();
                     }
@@ -40,17 +24,6 @@ if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
-        
-        const isBooting = (Date.now() - window.VR_BOOT_TIME) < 5000;
-        const isRedirect = window.location.search.includes('apiKey') || window.location.search.includes('mode') || window.location.hash.includes('access_token');
-        const isAuthVisible = !document.getElementById('authOverlay')?.classList.contains('hidden');
-        const isLoginSpinning = document.getElementById('authSubmitBtn')?.innerHTML.includes('loader');
-        
-        if (isBooting || isRedirect || isAuthVisible || isLoginSpinning) {
-            console.log("ViralReels AI: SW Controller change ignored (Iron Lock active).");
-            return;
-        }
-        
         refreshing = true;
         window.location.reload();
     });
@@ -85,26 +58,9 @@ const initApp = () => {
         spotlight.id = 'mouseSpotlight';
         container.appendChild(spotlight); // Append inside Aurora Container for perfect layering
 
-        window.addEventListener('mousedown', (e) => {
-            // Magnetic Burst Effect
-            const burstCount = 12;
-            for (let i = 0; i < burstCount; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle burst-particle';
-                const size = Math.random() * 4 + 2;
-                const angle = (i / burstCount) * Math.PI * 2;
-                const dist = 50 + Math.random() * 50;
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-                p.style.left = e.clientX + 'px';
-                p.style.top = e.clientY + 'px';
-                p.style.opacity = '0.8';
-                p.style.background = 'var(--accent-purple)';
-                p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-                p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
-                container.appendChild(p);
-                setTimeout(() => p.remove(), 1000);
-            }
+        window.addEventListener('mousemove', (e) => {
+            spotlight.style.left = e.clientX + 'px';
+            spotlight.style.top = e.clientY + 'px';
         });
 
         const particleCount = 80; // Optimized for performance while maintaining premium aesthetic
@@ -127,70 +83,7 @@ const initApp = () => {
         }
     };
     initAuroraParticles();
-
-    // -- Global Keyboard Protection System --
-    // -- Global Keyboard Protection System (Zenith V4.1 Robust) --
-    // Uses event delegation to ensure dynamic inputs (Chat, Rewrite) are always covered.
-    const setupKeyboardProtection = () => {
-        window.addEventListener('focusin', (e) => {
-            const target = e.target;
-            if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) {
-                if (window.innerWidth < 1024) document.body.classList.add('keyboard-mobile');
-            }
-        });
-        window.addEventListener('focusout', (e) => {
-            const target = e.target;
-            if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) {
-                document.body.classList.remove('keyboard-mobile');
-            }
-        });
-    };
-    setupKeyboardProtection();
     
-    // -- ZENITH NEURAL AUDIO ENGINE (V4.6) --
-    const neuralCtx = new (window.AudioContext || window.webkitAudioContext)();
-    window.playNeuralSound = (type) => {
-        if (!persona.audio || neuralCtx.state === 'suspended') {
-            if (neuralCtx.state === 'suspended') neuralCtx.resume();
-            if (!persona.audio) return;
-        }
-
-        const osc = neuralCtx.createOscillator();
-        const gain = neuralCtx.createGain();
-        osc.connect(gain);
-        gain.connect(neuralCtx.destination);
-
-        const now = neuralCtx.currentTime;
-
-        if (type === 'success') {
-            // Harmonic Rise
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'scanning') {
-            // High-Tech Pulse
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(20, now);
-            osc.frequency.linearRampToValueAtTime(40, now + 0.1);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        } else if (type === 'click') {
-            // Sharp Blip
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(1000, now);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-            osc.start(now);
-            osc.stop(now + 0.05);
-        }
-    };
-
     // 1. Immediate UI Reveal (Dismiss Splash)
     const splash = document.getElementById('splashScreen');
     if (splash) {
@@ -203,7 +96,7 @@ const initApp = () => {
         }, 500);
     }
 
-    console.log("ViralReels AI System: Zenith V4.6.8 Global Optimization Active");
+    console.log("ViralReels AI System: V3.1 Global Optimization Active");
         
     // -- Hardening Helper: safeListen --
     const safeListen = (id, event, callback) => {
@@ -220,7 +113,7 @@ const initApp = () => {
     // =============================================
     const CONFIG = {
         PUBLISHER_ID: "REPLACE_WITH_YOUR_PUBLISHER_ID", // e.g. "ca-pub-123456789"
-        STRIPE_TEST_MODE: false, // Flip to false for sk_live
+        STRIPE_TEST_MODE: true, // Flip to false for sk_live
     };
 
     let currentAnalyzedIdea = null;
@@ -231,34 +124,9 @@ const initApp = () => {
     let isPro = localStorage.getItem('vr_pro_status') === 'true';
     let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
     let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
-    let savedTheme = localStorage.getItem('vr_theme') || 'dark';
     let persona = safeGet('vr_persona', { niche: '', tone: 50 });
-
-    // Apply Saved Theme
-    if (savedTheme === 'light') document.body.classList.add('light-theme');
-    else document.body.classList.remove('light-theme');
-
-    // -- Centralized UI Refresh Helper (Debounced for Performance) --
-    let iconTimeout;
-    window.updateIcons = () => {
-        clearTimeout(iconTimeout);
-        iconTimeout = setTimeout(() => {
-            if (window.lucide) lucide.createIcons();
-            console.log("[ViralReels] UI Hydrated.");
-        }, 50);
-    };
     let currentAnalyzeData = null;
     let lastUsedInputs = { analyze: '', hooks: '', captions: '', trends: '', rewrite: '' };
-
-    // -- GROWTH ANALYTICS: Track Milestone Helper --
-    window.trackMilestone = (type, metadata = {}) => {
-        try {
-            const milestones = JSON.parse(localStorage.getItem('vr_analytics_milestones') || '[]');
-            milestones.push({ type, ...metadata, timestamp: Date.now() });
-            localStorage.setItem('vr_analytics_milestones', JSON.stringify(milestones));
-            console.log(`[Growth] Milestone Logged: ${type}`, metadata);
-        } catch(err) { /* silent */ }
-    };
  
     // -- DOM Elements (Explicit Declarations for UI Reliability) --
     const emailLoginBtn = document.getElementById('emailLoginBtn');
@@ -342,7 +210,7 @@ const initApp = () => {
             document.getElementById('restartVideoAiBtn')?.click();
         }
 
-        updateIcons();
+        lucide.createIcons();
     };
 
     // -- PREMIUM CELEBRATIONS --
@@ -444,10 +312,6 @@ const initApp = () => {
                 const token = await user.getIdToken();
                 if (!options.headers) options.headers = {};
                 options.headers['Authorization'] = `Bearer ${token}`;
-            } else if (window.isGuestMode) {
-                // Bridge: Send guest token to allow trials without account
-                if (!options.headers) options.headers = {};
-                options.headers['Authorization'] = `Bearer guest-token`;
             }
         } catch (authErr) {
             console.warn("[Auth Header] Token fetch issue:", authErr.message);
@@ -527,25 +391,6 @@ const initApp = () => {
         showToast(`Loaded: "${val.substring(0, 15)}..."`);
     };
 
-    // -- NATIVE POLISH: HAPTIC ENGINE --
-    window.triggerHaptic = (type = 'light') => {
-        if (!("vibrate" in navigator)) return;
-        
-        const patterns = {
-            light: 10,
-            medium: 35,
-            heavy: [50, 100, 50],
-            success: [30, 50, 30],
-            error: [100, 50, 100]
-        };
-        
-        try {
-            navigator.vibrate(patterns[type] || 10);
-        } catch (e) {
-            console.warn("Haptic Pulse Blocked:", e);
-        }
-    };
-
     // -- ANIMATION ENGINE --
     const triggerConfetti = () => {
         if (window.confetti) {
@@ -560,8 +405,6 @@ const initApp = () => {
             textEl.innerText = text;
             overlay.classList.remove('hidden');
             triggerConfetti();
-            window.triggerHaptic('success'); 
-            window.playNeuralSound('success'); // Zenith Neural Audio
             setTimeout(() => overlay.classList.add('hidden'), 2200);
         }
     };
@@ -596,33 +439,6 @@ const initApp = () => {
             localStorage.setItem('vr_trial_start', new Date().toISOString());
         }
     };
-
-    // --- MISSING LOGIC: LIMIT BLOCKER (V4.6.6) ---
-    const showLimitBlock = (container, tool) => {
-        if (!container) return;
-        const msg = `You've reached your daily limit for ${tool} (5 Uses).`;
-        const block = document.createElement('div');
-        block.className = 'glass-card p-6 text-center animate-appear mt-4';
-        block.innerHTML = `
-            <div class="text-3xl mb-3">⚡</div>
-            <h3 class="font-bold mb-2">Limit Reached!</h3>
-            <p class="text-sm text-secondary mb-4">${msg}</p>
-            <div class="flex flex-col gap-2">
-                <button class="btn-primary w-full" onclick="window.trackMilestone('CONVERSION_CLICK', { tool: '${tool}', type: 'LINK_AUTH' }); document.getElementById('authOverlay').classList.remove('hidden')">
-                    <i data-lucide="crown"></i> Start 7-Day Free Trial
-                </button>
-                <button class="btn-secondary w-full" onclick="window.trackMilestone('CONVERSION_LATER', { tool: '${tool}' }); this.parentElement.parentElement.remove()">Later</button>
-            </div>
-        `;
-        container.innerHTML = '';
-        container.appendChild(block);
-        updateIcons();
-        window.triggerHaptic('notification');
-        
-        // --- GROWTH ANALYTICS: Track Limit Hit ---
-        window.trackMilestone('LIMIT_HIT', { tool });
-    };
-
     const getTrialInfo = () => {
         const start = localStorage.getItem('vr_trial_start');
         if (!start) return { active: false, daysLeft: 0 };
@@ -657,26 +473,6 @@ const initApp = () => {
         if (usage[tool] > 0) usage[tool]--;
         saveUsage(usage);
         renderAllBadges();
-        
-        // --- GUEST CONVERSION TRACKING ---
-        if (window.isGuestMode) {
-            let count = parseInt(localStorage.getItem('vr_guest_uses') || '0') + 1;
-            localStorage.setItem('vr_guest_uses', count.toString());
-            console.log(`[ViralReels] Guest Usage: ${count}`);
-            
-            // Milestone prompts (5, 12, 20)
-            if ([5, 12, 20].includes(count)) {
-                setTimeout(() => {
-                    window.vrConfirm(
-                        "Save Your Creator History?",
-                        `You've used ViralReels ${count} times as a guest! Create a free account now to save all your hooks, trends, and analytics permanently.`,
-                        () => { document.getElementById('authOverlay').classList.remove('hidden'); },
-                        "Join Now",
-                        "Later"
-                    );
-                }, 1000);
-            }
-        }
     };
 
     const rechargeUses = (tool, amount) => {
@@ -696,7 +492,7 @@ const initApp = () => {
         if (isPro) {
             el.className = `usage-badge plenty`;
             el.innerHTML = `<i data-lucide="infinity" style="width:12px; height:12px;"></i> Unlimited Uses`;
-            updateIcons();
+            lucide.createIcons();
             return;
         }
 
@@ -732,22 +528,53 @@ const initApp = () => {
         return `${h}h ${m}m`;
     };
 
+    // Show limit block inside a target container element
+    const showLimitBlock = (containerEl, tool) => {
+        const block = document.createElement('div');
+        block.className = 'limit-block-card content-padding mb-6';
+        block.id = `limit-block-${tool}`;
+        block.innerHTML = `
+            <div class="limit-icon"><i data-lucide="lock" style="width:22px; color:var(--text-danger);"></i></div>
+            <h3 class="font-bold text-lg mb-1" style="color:var(--text-danger);">Daily Limit Reached</h3>
+            <p class="text-secondary text-sm mb-1">You've used all <strong>${LIMITS[tool]}</strong> free ${tool} uses today.</p>
+            <p class="text-xs text-muted">Resets in <strong style="color:var(--accent-gold);">${getResetIn()}</strong></p>
+            <div class="limit-block-actions">
+                <button class="btn-watch-ad watch-ad-btn" data-tool="${tool}">
+                    <i data-lucide="play" style="width:16px;"></i> Watch a 30s Ad → Get +2 Uses
+                </button>
+                <button class="btn-primary w-full open-paywall-btn" style="background:var(--gradient-premium); color:black;">
+                    <i data-lucide="crown" style="width:16px;"></i> Go Pro for Unlimited Access
+                </button>
+                <p class="text-xs text-muted" style="margin-top:4px;">⏰ Or wait for the automatic reset in ${getResetIn()}</p>
+            </div>
+        `;
+        // Remove any existing block first
+        const existing = containerEl.querySelector('.limit-block-card');
+        if (existing) existing.remove();
+        containerEl.prepend(block);
+        lucide.createIcons();
+
+        // Wire up buttons
+        block.querySelector('.watch-ad-btn').addEventListener('click', () => startAd(tool));
+        block.querySelector('.open-paywall-btn').addEventListener('click', () => {
+            document.getElementById('paywallOverlay').classList.remove('hidden');
+        });
+    };
+
     // Clipboard helper
     window.copyToClipboard = (text, btn) => {
         navigator.clipboard.writeText(text).then(() => {
             const original = btn.innerHTML;
             btn.innerHTML = '<i data-lucide="check" style="width:14px; color:var(--accent-green);"></i>';
             showToast("Copied to clipboard!");
-            window.triggerHaptic('light'); // Subtle confirmation pulse
-            updateIcons();
+            lucide.createIcons();
             setTimeout(() => {
                 btn.innerHTML = original;
-                updateIcons();
+                lucide.createIcons();
             }, 2000);
         }).catch(err => {
             console.error('Failed to copy: ', err);
             showToast("Copy failed.");
-            window.triggerHaptic('error');
         });
     };
 
@@ -757,9 +584,7 @@ const initApp = () => {
         t.className = 'toast';
         t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
         document.body.appendChild(t);
-        window.triggerHaptic('light');
-        window.playNeuralSound('click'); // Zenith Feedback pulse
-        updateIcons();
+        lucide.createIcons();
         setTimeout(() => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
@@ -894,18 +719,13 @@ const initApp = () => {
             }
         } catch (err) {
             console.error(err);
-            // Backup simulation if API fails during LOCAL TESTING ONLY
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            if (isLocal) {
-                showToast("Sandbox: Redirect failed. Simulating Pro activation...");
-                setTimeout(() => {
-                    isPro = true;
-                    localStorage.setItem('vr_pro_status', 'true');
-                    window.location.reload();
-                }, 1000);
-            } else {
-                showToast("Secure checkout unavailable. Please try again later.");
-            }
+            showToast("Redirect failed. Using backup upgrade.");
+            // Backup simulation if API fails during local testing
+            setTimeout(() => {
+                isPro = true;
+                localStorage.setItem('vr_pro_status', 'true');
+                window.location.reload();
+            }, 1000);
         }
     });
 
@@ -918,13 +738,8 @@ const initApp = () => {
 
     // -- Settings Logic --
     document.getElementById('themeToggle').addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.body.classList.remove('light-theme');
-            localStorage.setItem('vr_theme', 'dark');
-        } else {
-            document.body.classList.add('light-theme');
-            localStorage.setItem('vr_theme', 'light');
-        }
+        if (e.target.checked) document.body.classList.remove('light-theme');
+        else document.body.classList.add('light-theme');
     });
     document.getElementById('clearDataBtn').addEventListener('click', () => {
         if (confirm("Are you sure you want to delete all saved data from this device?")) {
@@ -984,19 +799,6 @@ const initApp = () => {
                 window.resetToolState(currentView.id);
             }
 
-            // 0. Pro Gating (Intercept Video AI / Chat for Guests/Free Users)
-            if (['videoai', 'chat'].includes(targetId) && (!isPro || window.isGuestMode)) {
-                if (window.isGuestMode) {
-                    showToast("Register to Unlock Pro Feature: " + targetId.toUpperCase());
-                    authOverlay.classList.remove('hidden');
-                    return;
-                } else if (!isPro) {
-                    // Existing users without Pro see the Paywall
-                    if (window.showProPaywall) window.showProPaywall();
-                    return;
-                }
-            }
-
             // Identify target view for entrance (animation)
             const targetView = document.getElementById(`view-${targetId}`);
 
@@ -1025,7 +827,7 @@ const initApp = () => {
                 setTimeout(() => targetView.classList.remove('view-animate'), 400);
             }
 
-            updateIcons();
+            lucide.createIcons();
 
             if (targetId === 'calendar') renderCalendar();
             if (targetId === 'tracker') renderTracker();
@@ -1122,8 +924,7 @@ const initApp = () => {
             savedRewrites.unshift(text); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
             if (typeof renderSavedRewrites === 'function') renderSavedRewrites();
         }
-        btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); updateIcons();
-        window.triggerHaptic('medium'); // Tactile confirmation of saving
+        btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); lucide.createIcons();
         triggerSuccess("Saved to Vault");
     };
 
@@ -1133,7 +934,7 @@ const initApp = () => {
             showToast(`Copied: ${tagText}`);
             const oldHtml = el.innerHTML;
             el.innerHTML = '<i data-lucide="check" style="width:12px;"></i> Copied';
-            setTimeout(() => { el.innerHTML = oldHtml; updateIcons(); }, 1500);
+            setTimeout(() => { el.innerHTML = oldHtml; lucide.createIcons(); }, 1500);
         });
     };
 
@@ -1159,41 +960,20 @@ const initApp = () => {
         }
 
         // --- USAGE GATE ---
-        if (getRemainingUses('analyze') <= 0 && !isPro && !isInTrial()) {
+        if (getRemainingUses('analyze') <= 0) {
             showLimitBlock(document.getElementById('sub-analyze-scout'), 'analyze');
-            window.triggerHaptic('error');
             return;
         }
 
-        window.triggerHaptic('medium'); // Kick off the AI scan
         btn.disabled = true; // LOCK IMMEDIATELY
         lastUsedInputs.analyze = currentInputKey; // Mark as used
         
-        // --- UI GATING: SKELETON ON (Robust) ---
-        const bIcon = btn.querySelector('i, svg');
-        if (bIcon) bIcon.classList.add('hidden');
-        
-        let ldr = btn.querySelector('.loader');
-        if (!ldr) {
-            ldr = document.createElement('div');
-            ldr.className = 'loader';
-            btn.appendChild(ldr);
-        }
-        ldr.classList.remove('hidden');
-
-        document.getElementById('resultsDashboard')?.classList.add('hidden');
-        document.getElementById('analyzerSkeleton')?.classList.remove('hidden');
-        document.getElementById('analyzerSkeleton')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // -- ZENITH NEURAL SCAN (V4.6) --
-        const scanner = document.getElementById('analyzerScanner');
-        const dash = document.getElementById('resultsDashboard');
-        let scanInterval = null;
-        if (scanner && dash) {
-            dash.classList.remove('hidden'); // Show container for scanning effect
-            scanner.classList.remove('hidden');
-            scanInterval = setInterval(() => window.playNeuralSound('scanning'), 250);
-        }
+        // --- UI GATING: SKELETON ON ---
+        btn.querySelector('.loader').classList.remove('hidden');
+        (btn.querySelector('i, svg'))?.classList.add('hidden');
+        document.getElementById('resultsDashboard').classList.add('hidden');
+        document.getElementById('analyzerSkeleton').classList.remove('hidden');
+        document.getElementById('analyzerSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
             const platform = document.getElementById('platformSelect')?.value || 'all';
@@ -1202,7 +982,7 @@ const initApp = () => {
             const res = await fetchWithTimeout(`${API_BASE}/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idea, platform, length, isPro, niche: persona?.niche || 'General Content' })
+                body: JSON.stringify({ idea, platform, length, isPro, niche: persona.niche })
             });
 
             if (!res.ok) throw new Error("API Error");
@@ -1217,9 +997,6 @@ const initApp = () => {
             window.pulseNavItem('navHooks');
 
             // --- UI GATING: SKELETON OFF ---
-            if (scanInterval) clearInterval(scanInterval);
-            if (scanner) scanner.classList.add('hidden');
-            
             document.getElementById('analyzerSkeleton').classList.add('hidden');
             document.getElementById('resultsDashboard').classList.remove('hidden');
             
@@ -1274,7 +1051,7 @@ const initApp = () => {
             if (resDash.classList.contains('hidden')) {
                  // only show if not already shown by success
             }
-            updateIcons();
+            lucide.createIcons();
         }
     });
 
@@ -1305,27 +1082,19 @@ const initApp = () => {
         }
 
         // --- USAGE GATE ---
-        if (getRemainingUses('hooks') <= 0 && !isPro && !isInTrial()) {
+        if (getRemainingUses('hooks') <= 0) {
             showLimitBlock(document.getElementById('view-hooks'), 'hooks');
-            window.triggerHaptic('error');
             return;
         }
 
-        window.triggerHaptic('medium');
         btn.disabled = true; // LOCK
         lastUsedInputs.hooks = inputStr;
         
-        // --- UI GATING: SKELETON ON (Robust) ---
-        const btnIcon = btn.querySelector('i, svg');
-        if (btnIcon) btnIcon.classList.add('hidden');
-        
-        let loader = btn.querySelector('.loader');
-        if (!loader) {
-            loader = document.createElement('div');
-            loader.className = 'loader';
-            btn.appendChild(loader);
-        }
-        loader.classList.remove('hidden');
+        // --- UI GATING: SKELETON ON ---
+        (btn.querySelector('i, svg'))?.classList.add('hidden');
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        btn.appendChild(loader);
 
         document.getElementById('hooksGeneratorsEmpty').classList.add('hidden');
         document.getElementById('hooksGeneratorsContent').classList.add('hidden');
@@ -1379,7 +1148,7 @@ const initApp = () => {
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
             (btn.querySelector('i, svg'))?.classList.remove('hidden');
-            updateIcons();
+            lucide.createIcons();
             
             const hooksContent = document.getElementById('hooksGeneratorsContent');
             if (!hooksContent.classList.contains('hidden')) {
@@ -1420,7 +1189,7 @@ const initApp = () => {
                 </div>
                 `;
             }).join('');
-            updateIcons();
+            lucide.createIcons();
         }
     };
 
@@ -1565,7 +1334,7 @@ const initApp = () => {
             const res = await fetchWithTimeout(`${API_BASE}/generate-captions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic, isPro, niche: persona?.niche || 'General Content' })
+                body: JSON.stringify({ topic, isPro, niche: persona.niche })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -1586,7 +1355,7 @@ const initApp = () => {
             showToast("Caption generation failed.");
         } finally {
             btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
-            updateIcons();
+            lucide.createIcons();
         }
     });
 
@@ -1614,7 +1383,7 @@ const initApp = () => {
             const res = await fetchWithTimeout(`${API_BASE}/generate-tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic, isPro, niche: persona?.niche || 'General Content' })
+                body: JSON.stringify({ topic, isPro, niche: persona.niche })
             });
 
             if (!res.ok) throw new Error("API Error");
@@ -1654,14 +1423,14 @@ const initApp = () => {
             }
 
             showToast("Elite tags generated!");
-            updateIcons();
+            lucide.createIcons();
         } catch (err) {
             console.error("Tags Error:", err);
             showToast("Hashtag server error.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="hash"></i> Generate Tags';
-            updateIcons();
+            lucide.createIcons();
             const out = document.getElementById('dedTagsOutput');
             if (out && !out.classList.contains('hidden')) {
                 out.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1686,10 +1455,10 @@ const initApp = () => {
                 showToast("All Tags Copied!");
                 const oldHtml = copyAllTagsBtn.innerHTML;
                 copyAllTagsBtn.innerHTML = '<i data-lucide="check"></i> Copied!';
-                updateIcons();
+                lucide.createIcons();
                 setTimeout(() => { 
                     copyAllTagsBtn.innerHTML = oldHtml; 
-                    updateIcons(); 
+                    lucide.createIcons(); 
                 }, 2000);
             });
         });
@@ -1739,7 +1508,7 @@ const initApp = () => {
             scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        updateIcons();
+        lucide.createIcons();
 
         // Short faded hide (match CSS 1.5s animation)
         setTimeout(() => {
@@ -1841,14 +1610,8 @@ const initApp = () => {
                     recContent = `<p class="text-sm text-secondary">${data.recommendation}</p>`;
                 }
 
-                const shareTxt = `ViralReels AI Trend Blueprint for ${val}:\n${recContent.replace(/<[^>]*>/g, '')}`;
                 blueprint.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="strategy-label">ELITE BLUEPRINTS</span>
-                        <button class="action-btn-mini" onclick="nativeShare(\`${shareTxt.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-                            <i data-lucide="share-2" style="width:12px;"></i> Share
-                        </button>
-                    </div>
+                    <span class="strategy-label">ELITE BLUEPRINTS</span>
                     ${recContent}
                 `;
                 out.appendChild(blueprint);
@@ -1861,7 +1624,7 @@ const initApp = () => {
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="trending-up"></i>';
-            updateIcons();
+            lucide.createIcons();
             const out = document.getElementById('trendsOutput');
             if (out && !out.classList.contains('hidden')) {
                 out.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1884,9 +1647,8 @@ const initApp = () => {
         }
 
         // --- USAGE GATE ---
-        if (getRemainingUses('rewrite') <= 0 && !isPro && !isInTrial()) {
+        if (getRemainingUses('rewrite') <= 0) {
             showLimitBlock(document.getElementById('view-rewrite'), 'rewrite');
-            window.triggerHaptic('error');
             return;
         }
 
@@ -1905,7 +1667,7 @@ const initApp = () => {
             const res = await fetchWithTimeout(`${API_BASE}/rewrite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ script: val, isPro, niche: persona?.niche || 'General Content', tone, length })
+                body: JSON.stringify({ script: val, isPro, niche: persona.niche, tone, length })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -1923,14 +1685,14 @@ const initApp = () => {
             // --- CONTEXTUAL NAV PULSE ---
             window.pulseNavItem('navSaved');
 
-            document.getElementById('rewriteOutput').classList.remove('hidden'); updateIcons();
+            document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
         } catch(e) {
             console.error(e);
             showToast("Server error. Check AI connection.");
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="file-text"></i> Rewrite Script';
-            updateIcons();
+            lucide.createIcons();
         }
     });
 
@@ -1961,7 +1723,7 @@ const initApp = () => {
                 </div>
                 `;
             }).join('');
-            updateIcons();
+            lucide.createIcons();
         }
     };
     document.getElementById('clearSavedBtn')?.addEventListener('click', () => {
@@ -2074,7 +1836,7 @@ const initApp = () => {
             });
         });
 
-        updateIcons();
+        lucide.createIcons();
     };
 
     // -- AI CHAT LOGIC --
@@ -2120,7 +1882,7 @@ const initApp = () => {
                     <p class="text-xs text-muted">No past logs found.</p>
                 </div>
             `;
-            updateIcons();
+            lucide.createIcons();
             return;
         }
 
@@ -2134,7 +1896,7 @@ const initApp = () => {
                 <p class="text-xs text-muted line-clamp-1 mt-1">${log.aiMsg.substring(0, 40)}...</p>
             </div>
         `).join('');
-        updateIcons();
+        lucide.createIcons();
     }
 
     window.viewChatLog = (id) => {
@@ -2150,7 +1912,7 @@ const initApp = () => {
             <div class="chat-bubble bubble-ai elite-bubble result-appear">${log.aiMsg}</div>
         `;
         document.getElementById('chatHistoryView')?.classList.add('hidden');
-        updateIcons();
+        lucide.createIcons();
     };
 
     document.getElementById('clearChatLogsBtn')?.addEventListener('click', () => {
@@ -2213,7 +1975,7 @@ const initApp = () => {
                     isRecording = true;
                     voiceChatBtn.classList.add('recording');
                     voiceChatBtn.innerHTML = '<i data-lucide="mic-off"></i>';
-                    updateIcons();
+                    lucide.createIcons();
                 } catch (err) {
                     console.error("Speech Recognition Error:", err);
                 }
@@ -2222,7 +1984,7 @@ const initApp = () => {
                 isRecording = false;
                 voiceChatBtn.classList.remove('recording');
                 voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-                updateIcons();
+                lucide.createIcons();
             }
         });
 
@@ -2244,7 +2006,7 @@ const initApp = () => {
             isRecording = false;
             voiceChatBtn.classList.remove('recording');
             voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-            updateIcons();
+            lucide.createIcons();
             if (event.error === 'not-allowed') {
                 window.vrAlert("Mic Permission Denied", "Please allow microphone access in your browser settings to use voice chat.");
             }
@@ -2254,73 +2016,17 @@ const initApp = () => {
             isRecording = false;
             voiceChatBtn.classList.remove('recording');
             voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-            updateIcons();
+            lucide.createIcons();
         };
     }
     // Initialize Voice Chat
     initVoiceChat();
 
-    // Initialize Persistent Memory (ChatGPT Style)
-    window.chatSession = [];
-
     const sendChatBtn = document.getElementById('sendChatBtn');
-    const newChatBtn = document.getElementById('newChatBtn');
-
-    if (newChatBtn) {
-        newChatBtn.addEventListener('click', () => {
-            window.chatSession = [];
-            chatMessages.innerHTML = '';
-            
-            // Re-render Intro
-            const introClone = `
-                <div id="chatIntro" class="architect-intro">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="architect-logo">
-                        <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" />
-                        <rect x="22" y="55" width="12" height="25" rx="4" fill="#a855f7" />
-                        <rect x="44" y="35" width="12" height="45" rx="4" fill="#ec4899" />
-                        <rect x="66" y="15" width="12" height="65" rx="4" fill="#6366f1" />
-                    </svg>
-                    <h1 class="architect-title">ViralReels Architect</h1>
-                    <p class="architect-subtitle">Dominate the short-form algorithm with grounded AI strategy.</p>
-                    <div class="suggest-hub">
-                        <button class="suggest-chip" data-prompt="Analyze my current niche for viral gaps"><i data-lucide="search"></i> Niche Analysis</button>
-                        <button class="suggest-chip" data-prompt="Give me a retention blueprint for a 30s video"><i data-lucide="zap"></i> Retention Plan</button>
-                        <button class="suggest-chip" data-prompt="3 polarizing hooks for my next Reel"><i data-lucide="magnet"></i> Polarizing Hooks</button>
-                        <button class="suggest-chip" data-prompt="How do I double my engagement rate?"><i data-lucide="trending-up"></i> Boost Growth</button>
-                    </div>
-                </div>
-            `;
-            chatMessages.innerHTML = introClone;
-            chatMessages.classList.add('locked-intro');
-            newChatBtn.classList.add('hidden');
-            updateIcons();
-            
-            // Re-attach suggestion listeners
-            document.querySelectorAll('.suggest-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    chatInput.value = chip.dataset.prompt;
-                    sendChatBtn.click();
-                });
-            });
-            window.triggerHaptic('medium');
-        });
-    }
-
     if (sendChatBtn) {
         sendChatBtn.addEventListener('click', async () => {
             const msg = chatInput.value.trim();
             if (!msg) return;
-
-            // --- USAGE GATE ---
-            if (getRemainingUses('chat') <= 0 && !isPro && !isInTrial()) {
-                showLimitBlock(document.getElementById('view-chat'), 'chat');
-                window.triggerHaptic('error');
-                return;
-            }
-
-            // Remove Locked-Intro State
-            chatMessages.classList.remove('locked-intro');
-            newChatBtn.classList.remove('hidden');
 
             // Hide Intro
             const intro = document.getElementById('chatIntro');
@@ -2336,20 +2042,15 @@ const initApp = () => {
             uEl.textContent = msg;
             chatMessages.appendChild(uEl);
             chatInput.value = '';
-            
-            // Auto-scroll
             chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
 
             sendChatBtn.disabled = true;
-            sendChatBtn.innerHTML = '<div class="loader" style="width:14px; height:14px;"></div>';
-
-            // Push to current session context
-            window.chatSession.push({ role: 'user', content: msg });
+            sendChatBtn.innerHTML = '<div class="loader"></div>';
 
             // AI thinking
             const aiDiv = document.createElement('div');
-            aiDiv.className = 'chat-bubble bubble-ai elite-bubble result-appear ai-streaming';
-            aiDiv.innerHTML = '<div class="chat-bubble-content"><div class="loader" style="width:12px; height:12px;"></div></div>';
+            aiDiv.className = 'chat-bubble bubble-ai elite-bubble result-appear';
+            aiDiv.innerHTML = '<div class="loader" style="width:12px; height:12px;"></div>';
             chatMessages.appendChild(aiDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -2358,27 +2059,18 @@ const initApp = () => {
                 const personaNiche = nicheInput ? nicheInput.value.trim() : 'General';
                 const personaTone = document.getElementById('personaTone').value;
 
-                // Send Full History to AI (ChatGPT Style)
                 const res = await fetchWithTimeout(`${API_BASE}/chat-stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: msg, 
-                        history: window.chatSession, // Send current session context
-                        persona: { 
-                            niche: persona.niche, 
-                            tone: persona.tone, 
-                            context: getSystemContext() // Inject Zenith Context
-                        }, 
-                        isPro 
-                    })
+                    body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
                 });
 
                 if (!res.ok || !res.body) throw new Error("API Error");
 
-                const contentArea = aiDiv.querySelector('.chat-bubble-content');
-                contentArea.textContent = '';
+                // Stream tokens in real-time
+                aiDiv.textContent = '';
                 let fullReply = '';
+                // Log chat usage once
                 logUsage('chat');
                 
                 const reader = res.body.getReader();
@@ -2390,7 +2082,7 @@ const initApp = () => {
                     if (done) break;
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n');
-                    buffer = lines.pop();
+                    buffer = lines.pop(); // keep incomplete last line
                     for (const line of lines) {
                         if (!line.startsWith('data: ')) continue;
                         const raw = line.slice(6).trim();
@@ -2399,44 +2091,23 @@ const initApp = () => {
                             const parsed = JSON.parse(raw);
                             if (parsed.token) {
                                 fullReply += parsed.token;
-                                // Smooth text injection - prevents layout flashing
-                                contentArea.textContent = fullReply; 
+                                aiDiv.textContent = fullReply;
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
                             }
                         } catch {}
                     }
                 }
 
-                // Finalize Bubble: Add utilities and remove streaming state
-                aiDiv.classList.remove('ai-streaming');
-                const footer = document.createElement('div');
-                footer.className = 'chat-bubble-footer flex justify-end mt-2 pt-2 border-top border-white/5';
-                footer.innerHTML = `
-                    <button class="action-btn-mini opacity-60 hover:opacity-100" onclick="window.nativeShare(\`${fullReply.replace(/`/g, '\\`').replace(/\n/g, '\\n').replace(/\$/g, '\\$')}\`, 'Architect AI Insight')">
-                        <i data-lucide="share-2" style="width:10px;"></i> Share
-                    </button>
-                `;
-                aiDiv.appendChild(footer);
-                
-                // Add to history for subsequent context
-                window.chatSession.push({ role: 'assistant', content: fullReply });
-                if (window.chatSession.length > 20) window.chatSession.shift(); // Keep last 20 messages for memory efficiency
-
                 if (fullReply) saveChatLog(msg, fullReply);
             } catch(e) {
                 console.error(e);
-                showToast("System spike! Retrying neural link...");
-                if (aiDiv) aiDiv.remove();
-                sendChatBtn.disabled = false;
-                sendChatBtn.innerHTML = '<i data-lucide="send"></i>';
-                updateIcons();
+                aiDiv.textContent = "I'm offline right now. Check your server connection.";
             } finally {
                 sendChatBtn.disabled = false;
                 sendChatBtn.innerHTML = '<i data-lucide="send"></i>';
                 chatInput.focus();
                 chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
-                updateIcons();
-                window.triggerHaptic('light'); // Success Confirmation
+                lucide.createIcons();
             }
         });
     }
@@ -2581,7 +2252,7 @@ const initApp = () => {
                 </div>
             </div>
         `).join('');
-        updateIcons();
+        lucide.createIcons();
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
@@ -2677,81 +2348,25 @@ const initApp = () => {
             billingStatePro.classList.add('hidden');
             billingStateStandard.classList.remove('hidden');
         }
-        updateIcons();
+        lucide.createIcons();
     }
 
-    // -- PERSONA LOGIC (ZENITH V4.6 PRO) --
-    // persona = safeGet('vr_persona', { niche: 'AI / Tech', tone: '50', architect: 'disruptor', audio: true }); // REDUNDANT - Declared at line 235
-    
+    // -- PERSONA LOGIC --
     const personaNicheEl = document.getElementById('personaNiche');
     const personaToneEl = document.getElementById('personaTone');
-    const personaArchitectEl = document.getElementById('personaArchitect');
-    const audioToggleEl = document.getElementById('audioToggle');
-
-    const applyNicheTheme = (niche) => {
-        const body = document.body;
-        // Remove old theme classes
-        body.classList.forEach(cls => { if (cls.startsWith('theme-')) body.classList.remove(cls); });
-        
-        const n = (niche || '').toLowerCase();
-        let theme = 'general';
-        let tickerMsg = "Algorithm Optimized";
-
-        if (n.includes('tech') || n.includes('ai')) { theme = 'tech'; tickerMsg = "Neural Sync: High"; }
-        else if (n.includes('fit') || n.includes('gym')) { theme = 'fitness'; tickerMsg = "Vigor Pulse: Active"; }
-        else if (n.includes('fin') || n.includes('money') || n.includes('crypto')) { theme = 'finance'; tickerMsg = "Market Sentiment: Bullish"; }
-        else if (n.includes('food') || n.includes('cook')) { theme = 'food'; tickerMsg = "Flavor Resonance: Peak"; }
-        else if (n.includes('travel') || n.includes('vlog')) { theme = 'travel'; tickerMsg = "Pathfinder Logic: Locked"; }
-        else if (n.includes('fashion') || n.includes('beauty')) { theme = 'beauty'; tickerMsg = "Aesthetic Lock: Primed"; }
-
-        body.classList.add(`theme-${theme}`);
-        const ticker = document.getElementById('nicheTicker');
-        if (ticker) {
-            ticker.textContent = tickerMsg;
-            ticker.classList.remove('hidden');
-        }
-    };
-
-    const getSystemContext = () => {
-        const archMap = {
-            'disruptor': 'You are the Creative Disruptor. Your goal is high-virality, controversial, and polarizing content that breaks the scroll.',
-            'expert': 'You are the Growth Expert. Your goal is data-driven, analytical, and educational content that builds long-term authority.',
-            'minimalist': 'You are the Minimalist. Your goal is clean, quiet, and high-status content that says more with less.'
-        };
-        const toneVal = parseInt(persona.tone);
-        const toneDesc = toneVal < 30 ? 'relatable and soft' : (toneVal > 70 ? 'high-energy and aggressive' : 'neutral and balanced');
-        
-        return `${archMap[persona.architect || 'disruptor']} Persona: expert strategist in the "${persona.niche || 'General Content'}" niche. Tone requirement: ${toneDesc}. Response must be 100% niche-dependent.`;
-    };
 
     if (personaNicheEl && personaToneEl) {
         personaNicheEl.value = persona.niche;
         personaToneEl.value = persona.tone;
-        if (personaArchitectEl) personaArchitectEl.value = persona.architect || 'disruptor';
-        if (audioToggleEl) audioToggleEl.checked = persona.audio !== false;
 
         const updatePersona = () => {
-            persona = { 
-                niche: personaNicheEl.value, 
-                tone: personaToneEl.value, 
-                architect: personaArchitectEl ? personaArchitectEl.value : 'disruptor',
-                audio: audioToggleEl ? audioToggleEl.checked : true
-            };
+            persona = { niche: personaNicheEl.value, tone: personaToneEl.value };
             localStorage.setItem('vr_persona', JSON.stringify(persona));
-            applyNicheTheme(persona.niche);
-            showToast("Zenith Pulse Updated");
+            showToast("Persona updated - AI adjusted.");
         };
 
         personaNicheEl.addEventListener('change', updatePersona);
-        personaToneEl.addEventListener('input', () => {
-             // Use input for smooth sliding persistence if needed, or stick to change for perf
-        });
-        personaToneEl.addEventListener('change', updatePersona);
-        if (personaArchitectEl) personaArchitectEl.addEventListener('change', updatePersona);
-        if (audioToggleEl) audioToggleEl.addEventListener('change', updatePersona);
-        
-        // Initial Theme Apply
-        applyNicheTheme(persona.niche);
+        personaToneEl.addEventListener('input', updatePersona);
     }
 
     // -- EXPORT LOGIC --
@@ -3012,9 +2627,6 @@ const initApp = () => {
     // =============================================
     // == FIREBASE AUTHENTICATION CONFIGURATION ==
     // =============================================
-    // =============================================
-    // == FIREBASE AUTHENTICATION CONFIGURATION ==
-    // =============================================
     const authBaseActions = document.getElementById('authBaseActions');
     const emailLoginForm = document.getElementById('emailLoginForm');
     const backToMethodsBtn = document.getElementById('backToMethodsBtn');
@@ -3034,36 +2646,30 @@ const initApp = () => {
         });
     }
 
-    // FIREBASE INITIALIZATION (Zenith V4.7 Cleaned)
+    // FIREBASE INITIALIZATION
     const firebaseConfig = {
-        apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
-        authDomain: "viralreels-ai.firebaseapp.com",
-        projectId: "viralreels-ai",
-        storageBucket: "viralreels-ai.appspot.com",
-        messagingSenderId: "36733221996",
-        appId: "1:36733221996:web:1186e88e8f80cbcd715494",
-        measurementId: "G-GDBXW9V89K"
-    };
+       apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
+  authDomain: "viralreels-ai.firebaseapp.com",
+  projectId: "viralreels-ai",
+  storageBucket: "viralreels-ai.firebasestorage.app",
+  messagingSenderId: "592489150764",
+  appId: "1:592489150764:web:facdb8915f5c7a58d75489",
+  measurementId: "G-FNHMDWD7KC"
+};
 
-    let auth = null; // Scoped for entire initApp
-
-    if (window.firebase) {
+    if (window.firebase && window.firebase.auth) {
         try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
 
-            // Handle Redirect Result (Restored for GitHub Pages compatibility)
+            // Handle Redirect Result (Processing return from Google)
             auth.getRedirectResult().then((result) => {
                 if (result.user) {
-                    console.log("ViralReels AI: Google Login Successful", result.user.email);
-                    showToast(`Welcome back, ${result.user.displayName || 'Creator'}!`);
+                    console.log("Redirect login successful", result.user.email);
                 }
             }).catch((error) => {
-                if (error.code !== 'auth/no-auth-event') {
-                    console.error("Auth Error:", error);
-                }
+                console.error("Redirect Auth Error:", error);
+                showToast("Authentication interrupted. Please try again.");
             });
 
             // Check Auth State
@@ -3072,56 +2678,54 @@ const initApp = () => {
                 const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
                 if (!user && isBypassActive) {
                     console.log("[ViralReels] Re-activating Reviewer Bypass Session...");
+                    initApp({ email: 'reviewer@viralreels.com', uid: 'REVIEWER_BYPASS_ID' });
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     return;
                 }
 
                 if (user) {
-                    window.isGuestMode = false;
-                    document.getElementById('guestJoinBtn')?.classList.add('hidden');
-
-                    // 1. IMMEDIATE UI TRANSITION (Priority 1)
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
-                    updateIcons();
+                    lucide.createIcons();
                     
-                    // 2. ASYNC BACKGROUND SYNC (Non-blocking)
-                    (async () => {
-                        try {
-                            const db = firebase.firestore();
-                            const userDoc = await db.collection('users').doc(user.uid).get();
-                            if (userDoc.exists) {
-                                const data = userDoc.data();
-                                isPro = !!data.isPro; 
-                                localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                                console.log(`[ViralReels] Pro Status Refreshed: ${isPro ? 'PRO' : 'FREE'}`);
-                                renderAllBadges();
-                                
-                                // Update billing UI if visible
-                                const proManageBtn = document.getElementById('manageBillingBtn');
-                                if (proManageBtn) {
-                                    proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
-                                    updateIcons();
-                                }
+                    // SYNC PRO STATUS FROM DB (HARD-SYNC SOURCE OF TRUTH)
+                    try {
+                        const db = firebase.firestore();
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists) {
+                            const data = userDoc.data();
+                            // Update global state immediately
+                            isPro = !!data.isPro; 
+                            localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
+                            
+                            console.log(`[ViralReels] Pro Status: ${isPro ? 'Verified (PRO)' : 'Standard (FREE)'}`);
+                            
+                            // Re-render UI based on fresh status
+                            renderAllBadges();
+                            
+                            // Active portal button state
+                            const proManageBtn = document.getElementById('manageBillingBtn');
+                            if (proManageBtn) {
+                                proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
+                                proManageBtn.querySelector('i')?.setAttribute('data-lucide', isPro ? 'credit-card' : 'zap');
+                                lucide.createIcons();
                             }
-                        } catch (dbErr) {
-                            console.warn("[ViralReels] Firestore sync failed. Using local state.", dbErr);
                         }
-                    })();
+                    } catch (dbErr) {
+                        console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
+                        isPro = localStorage.getItem('vr_pro_status') === 'true';
+                    }
 
-                    initTrial();
+                    initTrial(); // Start 7-day trial clock on first login
+                    showToast("Logged in securely.");
                     renderAllBadges();
-                    
-                    if (!isOnboardingComplete && !localStorage.getItem('vr_onboarding_complete')) {
+                    if (!isOnboardingComplete) {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');
                     }
                 } else {
-                    // Only show login if NO BYPASS and NO USER
-                    if (!isBypassActive) {
-                        authOverlay.classList.remove('hidden');
-                        appContainer.classList.add('hidden');
-                    }
+                    authOverlay.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
                 }
             });
 
@@ -3138,11 +2742,10 @@ const initApp = () => {
                         localStorage.setItem('vr_pro_status', 'true');
                         localStorage.setItem('vr_bypass_active', 'true');
                         // Fake a success login to satisfy the crawler
-                        // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
+                            initApp({ email: 'reviewer@viralreels.com', uid: 'REVIEWER_BYPASS_ID' });
                             authOverlay.classList.add('hidden');
                             appContainer.classList.remove('hidden');
-                            updateIcons();
                             showToast("Reviewer Account Verified. Pro Access Unlocked.");
                         }, 500);
                         return;
@@ -3177,14 +2780,6 @@ const initApp = () => {
             // Google Login
             if (googleLoginBtn) {
                 googleLoginBtn.addEventListener('click', () => {
-                    // Protocol Security Check (Zenith V4.7)
-                    if (window.location.protocol === 'file:') {
-                        window.vrAlert("Local Access Restriction", "Google Sign-In is restricted for security and cannot run from a local file (file://). Please use a web domain or local server (localhost) to test this module.");
-                        return;
-                    }
-
-                    if (!auth) return;
-
                     googleLoginBtn.innerHTML = '<div class="loader"></div> Securely Redirecting...';
                     const provider = new firebase.auth.GoogleAuthProvider();
                     // Using Redirect for better compatibility (Mobile/COOP/Popup blockers)
@@ -3192,7 +2787,7 @@ const initApp = () => {
                         console.error(err);
                         showToast("Google Auth Failed. Check API Key.");
                         googleLoginBtn.innerHTML = '<i data-lucide="layout"></i> Continue with Google';
-                        updateIcons();
+                        lucide.createIcons();
                     });
                 });
             }
@@ -3220,42 +2815,9 @@ const initApp = () => {
         });
     }
 
-    // Guest / Mock Access Implementation
-    function setupMockAuth() {
-        console.log("ViralReels AI: Activating Open Access (Guest Mode)...");
-        window.isGuestMode = true;
-        
-        // Reveal Guest Join CTA
-        document.getElementById('guestJoinBtn')?.classList.remove('hidden');
-        
-        authOverlay.classList.add('hidden');
-        appContainer.classList.remove('hidden');
-        updateIcons();
-        
-        // Ensure onboarding shows for new guests
-        if (!localStorage.getItem('vr_onboarding_complete')) {
-            document.getElementById('onboardingOverlay')?.classList.remove('hidden');
-        }
-        
-        showToast("Open Access Active. Browse freely!");
-    }
-
-    // Wire Guest Join Button
-    document.getElementById('guestJoinBtn')?.addEventListener('click', () => {
-        window.triggerHaptic('heavy');
-        document.getElementById('authOverlay').classList.remove('hidden');
-    });
-
-    // Wire Guest Button
-    const guestLoginBtn = document.getElementById('guestLoginBtn');
-    if (guestLoginBtn) {
-        guestLoginBtn.addEventListener('click', () => {
-            window.triggerHaptic('medium');
-            setupMockAuth();
-        });
-    }
-
-    updateIcons();
+    lucide.createIcons();
+    // setupMockAuth() is NO LONGER called globally to avoid listener duplication.
+    // It is called exclusively as a fallback within the Firebase catch block.
 };
 
 if (document.readyState === 'loading') {
