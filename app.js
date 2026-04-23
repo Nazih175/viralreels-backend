@@ -3144,7 +3144,7 @@ if ('serviceWorker' in navigator) {
         storageBucket: "viralreels-ai.appspot.com",
         messagingSenderId: "36733221996",
         appId: "1:36733221996:web:1186e88e8f80cbcd715494",
-        measurementId: envMonitor.hasValidAds ? "G-GDBXW9V89K" : "G-DEV-MODE"
+        measurementId: "G-GDBXW9V89K"
     };
 
     let auth = null; // Scoped for entire initApp
