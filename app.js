@@ -5,32 +5,11 @@
 // ViralReels System Boot (Auth Protection)
 window.VR_BOOT_TIME = Date.now();
 
-// 0. Core Logic Helpers (Zenith V3.7 Global)
-window.safeGet = (key, fallback) => {
-    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
-    catch (e) { return fallback; }
-};
-const safeGet = window.safeGet;
-
-// -- Core State (Global Scope for Sync Engine) --
-let currentAnalyzedIdea = null;
-let savedEvents = safeGet('viralreels_events', {});
-let savedHooks = safeGet('viralreels_tracked_hooks', []);
-let savedRewrites = safeGet('viralreels_saved_rewrites', []);
-let analyticsData = safeGet('vr_analytics_data', []);
-let chatHistory = safeGet('vr_chat_history', []);
-let isPro = localStorage.getItem('vr_pro_status') === 'true';
-let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
-let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
-let savedTheme = localStorage.getItem('vr_theme') || 'dark';
-let persona = safeGet('vr_persona', { niche: '', tone: 50 });
-
 // Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI System: Zenith V3.7-ULTIMATE Active");
-
+            console.log("ViralReels AI System: Zenith V4.6.8-ULTIMATE Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
@@ -77,148 +56,17 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+    // =============================================
+    // == ZENITH V5 PERFORMANCE CORE (AUTONOMOUS) ==
+    // =============================================
+    const envMonitor = {
+        isLocal: window.location.protocol === 'file:',
+        hasValidAds: !document.documentElement.innerHTML.includes('PROD_ID_PENDING'),
+        log: (msg) => console.log(`%c[Zenith V5] %c${msg}`, 'color: #a855f7; font-weight: bold;', 'color: inherit;')
+    };
+    envMonitor.log("Premium Engine Hydrated.");
 
     const initApp = () => {
-    // -- Aurora Elite: Floating Particles --
-    const initAuroraParticles = () => {
-        const container = document.getElementById('auroraParticles');
-        if (!container) return;
-        
-        // Inject Mouse Spotlight (Restoring Elite Magnetic Aura)
-        const spotlight = document.createElement('div');
-        spotlight.className = 'mouse-spotlight';
-        spotlight.id = 'mouseSpotlight';
-        document.body.appendChild(spotlight);
-
-        window.addEventListener('mousemove', (e) => {
-            spotlight.style.left = e.clientX + 'px';
-            spotlight.style.top = e.clientY + 'px';
-        });
-
-        const particleCount = 20;
-        for (let i = 0; i < particleCount; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = Math.random() * 3 + 1;
-            const left = Math.random() * 100;
-            const delay = Math.random() * 15;
-            const duration = 12 + Math.random() * 20;
-            const opacity = 0.2 + Math.random() * 0.4;
-            p.style.width = `${size}px`;
-            p.style.height = `${size}px`;
-            p.style.left = `${left}%`;
-            p.style.bottom = `-20px`;
-            p.style.opacity = opacity;
-            p.style.animationDuration = `${duration}s`;
-            p.style.animationDelay = `${delay}s`;
-            container.appendChild(p);
-        }
-    };
-    initAuroraParticles();
-
-    // =============================================
-    // == VIRALREELS DATA SYNC ENGINE (FIREBASE) ==
-    // =============================================
-    window.persistToCloud = async (collection, data) => {
-        try {
-            const user = firebase.auth().currentUser;
-            if (!user) return;
-            const db = firebase.firestore();
-            await db.collection('vault').doc(user.uid).collection(collection).doc('data').set({ 
-                payload: data, 
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp() 
-            }, { merge: true });
-            console.log(`[Sync] ${collection} backed up to cloud.`);
-        } catch (e) { console.warn(`[Sync] Cloud backup failed: ${collection}`, e); }
-    };
-
-    window.syncUserData = async () => {
-        const user = firebase.auth().currentUser;
-        if (!user) return;
-        
-        console.log("[Sync] Hydrating ViralReels Intelligence...");
-        const db = firebase.firestore();
-        const collections = [
-            { key: 'viralreels_tracked_hooks', col: 'hooks' },
-            { key: 'viralreels_saved_rewrites', col: 'rewrites' },
-            { key: 'viralreels_events', col: 'events' },
-            { key: 'vr_analytics_data', col: 'analytics' },
-            { key: 'vr_persona', col: 'persona' },
-            { key: 'vr_chat_history', col: 'chat_history' }
-        ];
-
-        try {
-            // 1. Refetch User Profile (Pro Status)
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                isPro = !!userData.isPro;
-                localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-            }
-
-            // 2. Hydrate Collections
-            for (const item of collections) {
-                const doc = await db.collection('vault').doc(user.uid).collection(item.col).doc('data').get();
-                if (doc.exists) {
-                    const cloudData = doc.data().payload;
-                    localStorage.setItem(item.key, JSON.stringify(cloudData));
-                    
-                    // Refresh global variables if they exist
-                    if (item.key === 'viralreels_tracked_hooks') savedHooks = cloudData;
-                    if (item.key === 'viralreels_saved_rewrites') savedRewrites = cloudData;
-                    if (item.key === 'viralreels_events') savedEvents = cloudData;
-                    if (item.key === 'vr_analytics_data') analyticsData = cloudData;
-                    if (item.key === 'vr_persona') persona = cloudData;
-                    if (item.key === 'vr_chat_history') chatHistory = cloudData;
-                }
-            }
-            
-            // 3. UI Refresh
-            if (typeof renderAllBadges === 'function') renderAllBadges();
-            if (window.renderTracker) window.renderTracker();
-            if (window.renderSavedRewrites) window.renderSavedRewrites();
-            if (window.renderCalendar) window.renderCalendar();
-            if (window.renderAnalytics) window.renderAnalytics();
-            if (window.renderChatLogs) window.renderChatLogs();
-            if (window.applyNicheTheme && persona && persona.niche) applyNicheTheme(persona.niche);
-            
-            console.log("[Sync] Intelligence Hydrated Successfully.");
-            showToast("Cloud Sync Complete");
-        } catch (e) {
-            console.warn("[Sync] Initial hydration failed. Using local cache.", e);
-        }
-    };
-
-    window.clearAllData = async () => {
-        const user = firebase.auth().currentUser;
-        
-        if (!confirm("DANGER: This will permanently delete ALL your saved hooks, scripts, analytics, and strategy data from both this device and the cloud. This cannot be undone. Proceed?")) return;
-
-        showToast("Purging core data...");
-        
-        try {
-            if (user) {
-                const db = firebase.firestore();
-                const collections = ['hooks', 'rewrites', 'events', 'analytics', 'persona', 'chat_history'];
-                const batch = db.batch();
-                
-                for (const col of collections) {
-                    const ref = db.collection('vault').doc(user.uid).collection(col).doc('data');
-                    batch.delete(ref);
-                }
-                await batch.commit();
-                console.log("[Sync] Cloud data purged.");
-            }
-        } catch (e) {
-            console.warn("[Sync] Cloud purge failed. Local wipe proceeding.", e);
-        }
-
-        localStorage.clear();
-        console.log("[Sync] Local data purged.");
-        showToast("System Reset Complete.");
-        setTimeout(() => window.location.reload(), 1500);
-    };
-
     window.renderState = (module, state) => {
         const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
         const contentEl = document.getElementById(`${module}GeneratorsContent`);
@@ -236,6 +84,59 @@ if ('serviceWorker' in navigator) {
     if (window.VR_INIT_DONE) return;
     window.VR_INIT_DONE = true;
 
+    // -- Aurora Elite: Floating Particles --
+    const initAuroraParticles = () => {
+        const container = document.getElementById('auroraParticles');
+        if (!container) return;
+        
+        // Inject Mouse Spotlight (Elite Magnetic Aura)
+        const spotlight = document.createElement('div');
+        spotlight.className = 'mouse-spotlight';
+        spotlight.id = 'mouseSpotlight';
+        container.appendChild(spotlight); // Append inside Aurora Container for perfect layering
+
+        window.addEventListener('mousedown', (e) => {
+            // Magnetic Burst Effect
+            const burstCount = 12;
+            for (let i = 0; i < burstCount; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle burst-particle';
+                const size = Math.random() * 4 + 2;
+                const angle = (i / burstCount) * Math.PI * 2;
+                const dist = 50 + Math.random() * 50;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = e.clientX + 'px';
+                p.style.top = e.clientY + 'px';
+                p.style.opacity = '0.8';
+                p.style.background = 'var(--accent-purple)';
+                p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        });
+
+        const particleCount = 80; // Optimized for performance while maintaining premium aesthetic
+        for (let i = 0; i < particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            const left = Math.random() * 100;
+            const duration = 12 + Math.random() * 20;
+            const delay = -(Math.random() * duration); // NEGATIVE DELAY: starts animation mid-cycle for immediate visibility
+            const opacity = 0.2 + Math.random() * 0.3;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${left}%`;
+            p.style.bottom = `${Math.random() * 100}%`; // Start scattered across the screen
+            p.style.opacity = opacity;
+            p.style.animationDuration = `${duration}s`;
+            p.style.animationDelay = `${delay}s`;
+            container.appendChild(p);
+        }
+    };
+    initAuroraParticles();
 
     // -- Global Keyboard Protection System --
     // -- Global Keyboard Protection System (Zenith V4.1 Robust) --
@@ -303,18 +204,16 @@ if ('serviceWorker' in navigator) {
     // 1. Immediate UI Reveal (Dismiss Splash)
     const splash = document.getElementById('splashScreen');
     if (splash) {
-        splash.style.pointerEvents = 'none';
         splash.style.opacity = '0';
-        splash.style.transition = 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1)';
         setTimeout(() => { 
-            splash.classList.add('hidden');
+            splash.style.visibility = 'hidden'; 
             splash.style.display = 'none'; 
+            // Fallback: if it's still there, force removal
             if (splash.parentNode) splash.parentNode.removeChild(splash);
-        }, 1000);
+        }, 500);
     }
 
-    console.log("ViralReels AI System: Zenith V3.7-ULTIMATE Active");
-
+    console.log("ViralReels AI System: Zenith V4.6.8 Global Optimization Active");
         
     // -- Hardening Helper: safeListen --
     const safeListen = (id, event, callback) => {
@@ -323,6 +222,7 @@ if ('serviceWorker' in navigator) {
         else { console.warn(`[ViralReels Secure] Element NOT FOUND: ${id}. Initializer continuing...`); }
     };
 
+    // -- Safe Storage Helpers (Moved Global for Zenith V3.9) --
     // safeGet is now global
 
     // =============================================
@@ -332,6 +232,17 @@ if ('serviceWorker' in navigator) {
         PUBLISHER_ID: "REPLACE_WITH_YOUR_PUBLISHER_ID", // e.g. "ca-pub-123456789"
         STRIPE_TEST_MODE: false, // Flip to false for sk_live
     };
+
+    let currentAnalyzedIdea = null;
+    let savedEvents = safeGet('viralreels_events', {});
+    let savedHooks = safeGet('viralreels_tracked_hooks', []);
+    let savedRewrites = safeGet('viralreels_saved_rewrites', []);
+    let analyticsData = safeGet('vr_analytics_data', []);
+    let isPro = localStorage.getItem('vr_pro_status') === 'true';
+    let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
+    let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
+    let savedTheme = localStorage.getItem('vr_theme') || 'dark';
+    let persona = safeGet('vr_persona', { niche: '', tone: 50 });
 
     // Apply Saved Theme
     if (savedTheme === 'light') document.body.classList.add('light-theme');
@@ -1026,9 +937,13 @@ if ('serviceWorker' in navigator) {
         }
     });
     document.getElementById('clearDataBtn').addEventListener('click', () => {
-        window.clearAllData();
+        if (confirm("Are you sure you want to delete all saved data from this device?")) {
+            localStorage.clear();
+            savedEvents = {}; savedHooks = []; savedRewrites = [];
+            renderCalendar(); renderTracker(); renderSavedRewrites();
+            alert("Local storage wiped.");
+        }
     });
-
     document.getElementById('delAccountBtn').addEventListener('click', async () => {
         if (confirm("DANGER! This will permanently wipe your ViralReels profile, saved hooks, and cancel any active subscription. This cannot be undone. Proceed?")) {
             try {
@@ -1212,14 +1127,11 @@ if ('serviceWorker' in navigator) {
     window.saveToVault = (text, type, btnElem) => {
         if (type === 'hook') {
             savedHooks.unshift(text); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks));
-            window.persistToCloud('hooks', savedHooks);
             if (typeof renderTracker === 'function') renderTracker();
         } else if (type === 'rewrite') {
             savedRewrites.unshift(text); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
-            window.persistToCloud('rewrites', savedRewrites);
             if (typeof renderSavedRewrites === 'function') renderSavedRewrites();
         }
-
         btnElem.innerHTML = '<i data-lucide="check"></i> Saved'; btnElem.classList.add('saved'); updateIcons();
         window.triggerHaptic('medium'); // Tactile confirmation of saving
         triggerSuccess("Saved to Vault");
@@ -1383,10 +1295,8 @@ if ('serviceWorker' in navigator) {
             if (!currentAnalyzeData) return;
             analyticsData.push({ ...currentAnalyzeData, actualViews: 0 });
             localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
-            window.persistToCloud('analytics', analyticsData);
             triggerSuccess("Idea Logged to Analytics DB");
             renderAnalytics();
-
         });
     }
 
@@ -1571,9 +1481,7 @@ if ('serviceWorker' in navigator) {
     });
     window.deleteHook = (index) => {
         window.vrConfirm("Delete Hook", "Are you sure you want to remove this hook from your tracker?", () => {
-             savedHooks.splice(index, 1); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks));
-             window.persistToCloud('hooks', savedHooks);
-             renderTracker(); 
+             savedHooks.splice(index, 1); localStorage.setItem('viralreels_tracked_hooks', JSON.stringify(savedHooks)); renderTracker(); 
         });
     };
 
@@ -1627,8 +1535,6 @@ if ('serviceWorker' in navigator) {
         if (title && activeDayKey) {
             savedEvents[activeDayKey] = JSON.stringify({ title, desc });
             localStorage.setItem('viralreels_events', JSON.stringify(savedEvents));
-            window.persistToCloud('events', savedEvents);
-
             calendarEventModal.classList.add('hidden'); 
             renderCalendar();
             triggerSuccess("Saved to Calendar");
@@ -2073,13 +1979,7 @@ if ('serviceWorker' in navigator) {
             savedRewrites = []; localStorage.setItem('viralreels_saved_rewrites', '[]'); renderSavedRewrites();
         });
     });
-    window.deleteRewrite = (index) => {
-        savedRewrites.splice(index, 1);
-        localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites));
-        window.persistToCloud('rewrites', savedRewrites);
-        renderSavedRewrites();
-    };
-
+    window.deleteRewrite = (index) => { savedRewrites.splice(index, 1); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites)); renderSavedRewrites(); };
 
     // -- ANALYTICS RENDER ENGINE --
     window.renderAnalytics = () => {
@@ -2531,8 +2431,6 @@ if ('serviceWorker' in navigator) {
                 // Add to history for subsequent context
                 window.chatSession.push({ role: 'assistant', content: fullReply });
                 if (window.chatSession.length > 20) window.chatSession.shift(); // Keep last 20 messages for memory efficiency
-                window.persistToCloud('chat_history', window.chatSession);
-
 
                 if (fullReply) saveChatLog(msg, fullReply);
             } catch(e) {
@@ -2801,13 +2699,25 @@ if ('serviceWorker' in navigator) {
     const audioToggleEl = document.getElementById('audioToggle');
 
     const applyNicheTheme = (niche) => {
-        // Niche themes disabled - reverting to original ViralReels AI palette
         const body = document.body;
+        // Remove old theme classes
         body.classList.forEach(cls => { if (cls.startsWith('theme-')) body.classList.remove(cls); });
         
+        const n = (niche || '').toLowerCase();
+        let theme = 'general';
+        let tickerMsg = "Algorithm Optimized";
+
+        if (n.includes('tech') || n.includes('ai')) { theme = 'tech'; tickerMsg = "Neural Sync: High"; }
+        else if (n.includes('fit') || n.includes('gym')) { theme = 'fitness'; tickerMsg = "Vigor Pulse: Active"; }
+        else if (n.includes('fin') || n.includes('money') || n.includes('crypto')) { theme = 'finance'; tickerMsg = "Market Sentiment: Bullish"; }
+        else if (n.includes('food') || n.includes('cook')) { theme = 'food'; tickerMsg = "Flavor Resonance: Peak"; }
+        else if (n.includes('travel') || n.includes('vlog')) { theme = 'travel'; tickerMsg = "Pathfinder Logic: Locked"; }
+        else if (n.includes('fashion') || n.includes('beauty')) { theme = 'beauty'; tickerMsg = "Aesthetic Lock: Primed"; }
+
+        body.classList.add(`theme-${theme}`);
         const ticker = document.getElementById('nicheTicker');
         if (ticker) {
-            ticker.textContent = "Algorithm Optimized";
+            ticker.textContent = tickerMsg;
             ticker.classList.remove('hidden');
         }
     };
@@ -2838,8 +2748,6 @@ if ('serviceWorker' in navigator) {
                 audio: audioToggleEl ? audioToggleEl.checked : true
             };
             localStorage.setItem('vr_persona', JSON.stringify(persona));
-            window.persistToCloud('persona', persona);
-
             applyNicheTheme(persona.niche);
             showToast("Zenith Pulse Updated");
         };
@@ -3144,7 +3052,7 @@ if ('serviceWorker' in navigator) {
         storageBucket: "viralreels-ai.appspot.com",
         messagingSenderId: "36733221996",
         appId: "1:36733221996:web:1186e88e8f80cbcd715494",
-        measurementId: "G-GDBXW9V89K"
+        measurementId: envMonitor.hasValidAds ? "G-GDBXW9V89K" : "G-DEV-MODE"
     };
 
     let auth = null; // Scoped for entire initApp
@@ -3188,9 +3096,29 @@ if ('serviceWorker' in navigator) {
                     appContainer.classList.remove('hidden');
                     updateIcons();
                     
-                    // 2. ASYNC BACKGROUND SYNC (Cloud Intelligence)
-                    window.syncUserData();
-
+                    // 2. ASYNC BACKGROUND SYNC (Non-blocking)
+                    (async () => {
+                        try {
+                            const db = firebase.firestore();
+                            const userDoc = await db.collection('users').doc(user.uid).get();
+                            if (userDoc.exists) {
+                                const data = userDoc.data();
+                                isPro = !!data.isPro; 
+                                localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
+                                console.log(`[ViralReels] Pro Status Refreshed: ${isPro ? 'PRO' : 'FREE'}`);
+                                renderAllBadges();
+                                
+                                // Update billing UI if visible
+                                const proManageBtn = document.getElementById('manageBillingBtn');
+                                if (proManageBtn) {
+                                    proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
+                                    updateIcons();
+                                }
+                            }
+                        } catch (dbErr) {
+                            console.warn("[ViralReels] Firestore sync failed. Using local state.", dbErr);
+                        }
+                    })();
 
                     initTrial();
                     renderAllBadges();
@@ -3379,6 +3307,11 @@ document.addEventListener('click', (e) => {
 });
 
 // -- Global Storage Helper --
+window.safeGet = (key, fallback) => {
+    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
+    catch (e) { return fallback; }
+};
+
 // 2. Resolve Analytics Hydration (V2 Stats + Chart)
 const originalRenderAnalytics = window.renderAnalytics;
 window.renderAnalytics = () => {
