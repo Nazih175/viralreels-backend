@@ -99,10 +99,10 @@
 
     <!-- Auth Overlay (Reverted/Standardized) -->
     <div id="authOverlay" class="fullscreen-overlay z-auth hidden">
-        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border); padding: 2.5rem 2rem;">
+        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border); padding: 3rem 2rem;">
             <div class="auth-logo-bg mb-4">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
-                    style="width: 80px; height: 80px; filter: drop-shadow(0 0 12px rgba(168,85,247,0.5));">
+                    style="width: 70px; height: 70px; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4));">
                     <defs>
                         <linearGradient id="neonGradAuth" x1="0%" y1="100%" x2="100%" y2="0%">
                             <stop offset="0%" stop-color="#a855f7" />
@@ -118,16 +118,31 @@
                     <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuth)" />
                 </svg>
             </div>
-            <h1 class="auth-title" style="font-size: 2rem; margin-bottom: 0.5rem;">ViralReels <span class="gradient-text">AI</span></h1>
-            <h2 class="auth-subtitle" style="opacity: 0.7; font-weight: 500; margin-bottom: 2rem;">Algorithm Grounded Creator Intelligence</h2>
+            
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(168,85,247,0.1); padding:4px 10px; border-radius:20px; border:1px solid rgba(168,85,247,0.2); margin-bottom:1rem;">
+                <i data-lucide="shield-check" style="width:12px; height:12px; color:var(--accent-purple);"></i>
+                <span style="font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--accent-purple);">Certified 2026 AI</span>
+            </div>
+
+            <h1 class="auth-title" style="font-size: 1.8rem; margin-bottom: 0.25rem;">ViralReels <span class="gradient-text">AI</span></h1>
+            <p class="text-muted" style="font-size: 0.85rem; max-width: 240px; margin: 0 auto 2rem; line-height: 1.4;">Dominate the short-form meta with precision-tuned creator intelligence.</p>
             
             <div class="auth-actions" id="authBaseActions">
-                <button class="btn-primary w-full" id="googleLoginBtn" style="margin-bottom: 0.75rem;"><i data-lucide="globe"></i> Continue with Google</button>
-                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1.5rem;"><i data-lucide="mail"></i> Continue with Email</button>
+                <button class="btn-primary w-full" id="googleLoginBtn" style="margin-bottom: 0.75rem; height: 52px;"><i data-lucide="globe"></i> Continue with Google</button>
+                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1.5rem; height: 52px;"><i data-lucide="mail"></i> Continue with Email</button>
                 
-                <button class="btn-secondary w-full" id="guestLoginBtn" style="background:transparent; border: 1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size: 0.8rem;">
-                    Browse as Guest
+                <button class="btn-secondary w-full" id="guestLoginBtn" style="background:transparent; border: none; color:rgba(255,255,255,0.4); font-size: 0.8rem; text-decoration: underline; margin-bottom: 1.5rem;">
+                    Or Browse as Guest
                 </button>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:center; gap:12px; opacity:0.6; margin-top:0.5rem;">
+                <div class="flex -space-x-2">
+                    <div style="width:20px; height:20px; border-radius:50%; background:#a855f7; border:2px solid #0a0a0f;"></div>
+                    <div style="width:20px; height:20px; border-radius:50%; background:#ec4899; border:2px solid #0a0a0f;"></div>
+                    <div style="width:20px; height:20px; border-radius:50%; background:#eab308; border:2px solid #0a0a0f;"></div>
+                </div>
+                <span style="font-size:11px; font-weight:600;">10,000+ Creators Onboard</span>
             </div>
 
 
