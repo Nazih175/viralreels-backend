@@ -1,5 +1,5 @@
 /**
- * ViralReels AI - App Logic (V3.2-PRO-RESTORED)
+ * ViralReels AI - App Logic (V3.1-PWA Pro Active)
  */
 
 // Service Worker Registration (PWA)
@@ -30,70 +30,14 @@ if ('serviceWorker' in navigator) {
 }
 
 const initApp = () => {
-    window.renderState = (module, state) => {
-        const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
-        const contentEl = document.getElementById(`${module}GeneratorsContent`);
-        if (!emptyEl || !contentEl) return;
-        
-        if (state === 'empty') {
-            emptyEl.classList.remove('hidden');
-            contentEl.classList.add('hidden');
-        } else {
-            emptyEl.classList.add('hidden');
-            contentEl.classList.remove('hidden');
-        }
-    };
-
     if (window.VR_INIT_DONE) return;
     window.VR_INIT_DONE = true;
-
-    // -- Aurora Elite: Floating Particles --
-    const initAuroraParticles = () => {
-        const container = document.getElementById('auroraParticles');
-        if (!container) return;
-        
-        // Inject Mouse Spotlight (Elite Magnetic Aura)
-        const spotlight = document.createElement('div');
-        spotlight.className = 'mouse-spotlight';
-        spotlight.id = 'mouseSpotlight';
-        container.appendChild(spotlight); // Append inside Aurora Container for perfect layering
-
-        window.addEventListener('mousemove', (e) => {
-            spotlight.style.left = e.clientX + 'px';
-            spotlight.style.top = e.clientY + 'px';
-        });
-
-        const particleCount = 80; // Optimized for performance while maintaining premium aesthetic
-        for (let i = 0; i < particleCount; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = Math.random() * 3 + 1;
-            const left = Math.random() * 100;
-            const duration = 12 + Math.random() * 20;
-            const delay = -(Math.random() * duration); // NEGATIVE DELAY: starts animation mid-cycle for immediate visibility
-            const opacity = 0.2 + Math.random() * 0.3;
-            p.style.width = `${size}px`;
-            p.style.height = `${size}px`;
-            p.style.left = `${left}%`;
-            p.style.bottom = `${Math.random() * 100}%`; // Start scattered across the screen
-            p.style.opacity = opacity;
-            p.style.animationDuration = `${duration}s`;
-            p.style.animationDelay = `${delay}s`;
-            container.appendChild(p);
-        }
-    };
-    initAuroraParticles();
     
     // 1. Immediate UI Reveal (Dismiss Splash)
     const splash = document.getElementById('splashScreen');
     if (splash) {
         splash.style.opacity = '0';
-        setTimeout(() => { 
-            splash.style.visibility = 'hidden'; 
-            splash.style.display = 'none'; 
-            // Fallback: if it's still there, force removal
-            if (splash.parentNode) splash.parentNode.removeChild(splash);
-        }, 500);
+        setTimeout(() => { splash.style.visibility = 'hidden'; splash.style.display = 'none'; }, 500);
     }
 
     console.log("ViralReels AI System: V3.1 Global Optimization Active");
@@ -105,17 +49,13 @@ const initApp = () => {
         else { console.warn(`[ViralReels Secure] Element NOT FOUND: ${id}. Initializer continuing...`); }
     };
 
-    // -- Safe Storage Helpers (Moved Global for Zenith V3.9) --
-    // safeGet is now global
-
-    // =============================================
-    // == GLOBAL PRODUCTION CONFIG (UPDATE THESE) ==
-    // =============================================
-    const CONFIG = {
-        PUBLISHER_ID: "REPLACE_WITH_YOUR_PUBLISHER_ID", // e.g. "ca-pub-123456789"
-        STRIPE_TEST_MODE: true, // Flip to false for sk_live
+    // -- Safe Storage Helpers --
+    const safeGet = (key, fallback) => {
+        try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
+        catch (e) { return fallback; }
     };
 
+    // -- State & Storage --
     let currentAnalyzedIdea = null;
     let savedEvents = safeGet('viralreels_events', {});
     let savedHooks = safeGet('viralreels_tracked_hooks', []);
@@ -161,58 +101,6 @@ const initApp = () => {
         modalConfirm.onclick = () => { modalOverlay.classList.add('hidden'); };
     };
 
-
-    window.resetToolState = (viewId) => {
-        if (!viewId) return;
-        const tool = viewId.replace('view-', '');
-        
-        // --- 1. CLEAR INPUTS ---
-        const inputMap = {
-            'analyze': ['ideaInput', 'captionInput', 'hashtagInput'],
-            'hooks': ['customHookInput'],
-            'captions': ['dedCapInput'],
-            'tags': ['dedTagsInput'],
-            'trends': ['trendsInput'],
-            'rewrite': ['rewriteInput'],
-            'chat': ['chatInput']
-        };
-        (inputMap[tool] || []).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-
-        // -- Mobile Keyboard Support --
-        if (tool === 'chat') {
-            const chatIn = document.getElementById('chatInput');
-            if (chatIn) {
-                chatIn.addEventListener('focus', () => document.body.classList.add('keyboard-mobile'));
-                chatIn.addEventListener('blur', () => document.body.classList.remove('keyboard-mobile'));
-            }
-        }
-
-        // --- 2. CLEAR OUTPUTS ---
-        if (tool === 'analyze') {
-            document.getElementById('resultsDashboard')?.classList.add('hidden');
-        } else if (tool === 'hooks') {
-            document.getElementById('hooksGeneratorsContent')?.classList.add('hidden');
-            document.getElementById('hooksGeneratorsEmpty')?.classList.remove('hidden');
-        } else if (tool === 'chat') {
-            const chatMessages = document.getElementById('chatMessages');
-            const chatIntro = document.getElementById('chatIntro');
-            const chatView = document.getElementById('view-chat');
-            if (chatMessages) chatMessages.innerHTML = '';
-            if (chatIntro) {
-                chatIntro.classList.remove('hidden');
-                chatMessages.appendChild(chatIntro);
-            }
-            if (chatView) chatView.classList.remove('neural-active');
-        } else if (tool === 'videoai') {
-            document.getElementById('restartVideoAiBtn')?.click();
-        }
-
-        lucide.createIcons();
-    };
-
     // -- PREMIUM CELEBRATIONS --
     window.vrCelebrate = (type = 'basic') => {
         if (type === 'basic') {
@@ -246,100 +134,6 @@ const initApp = () => {
         ? 'http://localhost:3000/api' 
         : 'https://viralreels-ai-backend.onrender.com/api';
     console.log("[ViralReels] Booting with API_BASE:", API_BASE);
-
-    // -- COLD-START DETECTION & SOLVER --
-    // Force-pings the backend on load. If it takes > 2s, we assume it's sleeping
-    // and we disable the main buttons with a "warming up" state until it's ready.
-    (() => {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
-        
-        let attempts = 0;
-        const pingServer = async () => {
-            try {
-                const start = Date.now();
-                const res = await fetch(`${API_BASE}/health`, { method: 'GET', cache: 'no-store' });
-                if (res.ok) {
-                    console.log("[ViralReels] Server is officially ALIVE.");
-                    return true;
-                }
-            } catch (e) {}
-            return false;
-        };
-
-        const checkLoop = async () => {
-            const alive = await pingServer();
-            if (!alive && attempts < 10) {
-                if (attempts === 0) showToast("🕯️ Initializing AI Engine... first load may take 30s.", 6000);
-                attempts++;
-                setTimeout(checkLoop, 5000);
-            }
-        };
-        checkLoop();
-    })();
-
-    // --- ANALYTICS UTILITY ---
-    async function logUsage(toolName) {
-        try {
-            const user = firebase.auth().currentUser;
-            const headers = { 'Content-Type': 'application/json' };
-            if (user) {
-                const token = await user.getIdToken();
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            await fetchWithTimeout(`${API_BASE}/log-usage`, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({ tool: toolName, uid: user ? user.uid : null })
-            });
-        } catch (e) {
-            console.warn(`[Analytics] Silent failure: ${e.message}`);
-        }
-    }
-
-    // --- FETCH WITH TIMEOUT & SMART RETRY ---
-    // Handles cold-starts automatically. If a request fails due to the server waking up,
-    // it enters a retry loop while keeping the user informed.
-    const fetchWithTimeout = async (url, options = {}, ms = 30000, retries = 0) => {
-        const MAX_RETRIES = 5;
-        const RETRY_DELAY = 6000;
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), ms);
-        
-        // SECURE RECOGNITION: ATTACH ID TOKEN
-        try {
-            const user = firebase.auth().currentUser;
-            if (user) {
-                const token = await user.getIdToken();
-                if (!options.headers) options.headers = {};
-                options.headers['Authorization'] = `Bearer ${token}`;
-            }
-        } catch (authErr) {
-            console.warn("[Auth Header] Token fetch issue:", authErr.message);
-        }
-
-        try {
-            const response = await fetch(url, { ...options, signal: controller.signal });
-            clearTimeout(timer);
-
-            // DETECT RENDER COLD-START (502/503/504)
-            if ([502, 503, 504].includes(response.status) && retries < MAX_RETRIES) {
-                throw new Error("COOLD_START");
-            }
-
-            return response;
-        } catch (err) {
-            clearTimeout(timer);
-            const isRetryable = (err.name === 'AbortError' || err.message === 'COOLD_START' || err.message === 'TypeError');
-            
-            if (isRetryable && retries < MAX_RETRIES) {
-                if (retries === 0) showToast("🚀 Waking up AI Engine... please stay on this page.", 10000);
-                console.log(`[SmartRetry] Server warming up. Attempt ${retries + 1}/${MAX_RETRIES}...`);
-                await new Promise(r => setTimeout(r, RETRY_DELAY));
-                return fetchWithTimeout(url, options, ms, retries + 1);
-            }
-            throw err;
-        }
-    };
 
     // -- HISTORY MANAGEMENT --
     let histories = safeGet('vr_tool_histories', {
@@ -425,32 +219,15 @@ const initApp = () => {
     // == USAGE LIMIT ENGINE ==
     // =============================================
     const LIMITS = { analyze: 5, hooks: 5, captions: 5, trends: 3, rewrite: 3 };
-    const TRIAL_DAYS = 7;
-    const TRIAL_LIMIT = 50; // uses per tool during trial
     const AD_DURATION = 30; // seconds
     let adTimer = null;
-    let currentAdRechargeTarget = null;
+    let currentAdRechargeTarget = null; // which tool to recharge after ad
 
     const getToday = () => new Date().toISOString().split('T')[0];
 
-    // ── TRIAL ENGINE ──
-    const initTrial = () => {
-        if (!localStorage.getItem('vr_trial_start')) {
-            localStorage.setItem('vr_trial_start', new Date().toISOString());
-        }
-    };
-    const getTrialInfo = () => {
-        const start = localStorage.getItem('vr_trial_start');
-        if (!start) return { active: false, daysLeft: 0 };
-        const elapsed = (Date.now() - new Date(start).getTime()) / (1000 * 60 * 60 * 24);
-        const daysLeft = Math.max(0, TRIAL_DAYS - Math.floor(elapsed));
-        return { active: daysLeft > 0, daysLeft };
-    };
-    const isInTrial = () => getTrialInfo().active;
-
     const getUsage = () => {
         const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
-        if (!stored || stored.date !== getToday() || typeof stored.analyze === 'undefined') {
+        if (!stored || stored.date !== getToday()) {
             // New day — reset to full limits
             const fresh = { date: getToday(), ...LIMITS };
             localStorage.setItem('vr_usage', JSON.stringify(fresh));
@@ -461,14 +238,10 @@ const initApp = () => {
 
     const saveUsage = (usage) => localStorage.setItem('vr_usage', JSON.stringify(usage));
 
-    const getRemainingUses = (tool) => {
-        if (isPro) return 999;
-        if (isInTrial()) return TRIAL_LIMIT;
-        return getUsage()[tool] ?? LIMITS[tool];
-    };
+    const getRemainingUses = (tool) => isPro ? 999 : (getUsage()[tool] ?? LIMITS[tool]);
 
     const consumeUse = (tool) => {
-        if (isPro || isInTrial()) return; // no consumption during trial or pro
+        if (isPro) return;
         const usage = getUsage();
         if (usage[tool] > 0) usage[tool]--;
         saveUsage(usage);
@@ -493,17 +266,6 @@ const initApp = () => {
             el.className = `usage-badge plenty`;
             el.innerHTML = `<i data-lucide="infinity" style="width:12px; height:12px;"></i> Unlimited Uses`;
             lucide.createIcons();
-            return;
-        }
-
-        // Trial badge
-        const trial = getTrialInfo();
-        if (trial.active) {
-            el.className = `usage-badge plenty`;
-            el.style.background = 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(251,146,60,0.1))';
-            el.style.borderColor = 'rgba(234,179,8,0.3)';
-            el.style.color = '#fbbf24';
-            el.innerHTML = `🎁 ${trial.daysLeft}d free trial`;
             return;
         }
 
@@ -579,7 +341,7 @@ const initApp = () => {
     };
 
     // Toast notification
-    const showToast = (msg, duration = 3000) => {
+    const showToast = (msg) => {
         const t = document.createElement('div');
         t.className = 'toast';
         t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
@@ -589,7 +351,7 @@ const initApp = () => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
             setTimeout(() => t.remove(), 300);
-        }, duration);
+        }, 3000);
     };
 
     // -- AD MODAL ENGINE (REWARD VIDEO ADS) --
@@ -604,9 +366,9 @@ const initApp = () => {
         currentAdRechargeTarget = tool;
 
         // REAL PRODUCTION TRIGGER: Google AdSense Interstitial
-        if (window.adsbygoogle && CONFIG.PUBLISHER_ID !== "REPLACE_WITH_YOUR_PUBLISHER_ID") {
+        if (window.adsbygoogle) {
             (window.adsbygoogle = window.adsbygoogle || []).push({
-                google_ad_client: CONFIG.PUBLISHER_ID,
+                google_ad_client: "ca-pub-YOUR_ID", // TODO: REPLACE WITH ca-pub-XXXX
                 enable_page_level_ads: true,
                 overlays: {bottom: true},
                 onAdClosed: () => {
@@ -706,10 +468,11 @@ const initApp = () => {
         this.disabled = true;
 
         try {
-            const res = await fetchWithTimeout(`${API_BASE}/checkout`, {
+            const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
+            const res = await fetch(`${API_BASE}/checkout`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null })
+                body: bodyData
             });
             const data = await res.json();
             if (data.url) {
@@ -775,15 +538,6 @@ const initApp = () => {
     const navItems = document.querySelectorAll('.nav-item, .nav-btn');
     const tabViews = document.querySelectorAll('.tab-view');
 
-    // --- ELITE NAV PULSE HELPER ---
-    window.pulseNavItem = (id) => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.classList.add('nav-pulse');
-            setTimeout(() => btn.classList.remove('nav-pulse'), 4500); // 1.5s * 3 cycles
-        }
-    };
-
     navItems.forEach(btn => {
         btn.addEventListener('click', async () => {
             const targetId = btn.getAttribute('data-tab');
@@ -792,14 +546,12 @@ const initApp = () => {
                 return;
             }
 
-            // --- CLEAN WORKSPACE: RESET ON LEAVE ---
-            const currentView = document.querySelector('.tab-view.active-view');
-            // Auto-reset everything EXCEPT permanent user archives (Calendar, Tracker, Vault, Home)
-            if (currentView && !['view-calendar', 'view-tracker', 'view-saved', 'view-home'].includes(currentView.id)) {
-                window.resetToolState(currentView.id);
-            }
+            // --- PRESERVE STATE ON LEAVE (REMOVED AGGRESSIVE RESET) ---
+            const activeView = document.querySelector('.active-view');
+            // We no longer clear inputs or hide dashboards here to allow seamless multi-tasking.
 
-            // Identify target view for entrance (animation)
+            // Identify current active view for exit animation
+            const currentView = document.querySelector('.tab-view.active-view');
             const targetView = document.getElementById(`view-${targetId}`);
 
             if (!targetView || (currentView && currentView.id === `view-${targetId}`)) return;
@@ -838,23 +590,6 @@ const initApp = () => {
 
             const tabName = btn.querySelector('span')?.innerText || 'Dashboard';
             document.title = `ViralReels | ${tabName}`;
-        });
-    });
-
-    // -- MANUAL RESET BUTTONS --
-    document.querySelectorAll('.tool-reset-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const viewId = btn.getAttribute('data-view');
-            
-            // SECURITY PASS: Confirmation for Log modules
-            if (['view-calendar', 'view-tracker', 'view-saved'].includes(viewId)) {
-                if (!confirm("Wipe all saved logs in this module? This cannot be undone, though your tool history (last 10 searches) will remain safe.")) return;
-            }
-
-            window.resetToolState(viewId);
-            showToast("Workspace Cleared.");
         });
     });
 
@@ -898,19 +633,14 @@ const initApp = () => {
 
     const toItemCard = (text, type) => {
         const escapedText = text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
-        const typeClass = type === 'hook' ? 'type-hook' : (type === 'rewrite' ? 'type-rewrite' : '');
-        const tagLabel = type === 'hook' ? 'REEL HOOK' : (type === 'rewrite' ? 'AI REWRITE' : 'SUGGESTION');
-        
         return `
-            <div class="saved-item-card ${typeClass} result-appear">
-                <div class="saved-card-header">
-                    <span class="saved-tag">${tagLabel}</span>
-                    <button class="icon-button" onclick="copyToClipboard('${escapedText}', this)" title="Copy"><i data-lucide="copy"></i></button>
-                </div>
-                <p class="saved-content-text" style="white-space:pre-wrap;">${text}</p>
-                <div class="saved-card-actions">
-                    <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
-                    ${(type === 'hook' || type === 'rewrite') ? `<button class="action-btn-mini" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i> Save to Vault</button>` : ''}
+            <div class="item-card glass-card result-appear">
+                <p class="item-text" style="white-space:pre-wrap;">${text}</p>
+                <div class="item-actions">
+                    <button class="action-btn" onclick="copyToClipboard('${escapedText}', this)" title="Copy to Clipboard"><i data-lucide="copy"></i> Copy</button>
+                    <button class="action-btn btn-share" onclick="nativeShare('${escapedText}')" title="Share Content"><i data-lucide="share-2"></i> Share</button>
+                    ${type === 'hook' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'hook', this)" title="Save to Ledger"><i data-lucide="archive"></i> Save</button>` : ''}
+                    ${type === 'rewrite' ? `<button class="action-btn" onclick="saveToVault('${escapedText}', 'rewrite', this)" title="Save to Vault"><i data-lucide="archive"></i> Save</button>` : ''}
                 </div>
             </div>
         `;
@@ -929,9 +659,8 @@ const initApp = () => {
     };
 
     window.copyHash = (text, el) => {
-        let tagText = text.startsWith('#') ? text : '#' + text;
-        navigator.clipboard.writeText(tagText).then(() => {
-            showToast(`Copied: ${tagText}`);
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`Copied: ${text}`);
             const oldHtml = el.innerHTML;
             el.innerHTML = '<i data-lucide="check" style="width:12px;"></i> Copied';
             setTimeout(() => { el.innerHTML = oldHtml; lucide.createIcons(); }, 1500);
@@ -953,12 +682,6 @@ const initApp = () => {
             return;
         }
 
-        // --- EMPTY VALIDATION ---
-        if (!idea) {
-            showToast("Please enter an idea first!");
-            return;
-        }
-
         // --- USAGE GATE ---
         if (getRemainingUses('analyze') <= 0) {
             showLimitBlock(document.getElementById('sub-analyze-scout'), 'analyze');
@@ -970,7 +693,7 @@ const initApp = () => {
         
         // --- UI GATING: SKELETON ON ---
         btn.querySelector('.loader').classList.remove('hidden');
-        (btn.querySelector('i, svg'))?.classList.add('hidden');
+        btn.querySelector('i').classList.add('hidden');
         document.getElementById('resultsDashboard').classList.add('hidden');
         document.getElementById('analyzerSkeleton').classList.remove('hidden');
         document.getElementById('analyzerSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -979,7 +702,7 @@ const initApp = () => {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
             
-            const res = await fetchWithTimeout(`${API_BASE}/analyze`, {
+            const res = await fetch(`${API_BASE}/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idea, platform, length, isPro, niche: persona.niche })
@@ -990,11 +713,7 @@ const initApp = () => {
             
             // --- USAGE & HISTORY (Move here to prevent bug) ---
             consumeUse('analyze');
-            logUsage('analyze');
             addToHistory('analyze', { text: idea, platform, length, timestamp: Date.now() });
-
-            // --- CONTEXTUAL NAV PULSE ---
-            window.pulseNavItem('navHooks');
 
             // --- UI GATING: SKELETON OFF ---
             document.getElementById('analyzerSkeleton').classList.add('hidden');
@@ -1002,7 +721,7 @@ const initApp = () => {
             
             btn.disabled = false;
             btn.querySelector('.loader').classList.add('hidden');
-            (btn.querySelector('i, svg'))?.classList.remove('hidden');
+            btn.querySelector('i').classList.remove('hidden');
 
             const score = data.score;
             currentAnalyzedIdea = { idea, score };
@@ -1013,11 +732,6 @@ const initApp = () => {
 
             if (score >= 80) {
                 setTimeout(() => vrCelebrate('viral'), 500);
-            }
-            if (data.script) {
-                renderState('rewrite', 'result');
-                logUsage('rewrite'); // Log success
-                document.getElementById('rewriteResultText').innerText = data.script;
             }
             document.getElementById('resScoreText').innerText = score > 80 ? "Viral Potential 🔥" : "Solid 📈";
             document.getElementById('resHookBar').style.width = `${(data.hookStrength / 10) * 100}%`;
@@ -1046,7 +760,7 @@ const initApp = () => {
             document.getElementById('analyzerSkeleton').classList.add('hidden');
             btn.disabled = false;
             btn.querySelector('.loader').classList.add('hidden');
-            (btn.querySelector('i, svg'))?.classList.remove('hidden');
+            btn.querySelector('i').classList.remove('hidden');
             const resDash = document.getElementById('resultsDashboard');
             if (resDash.classList.contains('hidden')) {
                  // only show if not already shown by success
@@ -1073,8 +787,6 @@ const initApp = () => {
         const inputStr = document.getElementById('customHookInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
 
-        if (!inputStr) { showToast("Please enter a topic first!"); return; }
-
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.hooks === inputStr) {
             showToast("Modify the topic for new hooks!");
@@ -1091,7 +803,7 @@ const initApp = () => {
         lastUsedInputs.hooks = inputStr;
         
         // --- UI GATING: SKELETON ON ---
-        (btn.querySelector('i, svg'))?.classList.add('hidden');
+        btn.querySelector('i').classList.add('hidden');
         const loader = document.createElement('div');
         loader.className = 'loader';
         btn.appendChild(loader);
@@ -1102,41 +814,27 @@ const initApp = () => {
         document.getElementById('hooksSkeleton').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
-            // --- UI GATING: Get Advanced Controls ---
-            const tone = document.getElementById('hooksTone')?.value || 'Aggressive';
-            const audience = document.getElementById('hooksAudience')?.value || 'General';
-
-            const res = await fetchWithTimeout(`${API_BASE}/generate-hooks`, {
+            const res = await fetch(`${API_BASE}/generate-hooks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: inputStr, isPro: localStorage.getItem('vr_pro_status') === 'true', niche: persona.niche, tone, audience })
+                body: JSON.stringify({ topic: inputStr, isPro, niche: persona.niche })
             });
 
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
             
             consumeUse('hooks');
-            logUsage('hooks');
             addToHistory('hooks', { text: inputStr, timestamp: Date.now() });
 
             vrCelebrate('basic');
 
-            // --- CONTEXTUAL NAV PULSE ---
-            window.pulseNavItem('navTracker');
-            window.pulseNavItem('navCaptions');
-
             // --- UI GATING: SKELETON OFF ---
             document.getElementById('hooksSkeleton').classList.add('hidden');
-            if (data.hooks) {
-                renderState('hooks', 'result');
-                logUsage('hooks'); // Log success
-                const grid = document.getElementById('hookResultsGrid');
-            }
             document.getElementById('hooksGeneratorsContent').classList.remove('hidden');
             
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
-            (btn.querySelector('i, svg'))?.classList.remove('hidden');
+            btn.querySelector('i').classList.remove('hidden');
 
             document.getElementById('sub-hooks-list').innerHTML = (data.hooks || []).map(h => toItemCard(h, 'hook')).join('');
             document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
@@ -1147,7 +845,7 @@ const initApp = () => {
             document.getElementById('hooksSkeleton').classList.add('hidden');
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
-            (btn.querySelector('i, svg'))?.classList.remove('hidden');
+            btn.querySelector('i').classList.remove('hidden');
             lucide.createIcons();
             
             const hooksContent = document.getElementById('hooksGeneratorsContent');
@@ -1161,30 +859,26 @@ const initApp = () => {
     const renderTracker = () => {
         const list = document.getElementById('trackerList');
         const empty = document.getElementById('trackerEmpty');
-        if (!list) return;
-
-        if (savedHooks.length === 0) { 
-            list.innerHTML = ''; 
-            empty?.classList.remove('hidden'); 
-        } else {
-            empty?.classList.add('hidden');
+        if (savedHooks.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
+            empty.classList.add('hidden');
             list.innerHTML = savedHooks.map((h, i) => {
-                const escapedText = h.replace(/'/g, "\\'").replace(/\n/g, "\\n");
                 const isVerified = analyticsData.some(a => a.idea.includes(h.substring(0, 10)) && a.actualViews > 0);
-                
                 return `
-                <div class="saved-item-card type-hook result-appear" style="animation-delay: ${i * 0.05}s">
-                    <div class="saved-card-header">
+                <div class="item-card flex-col border-subtle bg-card-dark interactive-glow result-appear">
+                    <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="saved-tag">SAVED HOOK #${savedHooks.length - i}</span>
-                            ${isVerified ? '<span class="text-[8px] bg-green/20 text-green font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">Verified</span>' : ''}
+                            <span class="text-[10px] bg-accent/20 text-accent font-bold px-2 py-0.5 rounded">HOOK #${savedHooks.length - i}</span>
                         </div>
-                        <button class="icon-button" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--accent-red)"></i></button>
+                        <button class="icon-button flex-shrink-0" onclick="deleteHook(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
-                    <p class="saved-content-text mb-4" style="white-space:pre-wrap;">${h}</p>
-                    <div class="saved-card-actions">
-                        <button class="action-btn-mini" onclick="copyToClipboard('${escapedText}', this)"><i data-lucide="copy"></i> Copy</button>
-                        <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
+                    <p class="item-text mb-4 w-full text-sm" style="line-height:1.6; white-space:pre-wrap;">${h}</p>
+                    <div class="flex justify-between items-center pt-3 border-top border-subtle">
+                        ${isVerified ? `
+                        <div class="flex items-center gap-1 text-green font-bold uppercase" style="font-size:0.6rem; letter-spacing:1px;">
+                            <i data-lucide="check-circle" style="width:10px;"></i> Verified Viral
+                        </div>` : `
+                        <div class="text-[10px] text-muted uppercase tracking-wider">Unverified Prediction</div>`}
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${h.replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy</button>
                     </div>
                 </div>
                 `;
@@ -1307,8 +1001,6 @@ const initApp = () => {
         const style = document.getElementById('dedCapStyle').value;
         const btn = document.getElementById('dedCapBtn');
 
-        if (!topic) { showToast("Please enter a topic first!"); return; }
-
         // --- DUPLICATE CHECK ---
         const currentKey = `${topic}-${style}`;
         if (lastUsedInputs.captions === currentKey) {
@@ -1324,14 +1016,13 @@ const initApp = () => {
 
         btn.disabled = true; // LOCK
         consumeUse('captions');
-        logUsage('captions');
         lastUsedInputs.captions = currentKey;
         addToHistory('captions', { text: topic, style, timestamp: Date.now() });
         
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetchWithTimeout(`${API_BASE}/generate-captions`, {
+            const res = await fetch(`${API_BASE}/generate-captions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic, isPro, niche: persona.niche })
@@ -1345,28 +1036,22 @@ const initApp = () => {
                 const html = toItemCard(txt, null);
                 return html.replace('class="item-card glass-card', 'class="item-card glass-card result-appear');
             }).join('');
-            
-            // --- CONTEXTUAL NAV PULSE ---
-            window.pulseNavItem('navTags');
-
             out.classList.remove('hidden');
         } catch (e) {
             console.error(e);
             showToast("Caption generation failed.");
         } finally {
+            btn.disabled = false;
             btn.innerHTML = '<i data-lucide="pen-tool"></i> Generate Captions';
             lucide.createIcons();
         }
     });
 
-    // -- STORAGE RECOVERY --
     // -- 6. TAGS VIEW --
     document.getElementById('dedTagsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const topic = document.getElementById('dedTagsInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
-
-        if (!topic) { showToast("Please enter a topic first!"); return; }
 
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.tags === topic) {
@@ -1380,7 +1065,7 @@ const initApp = () => {
         addToHistory('tags', { text: topic, timestamp: Date.now() });
 
         try {
-            const res = await fetchWithTimeout(`${API_BASE}/generate-tags`, {
+            const res = await fetch(`${API_BASE}/generate-tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic, isPro, niche: persona.niche })
@@ -1391,12 +1076,6 @@ const initApp = () => {
 
             const output = document.getElementById('dedTagsOutput');
             if (output) output.classList.remove('hidden');
-
-            if (data.tags) {
-                renderState('tags', 'result');
-                logUsage('tags'); // Log success
-                const grid = document.getElementById('tagResultsGrid');
-            }
 
             // 1. Trending (Viral Momentum)
             const trendingEl = document.getElementById('tagsTrending');
@@ -1437,32 +1116,6 @@ const initApp = () => {
             }
         }
     });
-
-    // -- COPY ALL TAGS --
-    const copyAllTagsBtn = document.getElementById('copyAllTagsBtn');
-    if (copyAllTagsBtn) {
-        copyAllTagsBtn.addEventListener('click', () => {
-            const tagElements = document.querySelectorAll('#dedTagsOutput .hashtag');
-            if (tagElements.length === 0) return;
-            
-            // Extract text, ensure # prefix for all
-            const allTags = Array.from(tagElements).map(el => {
-                let text = el.innerText.trim();
-                return text.startsWith('#') ? text : '#' + text;
-            }).join(' ');
-
-            navigator.clipboard.writeText(allTags).then(() => {
-                showToast("All Tags Copied!");
-                const oldHtml = copyAllTagsBtn.innerHTML;
-                copyAllTagsBtn.innerHTML = '<i data-lucide="check"></i> Copied!';
-                lucide.createIcons();
-                setTimeout(() => { 
-                    copyAllTagsBtn.innerHTML = oldHtml; 
-                    lucide.createIcons(); 
-                }, 2000);
-            });
-        });
-    }
 
     // -- 7. CHECKLIST VIEW --
     const checks = document.querySelectorAll('.task-check');
@@ -1523,8 +1176,6 @@ const initApp = () => {
         const val = document.getElementById('trendsInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
 
-        if (!val) { showToast("Please enter a topic first!"); return; }
-
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.trends === val) {
             showToast("Change your niche to see new trends!");
@@ -1545,7 +1196,7 @@ const initApp = () => {
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const res = await fetchWithTimeout(`${API_BASE}/trends`, {
+            const res = await fetch(`${API_BASE}/trends`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ niche: val, isPro })
@@ -1555,68 +1206,20 @@ const initApp = () => {
 
             document.getElementById('trendsEmpty').classList.add('hidden');
             const out = document.getElementById('trendsOutput');
-            out.innerHTML = '';
-
-            // 1. Live Badge
-            const liveBadge = document.createElement('div');
-            liveBadge.className = 'live-data-badge';
-            liveBadge.innerHTML = `<span class="pulse-dot"></span><span class="text-xs font-bold uppercase tracking-widest text-accent">Verified Live Intelligence</span>`;
-            out.appendChild(liveBadge);
-
-            // 2. Metrics Grid
-            if (data.data_points) {
-                const metricsGrid = document.createElement('div');
-                metricsGrid.className = 'trends-metrics-grid';
-                metricsGrid.innerHTML = data.data_points.map(mp => `
-                    <div class="metric-row">
-                        <div class="flex justify-between items-center">
-                            <span class="metric-label">${mp.label}</span>
-                            <span class="text-xs font-bold text-primary">${mp.value}%</span>
-                        </div>
-                        <div class="metric-bar-bg">
-                            <div class="metric-bar-fill" style="width: 0%; background: var(--accent-cyan);"></div>
-                        </div>
-                    </div>
-                `).join('');
-                out.appendChild(metricsGrid);
-
-                // Animate bars
-                setTimeout(() => {
-                    out.querySelectorAll('.metric-bar-fill').forEach((bar, i) => {
-                        bar.style.width = `${data.data_points[i].value}%`;
-                    });
-                }, 100);
-            }
-
-            // 3. Verdict
-            if (data.verdict) {
-                const verdict = document.createElement('div');
-                verdict.className = 'verdict-banner interactive-glow';
-                verdict.innerHTML = `<p class="verdict-text">${data.verdict}</p>`;
-                out.appendChild(verdict);
-            }
-
-            // 4. Recommendation (Blueprints)
-            if (data.recommendation) {
-                const blueprint = document.createElement('div');
-                blueprint.className = 'strategy-card border-accent';
+            out.innerHTML = (data.trends || []).map(t => {
+                const starsCount = t.rep || 0;
+                const starsHtml = '★'.repeat(starsCount).padEnd(5, '☆');
                 
-                let recContent = '';
-                if (Array.isArray(data.recommendation)) {
-                    recContent = data.recommendation.map(r => `<p class="text-sm text-secondary mb-2">• ${r}</p>`).join('');
-                } else if (typeof data.recommendation === 'object') {
-                    recContent = `<p class="text-sm text-secondary">${JSON.stringify(data.recommendation)}</p>`;
-                } else {
-                    recContent = `<p class="text-sm text-secondary">${data.recommendation}</p>`;
-                }
-
-                blueprint.innerHTML = `
-                    <span class="strategy-label">ELITE BLUEPRINTS</span>
-                    ${recContent}
+                return `
+                <div class="trend-card border-subtle result-appear animate-fade-in-up">
+                    <div class="flex justify-between items-start mb-2">
+                        <strong class="text-md text-primary font-bold" style="padding-right: 1rem;">${t.title}</strong>
+                        <div class="stars-container text-gold flex-shrink-0" style="letter-spacing:2px;">${starsHtml}</div>
+                    </div>
+                    <p class="text-sm text-secondary line-height-15">${t.desc}</p>
+                </div>
                 `;
-                out.appendChild(blueprint);
-            }
-
+            }).join('');
             out.classList.remove('hidden');
         } catch (err) {
             console.error(err);
@@ -1638,8 +1241,6 @@ const initApp = () => {
         const val = document.getElementById('rewriteInput').value.trim();
         const btn = e.target.querySelector('button[type="submit"]');
 
-        if (!val) { showToast("Please enter a script to rewrite!"); return; }
-
         // --- DUPLICATE CHECK ---
         if (lastUsedInputs.rewrite === val) {
             showToast("Change the script before rewriting!");
@@ -1654,20 +1255,16 @@ const initApp = () => {
 
         btn.disabled = true; // LOCK
         consumeUse('rewrite');
-        logUsage('rewrite');
         lastUsedInputs.rewrite = val;
         addToHistory('rewrite', { text: val, timestamp: Date.now() });
         
         btn.innerHTML = '<div class="loader"></div>';
 
         try {
-            const tone = document.getElementById('rewriteTone')?.value || 'Punchy';
-            const length = document.getElementById('rewriteLength')?.value || 'Standard';
-
-            const res = await fetchWithTimeout(`${API_BASE}/rewrite`, {
+            const res = await fetch(`${API_BASE}/rewrite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ script: val, isPro, niche: persona.niche, tone, length })
+                body: JSON.stringify({ script: val, isPro, niche: persona.niche })
             });
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
@@ -1681,10 +1278,6 @@ const initApp = () => {
                     <button class="btn-secondary w-full" onclick="copyToClipboard('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy"></i> Copy Script</button>
                 </div>
             `;
-            
-            // --- CONTEXTUAL NAV PULSE ---
-            window.pulseNavItem('navSaved');
-
             document.getElementById('rewriteOutput').classList.remove('hidden'); lucide.createIcons();
         } catch(e) {
             console.error(e);
@@ -1700,29 +1293,20 @@ const initApp = () => {
     const renderSavedRewrites = () => {
         const list = document.getElementById('savedList');
         const empty = document.getElementById('savedEmpty');
-        if (!list) return;
-
-        if (savedRewrites.length === 0) { 
-            list.innerHTML = ''; 
-            empty?.classList.remove('hidden'); 
-        } else {
-            empty?.classList.add('hidden');
-            list.innerHTML = savedRewrites.map((r, i) => {
-                const escapedText = r.replace(/'/g, "\\'").replace(/\n/g, "\\n");
-                return `
-                <div class="saved-item-card type-rewrite result-appear" style="animation-delay: ${i * 0.05}s">
-                    <div class="saved-card-header">
-                        <span class="saved-tag">SCRIPTS VAULT #${savedRewrites.length - i}</span>
-                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--accent-red)"></i></button>
+        if (savedRewrites.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); } else {
+            empty.classList.add('hidden');
+            list.innerHTML = savedRewrites.map((r, i) => `
+                <div class="item-card border-subtle bg-card-dark interactive-glow result-appear">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] bg-purple/20 text-purple font-bold px-2 py-0.5 rounded uppercase">AI REWRITE #${savedRewrites.length - i}</span>
+                        <button class="icon-button" onclick="deleteRewrite(${i})"><i data-lucide="trash-2" style="width:14px; color:var(--text-muted)"></i></button>
                     </div>
-                    <p class="saved-content-text mb-4" style="white-space:pre-wrap;">${r}</p>
-                    <div class="saved-card-actions">
-                        <button class="action-btn-mini" onclick="copyToClipboard('${escapedText}', this)"><i data-lucide="copy"></i> Copy</button>
-                        <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
+                    <p class="item-text text-sm mb-4" style="white-space:pre-wrap; line-height:1.6;">${r}</p>
+                    <div class="flex justify-end pt-3 border-top border-subtle">
+                        <button class="btn-text p-0 text-[10px]" onclick="copyToClipboard('${r.replace(/\n/g, "\\n").replace(/'/g, "\\'")}')"><i data-lucide="copy" style="width:10px;"></i> Copy Script</button>
                     </div>
                 </div>
-                `;
-            }).join('');
+            `).join('');
             lucide.createIcons();
         }
     };
@@ -1734,7 +1318,7 @@ const initApp = () => {
     window.deleteRewrite = (index) => { savedRewrites.splice(index, 1); localStorage.setItem('viralreels_saved_rewrites', JSON.stringify(savedRewrites)); renderSavedRewrites(); };
 
     // -- ANALYTICS RENDER ENGINE --
-    window.renderAnalytics = () => {
+    const renderAnalytics = () => {
         const list = document.getElementById('analyticsList');
         const empty = document.getElementById('analyticsEmpty');
         if (!list || !empty) return;
@@ -1743,53 +1327,15 @@ const initApp = () => {
             empty.classList.remove('hidden');
             list.innerHTML = '';
             list.appendChild(empty);
-            
-            document.getElementById('analyticsChartSection')?.classList.add('hidden');
-            document.getElementById('statTotalReach').textContent = '0';
-            document.getElementById('statAvgScore').textContent = '0%';
             return;
         }
-
         empty.classList.add('hidden');
         list.innerHTML = '';
-
-        // --- CALCULATE AGGREGATE STATS ---
-        let totalViews = 0;
-        let totalScore = 0;
-        analyticsData.forEach(log => {
-            totalViews += (log.actualViews || 0);
-            totalScore += log.score;
-        });
-
-        document.getElementById('statTotalReach').textContent = totalViews > 999999 ? (totalViews/1000000).toFixed(1) + 'M' : totalViews.toLocaleString();
-        document.getElementById('statAvgScore').textContent = Math.round(totalScore / analyticsData.length) + '%';
-        
-        // --- DRAW PERFORMANCE CURVE ---
-        const chartSection = document.getElementById('analyticsChartSection');
-        const curve = document.getElementById('performanceCurve');
-        if (chartSection && curve) {
-            chartSection.classList.remove('hidden');
-            curve.innerHTML = analyticsData.slice(-15).map(log => {
-                const height = log.score;
-                const viewRatio = Math.min(1, (log.actualViews || 0) / 10000); // Scale 10k views to 100%
-                return `
-                    <div class="flex-grow flex items-end group relative" style="height: 100%;">
-                        <div class="w-full bg-accent/20 rounded-t-sm transition-all duration-500 hover:bg-accent/40" style="height: ${height}%;"></div>
-                        <div class="absolute bottom-0 left-0 w-full bg-accent-blue rounded-t-sm transition-all duration-700 delay-100" style="height: ${viewRatio * 100}%; opacity: 0.6;"></div>
-                        
-                        <div class="tooltip hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 p-2 rounded text-[8px] whitespace-nowrap z-50 border border-white/10">
-                            Score: ${log.score}%<br>Views: ${log.actualViews || 0}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
 
         analyticsData.slice().reverse().forEach((log) => {
             const el = document.createElement('div');
             el.className = 'glass-card p-3 rounded-md border-subtle bg-card-dark interactive-glow mb-2 result-appear';
-            
-            // ... (rest of old logic for list items)
+
             let viewInputStr = log.actualViews > 0
                 ? `<span class="text-xs font-bold text-green w-full block mt-2 p-2" style="background:rgba(6,214,160,0.1); border-radius:6px; border:1px solid rgba(6,214,160,0.3);"><i data-lucide="eye" style="display:inline; width:12px;"></i> Verified: ${log.actualViews.toLocaleString()} Views</span>`
                 : `<div class="flex gap-2 w-full mt-2"><input type="number" class="text-input p-2 flex-grow log-view-input" style="background:rgba(0,0,0,0.4);" placeholder="Enter Views"><button class="btn-primary log-view-btn text-xs p-2 whitespace-nowrap" data-id="${log.id}">Update</button></div>`;
@@ -1816,13 +1362,12 @@ const initApp = () => {
             b.addEventListener('click', (e) => {
                 const id = e.target.getAttribute('data-id');
                 const val = parseInt(e.target.previousElementSibling.value);
-                if (isNaN(val) || val <= 0) return showToast("Enter valid views");
+                if (isNaN(val) || val <= 0) return alert("Enter valid view count");
                 const target = analyticsData.find(a => a.id === id);
                 if (target) {
                     target.actualViews = val;
                     localStorage.setItem('vr_analytics_data', JSON.stringify(analyticsData));
                     renderAnalytics();
-                    triggerSuccess("Views Verified");
                 }
             });
         });
@@ -1859,20 +1404,6 @@ const initApp = () => {
         renderChatLogs();
     }
 
-    // --- ELITE KEYBOARD AWARENESS (V3.7) ---
-    if (chatInput) {
-        chatInput.addEventListener('focus', () => {
-            if (window.innerWidth < 768) {
-                document.body.classList.add('keyboard-mobile');
-                // Auto-scroll to bottom of chat
-                setTimeout(() => chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' }), 300);
-            }
-        });
-        chatInput.addEventListener('blur', () => {
-            document.body.classList.remove('keyboard-mobile');
-        });
-    }
-
     function renderChatLogs() {
         if (!chatLogsList) return;
         if (chatHistory.length === 0) {
@@ -1904,14 +1435,11 @@ const initApp = () => {
         if (!log) return;
         
         // Populate chat messages and switch tab
-        const intro = document.getElementById('chatIntro');
-        if (intro) intro.classList.add('hidden');
-        
         chatMessages.innerHTML = `
             <div class="chat-bubble bubble-user result-appear">${log.userMsg}</div>
-            <div class="chat-bubble bubble-ai elite-bubble result-appear">${log.aiMsg}</div>
+            <div class="chat-bubble bubble-ai result-appear">${log.aiMsg}</div>
         `;
-        document.getElementById('chatHistoryView')?.classList.add('hidden');
+        document.querySelector('[data-subtab="sub-chat-live"]').click();
         lucide.createIcons();
     };
 
@@ -1927,114 +1455,12 @@ const initApp = () => {
     // Initial render
     renderChatLogs();
 
-    // -- AI CHAT ELITE OVERLAYS --
-    document.getElementById('chatHistoryBtn')?.addEventListener('click', () => {
-        document.getElementById('chatHistoryView')?.classList.remove('hidden');
-        renderChatLogs();
-    });
-    document.getElementById('closeChatHistoryBtn')?.addEventListener('click', () => {
-        document.getElementById('chatHistoryView')?.classList.add('hidden');
-    });
-
-    // -- SUGGESTION CHIPS --
-    document.querySelectorAll('.suggest-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            const prompt = chip.getAttribute('data-prompt');
-            if (prompt && chatInput) {
-                chatInput.value = prompt;
-                document.getElementById('sendChatBtn')?.click();
-            }
-        });
-    });
-
-    // -- AI VOICE CHAT (SPEECH-TO-TEXT) --
-    function initVoiceChat() {
-        const voiceChatBtn = document.getElementById('voiceChatBtn');
-        const chatInput = document.getElementById('chatInput');
-        if (!voiceChatBtn || !chatInput) return;
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            voiceChatBtn.style.opacity = '0.3';
-            voiceChatBtn.style.cursor = 'not-allowed';
-            voiceChatBtn.title = "Voice not supported in this browser";
-            return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-
-        let isRecording = false;
-
-        voiceChatBtn.addEventListener('click', () => {
-            if (!isRecording) {
-                try {
-                    recognition.start();
-                    isRecording = true;
-                    voiceChatBtn.classList.add('recording');
-                    voiceChatBtn.innerHTML = '<i data-lucide="mic-off"></i>';
-                    lucide.createIcons();
-                } catch (err) {
-                    console.error("Speech Recognition Error:", err);
-                }
-            } else {
-                recognition.stop();
-                isRecording = false;
-                voiceChatBtn.classList.remove('recording');
-                voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-                lucide.createIcons();
-            }
-        });
-
-        recognition.onresult = (event) => {
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                }
-            }
-            if (finalTranscript) {
-                const currentVal = chatInput.value.trim();
-                chatInput.value = currentVal ? currentVal + ' ' + finalTranscript : finalTranscript;
-            }
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Speech Recognition Error Event:", event.error);
-            isRecording = false;
-            voiceChatBtn.classList.remove('recording');
-            voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-            lucide.createIcons();
-            if (event.error === 'not-allowed') {
-                window.vrAlert("Mic Permission Denied", "Please allow microphone access in your browser settings to use voice chat.");
-            }
-        };
-
-        recognition.onend = () => {
-            isRecording = false;
-            voiceChatBtn.classList.remove('recording');
-            voiceChatBtn.innerHTML = '<i data-lucide="mic"></i>';
-            lucide.createIcons();
-        };
-    }
-    // Initialize Voice Chat
-    initVoiceChat();
-
-    const sendChatBtn = document.getElementById('sendChatBtn');
-    if (sendChatBtn) {
-        sendChatBtn.addEventListener('click', async () => {
+    if (chatForm) {
+        const chatSubmit = chatForm.querySelector('button[type="submit"]');
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const msg = chatInput.value.trim();
             if (!msg) return;
-
-            // Hide Intro
-            const intro = document.getElementById('chatIntro');
-            if (intro) intro.classList.add('hidden');
-            
-            // Toggle Neurals
-            const chatView = document.getElementById('view-chat');
-            chatView.classList.add('neural-active');
 
             // Add user bubble
             const uEl = document.createElement('div');
@@ -2044,12 +1470,12 @@ const initApp = () => {
             chatInput.value = '';
             chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
 
-            sendChatBtn.disabled = true;
-            sendChatBtn.innerHTML = '<div class="loader"></div>';
+            chatSubmit.disabled = true;
+            chatSubmit.innerHTML = '<div class="loader"></div>';
 
             // AI thinking
             const aiDiv = document.createElement('div');
-            aiDiv.className = 'chat-bubble bubble-ai elite-bubble result-appear';
+            aiDiv.className = 'chat-bubble bubble-ai result-appear';
             aiDiv.innerHTML = '<div class="loader" style="width:12px; height:12px;"></div>';
             chatMessages.appendChild(aiDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -2059,52 +1485,22 @@ const initApp = () => {
                 const personaNiche = nicheInput ? nicheInput.value.trim() : 'General';
                 const personaTone = document.getElementById('personaTone').value;
 
-                const res = await fetchWithTimeout(`${API_BASE}/chat-stream`, {
+                const res = await fetch(`${API_BASE}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, persona: { niche: personaNiche, tone: personaTone }, isPro })
                 });
-
-                if (!res.ok || !res.body) throw new Error("API Error");
-
-                // Stream tokens in real-time
-                aiDiv.textContent = '';
-                let fullReply = '';
-                // Log chat usage once
-                logUsage('chat');
+                if (!res.ok) throw new Error("API Error");
+                const data = await res.json();
                 
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop(); // keep incomplete last line
-                    for (const line of lines) {
-                        if (!line.startsWith('data: ')) continue;
-                        const raw = line.slice(6).trim();
-                        if (raw === '[DONE]') break;
-                        try {
-                            const parsed = JSON.parse(raw);
-                            if (parsed.token) {
-                                fullReply += parsed.token;
-                                aiDiv.textContent = fullReply;
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
-                            }
-                        } catch {}
-                    }
-                }
-
-                if (fullReply) saveChatLog(msg, fullReply);
+                aiDiv.textContent = data.reply || "Strategic advisor offline.";
+                if (data.reply) saveChatLog(msg, data.reply);
             } catch(e) {
                 console.error(e);
                 aiDiv.textContent = "I'm offline right now. Check your server connection.";
             } finally {
-                sendChatBtn.disabled = false;
-                sendChatBtn.innerHTML = '<i data-lucide="send"></i>';
+                chatSubmit.disabled = false;
+                chatSubmit.innerHTML = '<i data-lucide="send"></i>';
                 chatInput.focus();
                 chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
                 lucide.createIcons();
@@ -2148,15 +1544,6 @@ const initApp = () => {
             videoAiUploadState.classList.add('hidden');
             videoAiResultState.classList.remove('hidden');
             videoAiLoadingOverlay.classList.remove('hidden');
-            
-            // Elite: Holographic Mesh Pulse
-            const gridCells = document.querySelectorAll('.elite-grid-cell');
-            const flashInterval = setInterval(() => {
-                const rand = Math.floor(Math.random() * gridCells.length);
-                gridCells[rand].style.background = 'rgba(34, 211, 238, 0.4)';
-                setTimeout(() => gridCells[rand].style.background = 'transparent', 400);
-            }, 100);
-            setTimeout(() => clearInterval(flashInterval), 5000);
 
             // 3. Technical Analysis
             const videoUrl = URL.createObjectURL(file);
@@ -2200,12 +1587,6 @@ const initApp = () => {
                     resVidAesthetic.textContent = `${Math.min(10, (lum/25.5) + (vibrance/12.8)).toFixed(1)}/10`;
                     
                     triggerSuccess("Deep Scan Complete");
-                    logUsage('videoai');
-                    
-                    // Show Storyboard Trigger
-                    const genBtn = document.getElementById('initialGenStoryboardBtn');
-                    if (genBtn) genBtn.classList.remove('hidden');
-
                     document.body.removeChild(tempVid);
                     URL.revokeObjectURL(videoUrl);
                 }, 2000);
@@ -2224,101 +1605,8 @@ const initApp = () => {
             videoAiResultState.classList.add('hidden');
             videoAiUploadState.classList.remove('hidden');
             if (videoFileInput) videoFileInput.value = '';
-            
-            // Reset Storyboard
-            document.getElementById('videoAiStoryboardSection')?.classList.add('hidden');
-            document.getElementById('initialGenStoryboardBtn')?.classList.add('hidden');
-            document.getElementById('storyboardGallery').innerHTML = '';
         });
     }
-
-    // -- GENERATE STORYBOARD LOGIC --
-    async function generateVideoStoryboard() {
-        const gallery = document.getElementById('storyboardGallery');
-        const section = document.getElementById('videoAiStoryboardSection');
-        if (!gallery || !section) return;
-
-        section.classList.remove('hidden');
-        gallery.innerHTML = Array(5).fill(0).map((_, i) => `
-            <div class="storyboard-card result-appear" style="animation-delay: ${i * 0.1}s">
-                <div class="scene-badge">SCENE ${i + 1}</div>
-                <div class="flex-col gap-2">
-                    <div class="storyboard-label"><i data-lucide="eye" style="width:10px;"></i> Visual</div>
-                    <div id="scene-visual-${i}" class="scene-content text-xs opacity-50 italic">Generating...</div>
-                </div>
-                <div class="flex-col gap-2">
-                    <div class="storyboard-label"><i data-lucide="mic" style="width:10px;"></i> Audio</div>
-                    <div id="scene-audio-${i}" class="scene-content text-xs opacity-50 italic">Waiting...</div>
-                </div>
-            </div>
-        `).join('');
-        lucide.createIcons();
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        try {
-            const res = await fetchWithTimeout(`${API_BASE}/chat-stream`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: `Generate a 5-step viral storyboard for a ${persona.niche} video. Aesthetic score was ${document.getElementById('resVidAesthetic').textContent}. 
-                             Format each scene EXACTLY like this: [S1] Visual: ... | Audio: ... [S2] ...`,
-                    isPro: true 
-                })
-            });
-
-            if (!res.ok || !res.body) throw new Error("API Error");
-
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const raw = line.slice(6).trim();
-                        if (raw === '[DONE]') break;
-                        try {
-                            const parsed = JSON.parse(raw);
-                            if (parsed.token) {
-                                fullText += parsed.token;
-                                updateStoryboardUI(fullText);
-                            }
-                        } catch {}
-                    }
-                }
-            }
-            triggerSuccess("Storyboard Ready");
-        } catch (e) {
-            console.error(e);
-            showToast("Brain offline. Try again.");
-        }
-    }
-
-    function updateStoryboardUI(text) {
-        for (let i = 0; i < 5; i++) {
-            const visual = document.getElementById(`scene-visual-${i}`);
-            const audio = document.getElementById(`scene-audio-${i}`);
-            const pattern = new RegExp(`\\[S${i+1}\\] Visual: (.*?) \\| Audio: (.*?)(?=\\[S|$)`, 's');
-            const match = text.match(pattern);
-            if (match) {
-                if (visual) { visual.textContent = match[1].trim(); visual.classList.remove('opacity-50', 'italic'); }
-                if (audio) { audio.textContent = match[2].trim(); audio.classList.remove('opacity-50', 'italic'); }
-            }
-        }
-    }
-
-    document.getElementById('initialGenStoryboardBtn')?.addEventListener('click', (e) => {
-        e.currentTarget.classList.add('hidden');
-        generateVideoStoryboard();
-    });
-
-    document.getElementById('genStoryboardBtn')?.addEventListener('click', () => {
-        generateVideoStoryboard();
-    });
 
     // -- SUBSCRIPTION MANAGEMENT --
     const billingStatePro = document.getElementById('billingStatePro');
@@ -2479,15 +1767,8 @@ const initApp = () => {
                     manageBillingBtn.disabled = false;
                     return;
                 }
-                
-                if (!isPro) {
-                    // Start Checkout for Free users
-                    initiateCheckout();
-                    return;
-                }
 
-                // Create Portal for Pro users
-                const response = await fetchWithTimeout(`${API_BASE}/create-portal-session`, {
+                const response = await fetch(`${API_BASE}/create-portal-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid: user.uid, email: user.email })
@@ -2527,10 +1808,11 @@ const initApp = () => {
                 btn.innerHTML = '<div class="loader"></div>';
                 btn.disabled = true;
                 try {
-                    const res = await fetchWithTimeout(`${API_BASE}/checkout`, {
+                    const bodyData = firebase.auth().currentUser ? JSON.stringify({ uid: firebase.auth().currentUser.uid }) : JSON.stringify({});
+                    const res = await fetch(`${API_BASE}/checkout`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null })
+                        body: bodyData
                     });
                     const data = await res.json();
                     if (data.url) {
@@ -2572,7 +1854,7 @@ const initApp = () => {
             document.body.appendChild(verifyOverlay);
 
             try {
-                const response = await fetchWithTimeout(`${API_BASE}/verify-session`, {
+                const response = await fetch(`${API_BASE}/verify-session`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: sessionId })
@@ -2674,52 +1956,34 @@ const initApp = () => {
 
             // Check Auth State
             auth.onAuthStateChanged(async (user) => {
-                // --- PERSISTENT REVIEWER BYPASS ---
-                const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
-                if (!user && isBypassActive) {
-                    console.log("[ViralReels] Re-activating Reviewer Bypass Session...");
-                    initApp({ email: 'reviewer@viralreels.com', uid: 'REVIEWER_BYPASS_ID' });
-                    authOverlay.classList.add('hidden');
-                    appContainer.classList.remove('hidden');
-                    return;
-                }
-
                 if (user) {
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     lucide.createIcons();
                     
-                    // SYNC PRO STATUS FROM DB (HARD-SYNC SOURCE OF TRUTH)
+                    // SYNC PRO STATUS FROM DB (The "Remember Me" Core Fix)
                     try {
                         const db = firebase.firestore();
                         const userDoc = await db.collection('users').doc(user.uid).get();
                         if (userDoc.exists) {
                             const data = userDoc.data();
-                            // Update global state immediately
-                            isPro = !!data.isPro; 
-                            localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                            
-                            console.log(`[ViralReels] Pro Status: ${isPro ? 'Verified (PRO)' : 'Standard (FREE)'}`);
-                            
-                            // Re-render UI based on fresh status
-                            renderAllBadges();
-                            
-                            // Active portal button state
-                            const proManageBtn = document.getElementById('manageBillingBtn');
-                            if (proManageBtn) {
-                                proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
-                                proManageBtn.querySelector('i')?.setAttribute('data-lucide', isPro ? 'credit-card' : 'zap');
-                                lucide.createIcons();
+                            if (data.isPro) {
+                                console.log("[ViralReels] Pro Status verified from Database.");
+                                localStorage.setItem('vr_pro_status', 'true');
+                                isPro = true;
+                                // Force hydration of premium features if they were hidden
+                                document.querySelectorAll('.crown-badge').forEach(b => b.classList.add('active'));
+                            } else {
+                                // Sync reverse (if subscription expired/cancelled but local storage is stale)
+                                localStorage.setItem('vr_pro_status', 'false');
+                                isPro = false;
                             }
                         }
                     } catch (dbErr) {
                         console.warn("[ViralReels] Database sync failed. Using local cache.", dbErr);
-                        isPro = localStorage.getItem('vr_pro_status') === 'true';
                     }
 
-                    initTrial(); // Start 7-day trial clock on first login
                     showToast("Logged in securely.");
-                    renderAllBadges();
                     if (!isOnboardingComplete) {
                         document.getElementById('onboardingOverlay').classList.remove('hidden');
                     }
@@ -2761,17 +2025,7 @@ const initApp = () => {
                     })
                     .catch((error) => {
                         console.error("Auth Error:", error);
-                        if (error.code === 'auth/email-already-in-use') {
-                            showToast("Incorrect password for this account.");
-                        } else if (error.code === 'auth/weak-password') {
-                            showToast("Password must be at least 6 characters.");
-                        } else if (error.code === 'auth/invalid-email') {
-                            showToast("Invalid email address format.");
-                        } else if (error.code && error.code.includes('too-many-requests')) {
-                            showToast("Too many attempts. Please try again later.");
-                        } else {
-                            showToast(error.message || "Authentication failed. Please try again.");
-                        }
+                        showToast("Auth Error: Check API Key or try again.");
                         authSubmitBtn.innerHTML = 'Sign In / Create Account';
                     });
                 });
@@ -2786,7 +2040,7 @@ const initApp = () => {
                     auth.signInWithRedirect(provider).catch(err => {
                         console.error(err);
                         showToast("Google Auth Failed. Check API Key.");
-                        googleLoginBtn.innerHTML = '<i data-lucide="layout"></i> Continue with Google';
+                        googleLoginBtn.innerHTML = '<i data-lucide="chrome"></i> Continue with Google';
                         lucide.createIcons();
                     });
                 });
@@ -2825,73 +2079,3 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
-// =============================================
-// == SUB-TAB & PRECISION LOGIC (ZENITH V3.9) ==
-// =============================================
-
-// 1. Generic Sub-Tab Switching (Pill Tabs)
-document.addEventListener('click', (e) => {
-    const pill = e.target.closest('.pill');
-    if (!pill) return;
-
-    const subtabId = pill.dataset.subtab;
-    if (!subtabId) return;
-
-    // Scope the container (only search within the current active view)
-    const container = pill.closest('.tab-view');
-    if (!container) return;
-
-    // Update pills
-    container.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-
-    // Update sections
-    container.querySelectorAll('.item-list-container, #sub-analyze-scout, #sub-analyze-metrics, #sub-hooks-scout, #hooksGeneratorsContent > div').forEach(sec => {
-        if (sec.id.includes('usage-badge')) return;
-        sec.classList.add('hidden');
-    });
-
-    const target = document.getElementById(subtabId);
-    if (target) {
-        target.classList.remove('hidden');
-        if (subtabId === 'sub-analyze-metrics') renderAnalytics();
-    }
-});
-
-// -- Global Storage Helper --
-window.safeGet = (key, fallback) => {
-    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
-    catch (e) { return fallback; }
-};
-
-// 2. Resolve Analytics Hydration (V2 Stats + Chart)
-const originalRenderAnalytics = window.renderAnalytics;
-window.renderAnalytics = () => {
-    // Call original if it exists and isn't this function
-    if (typeof originalRenderAnalytics === 'function' && originalRenderAnalytics !== window.renderAnalytics) {
-        try { originalRenderAnalytics(); } catch(e) {}
-    }
-
-    const stats = window.safeGet('vr_analytics_data', []);
-    const totalReach = stats.reduce((acc, curr) => acc + (curr.actualViews || 0), 0);
-    const avgScore = stats.length ? Math.round(stats.reduce((acc, curr) => acc + (curr.score || 0), 0) / stats.length) : 0;
-
-    const statTotalReachEl = document.getElementById('statTotalReach');
-    const statAvgScoreEl = document.getElementById('statAvgScore');
-    const analyticsChartSection = document.getElementById('analyticsChartSection');
-    const perfCurve = document.getElementById('performanceCurve');
-
-    if (statTotalReachEl) statTotalReachEl.innerText = totalReach.toLocaleString();
-    if (statAvgScoreEl) statAvgScoreEl.innerText = `${avgScore}%`;
-
-    if (stats.length > 0) {
-        analyticsChartSection?.classList.remove('hidden');
-        if (perfCurve) {
-            perfCurve.innerHTML = stats.slice(-7).map(s => {
-                const height = Math.max(20, (s.score || 0));
-                return `<div class="w-2 bg-accent rounded-t-sm animate-height" style="height: ${height}%;"></div>`;
-            }).join('');
-        }
-    }
-};
-
