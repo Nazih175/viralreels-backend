@@ -99,9 +99,8 @@
 
     <!-- Auth Overlay (Reverted/Standardized) -->
     <div id="authOverlay" class="fullscreen-overlay z-auth hidden">
-        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border);">
-            <div class="certified-badge"><i data-lucide="shield-check"></i> Certified 2026 AI Engine</div>
-            <div class="auth-logo-bg mb-2">
+        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border); padding: 2.5rem 2rem;">
+            <div class="auth-logo-bg mb-4">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
                     style="width: 80px; height: 80px; filter: drop-shadow(0 0 12px rgba(168,85,247,0.5));">
                     <defs>
@@ -119,30 +118,16 @@
                     <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuth)" />
                 </svg>
             </div>
-            <h1 class="auth-title">ViralReels <span class="gradient-text">AI</span></h1>
-            <h2 class="auth-subtitle">Creator Intelligence <span class="text-accent">•</span> Algorithm Grounded</h2>
-            <p class="auth-desc text-xs mb-3">Gain the ultimate advantage with the 2026 AI creator suite. Analyze, engineer, and dominate the digital meta with precision-tuned logic.</p>
+            <h1 class="auth-title" style="font-size: 2rem; margin-bottom: 0.5rem;">ViralReels <span class="gradient-text">AI</span></h1>
+            <h2 class="auth-subtitle" style="opacity: 0.7; font-weight: 500; margin-bottom: 2rem;">Algorithm Grounded Creator Intelligence</h2>
+            
             <div class="auth-actions" id="authBaseActions">
-                <button class="btn-primary w-full" id="googleLoginBtn"><i data-lucide="globe"></i> Continue with Google</button>
-                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:var(--bg-card-dark);"><i data-lucide="mail"></i> Continue with Email</button>
+                <button class="btn-primary w-full" id="googleLoginBtn" style="margin-bottom: 0.75rem;"><i data-lucide="globe"></i> Continue with Google</button>
+                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1.5rem;"><i data-lucide="mail"></i> Continue with Email</button>
                 
-                <div class="flex items-center gap-2 my-2 opacity-30">
-                    <div class="h-[1px] flex-1 bg-white/20"></div>
-                    <span class="text-[10px] uppercase tracking-widest font-bold">Or Open Access</span>
-                    <div class="h-[1px] flex-1 bg-white/20"></div>
-                </div>
-
-                <button class="btn-secondary w-full border-accent/20" id="guestLoginBtn" style="background:rgba(168,85,247,0.05); color:var(--text-primary);">
-                    <i data-lucide="zap"></i> Browse as Guest (Instant Access)
+                <button class="btn-secondary w-full" id="guestLoginBtn" style="background:transparent; border: 1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size: 0.8rem;">
+                    Browse as Guest
                 </button>
-            </div>
-
-            <div class="social-proof">
-                <div class="flex items-center gap-1">
-                    <i data-lucide="users" class="text-accent" style="width:14px;"></i>
-                    <span class="text-xs font-bold text-primary">10,000+</span>
-                    <span class="text-xs text-muted">Creators onboard</span>
-                </div>
             </div>
 
 
