@@ -147,6 +147,50 @@ const initApp = () => {
     };
     setupKeyboardProtection();
     
+    // -- ZENITH NEURAL AUDIO ENGINE (V4.6) --
+    const neuralCtx = new (window.AudioContext || window.webkitAudioContext)();
+    window.playNeuralSound = (type) => {
+        if (!persona.audio || neuralCtx.state === 'suspended') {
+            if (neuralCtx.state === 'suspended') neuralCtx.resume();
+            if (!persona.audio) return;
+        }
+
+        const osc = neuralCtx.createOscillator();
+        const gain = neuralCtx.createGain();
+        osc.connect(gain);
+        gain.connect(neuralCtx.destination);
+
+        const now = neuralCtx.currentTime;
+
+        if (type === 'success') {
+            // Harmonic Rise
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'scanning') {
+            // High-Tech Pulse
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(20, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.1);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'click') {
+            // Sharp Blip
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1000, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        }
+    };
+
     // 1. Immediate UI Reveal (Dismiss Splash)
     const splash = document.getElementById('splashScreen');
     if (splash) {
@@ -516,7 +560,8 @@ const initApp = () => {
             textEl.innerText = text;
             overlay.classList.remove('hidden');
             triggerConfetti();
-            window.triggerHaptic('success'); // High-fidelity sensory confirmation
+            window.triggerHaptic('success'); 
+            window.playNeuralSound('success'); // Zenith Neural Audio
             setTimeout(() => overlay.classList.add('hidden'), 2200);
         }
     };
@@ -712,7 +757,8 @@ const initApp = () => {
         t.className = 'toast';
         t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
         document.body.appendChild(t);
-        window.triggerHaptic('light'); // Subtle entrance pulse
+        window.triggerHaptic('light');
+        window.playNeuralSound('click'); // Zenith Feedback pulse
         updateIcons();
         setTimeout(() => {
             t.style.opacity = '0';
@@ -1139,6 +1185,16 @@ const initApp = () => {
         document.getElementById('analyzerSkeleton')?.classList.remove('hidden');
         document.getElementById('analyzerSkeleton')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+        // -- ZENITH NEURAL SCAN (V4.6) --
+        const scanner = document.getElementById('analyzerScanner');
+        const dash = document.getElementById('resultsDashboard');
+        let scanInterval = null;
+        if (scanner && dash) {
+            dash.classList.remove('hidden'); // Show container for scanning effect
+            scanner.classList.remove('hidden');
+            scanInterval = setInterval(() => window.playNeuralSound('scanning'), 250);
+        }
+
         try {
             const platform = document.getElementById('platformSelect')?.value || 'all';
             const length = document.getElementById('lengthInput')?.value || '15s';
@@ -1161,6 +1217,9 @@ const initApp = () => {
             window.pulseNavItem('navHooks');
 
             // --- UI GATING: SKELETON OFF ---
+            if (scanInterval) clearInterval(scanInterval);
+            if (scanner) scanner.classList.add('hidden');
+            
             document.getElementById('analyzerSkeleton').classList.add('hidden');
             document.getElementById('resultsDashboard').classList.remove('hidden');
             
@@ -2306,7 +2365,11 @@ const initApp = () => {
                     body: JSON.stringify({ 
                         message: msg, 
                         history: window.chatSession, // Send current session context
-                        persona: { niche: personaNiche, tone: personaTone }, 
+                        persona: { 
+                            niche: persona.niche, 
+                            tone: persona.tone, 
+                            context: getSystemContext() // Inject Zenith Context
+                        }, 
                         isPro 
                     })
                 });
@@ -2617,22 +2680,78 @@ const initApp = () => {
         updateIcons();
     }
 
-    // -- PERSONA LOGIC --
+    // -- PERSONA LOGIC (ZENITH V4.6 PRO) --
+    // persona = safeGet('vr_persona', { niche: 'AI / Tech', tone: '50', architect: 'disruptor', audio: true }); // REDUNDANT - Declared at line 235
+    
     const personaNicheEl = document.getElementById('personaNiche');
     const personaToneEl = document.getElementById('personaTone');
+    const personaArchitectEl = document.getElementById('personaArchitect');
+    const audioToggleEl = document.getElementById('audioToggle');
+
+    const applyNicheTheme = (niche) => {
+        const body = document.body;
+        // Remove old theme classes
+        body.classList.forEach(cls => { if (cls.startsWith('theme-')) body.classList.remove(cls); });
+        
+        const n = (niche || '').toLowerCase();
+        let theme = 'general';
+        let tickerMsg = "Algorithm Optimized";
+
+        if (n.includes('tech') || n.includes('ai')) { theme = 'tech'; tickerMsg = "Neural Sync: High"; }
+        else if (n.includes('fit') || n.includes('gym')) { theme = 'fitness'; tickerMsg = "Vigor Pulse: Active"; }
+        else if (n.includes('fin') || n.includes('money') || n.includes('crypto')) { theme = 'finance'; tickerMsg = "Market Sentiment: Bullish"; }
+        else if (n.includes('food') || n.includes('cook')) { theme = 'food'; tickerMsg = "Flavor Resonance: Peak"; }
+        else if (n.includes('travel') || n.includes('vlog')) { theme = 'travel'; tickerMsg = "Pathfinder Logic: Locked"; }
+        else if (n.includes('fashion') || n.includes('beauty')) { theme = 'beauty'; tickerMsg = "Aesthetic Lock: Primed"; }
+
+        body.classList.add(`theme-${theme}`);
+        const ticker = document.getElementById('nicheTicker');
+        if (ticker) {
+            ticker.textContent = tickerMsg;
+            ticker.classList.remove('hidden');
+        }
+    };
+
+    const getSystemContext = () => {
+        const archMap = {
+            'disruptor': 'You are the Creative Disruptor. Your goal is high-virality, controversial, and polarizing content that breaks the scroll.',
+            'expert': 'You are the Growth Expert. Your goal is data-driven, analytical, and educational content that builds long-term authority.',
+            'minimalist': 'You are the Minimalist. Your goal is clean, quiet, and high-status content that says more with less.'
+        };
+        const toneVal = parseInt(persona.tone);
+        const toneDesc = toneVal < 30 ? 'relatable and soft' : (toneVal > 70 ? 'high-energy and aggressive' : 'neutral and balanced');
+        
+        return `${archMap[persona.architect || 'disruptor']} Persona: expert strategist in the "${persona.niche || 'General Content'}" niche. Tone requirement: ${toneDesc}. Response must be 100% niche-dependent.`;
+    };
 
     if (personaNicheEl && personaToneEl) {
         personaNicheEl.value = persona.niche;
         personaToneEl.value = persona.tone;
+        if (personaArchitectEl) personaArchitectEl.value = persona.architect || 'disruptor';
+        if (audioToggleEl) audioToggleEl.checked = persona.audio !== false;
 
         const updatePersona = () => {
-            persona = { niche: personaNicheEl.value, tone: personaToneEl.value };
+            persona = { 
+                niche: personaNicheEl.value, 
+                tone: personaToneEl.value, 
+                architect: personaArchitectEl ? personaArchitectEl.value : 'disruptor',
+                audio: audioToggleEl ? audioToggleEl.checked : true
+            };
             localStorage.setItem('vr_persona', JSON.stringify(persona));
-            showToast("Persona updated - AI adjusted.");
+            applyNicheTheme(persona.niche);
+            showToast("Zenith Pulse Updated");
         };
 
         personaNicheEl.addEventListener('change', updatePersona);
-        personaToneEl.addEventListener('input', updatePersona);
+        personaToneEl.addEventListener('input', () => {
+             // Use input for smooth sliding persistence if needed, or stick to change for perf
+        });
+        personaToneEl.addEventListener('change', updatePersona);
+        if (personaArchitectEl) personaArchitectEl.addEventListener('change', updatePersona);
+        if (audioToggleEl) audioToggleEl.addEventListener('change', updatePersona);
+        
+        // Initial Theme Apply
+        applyNicheTheme(persona.niche);
     }
 
     // -- EXPORT LOGIC --
@@ -2893,6 +3012,9 @@ const initApp = () => {
     // =============================================
     // == FIREBASE AUTHENTICATION CONFIGURATION ==
     // =============================================
+    // =============================================
+    // == FIREBASE AUTHENTICATION CONFIGURATION ==
+    // =============================================
     const authBaseActions = document.getElementById('authBaseActions');
     const emailLoginForm = document.getElementById('emailLoginForm');
     const backToMethodsBtn = document.getElementById('backToMethodsBtn');
@@ -2912,30 +3034,25 @@ const initApp = () => {
         });
     }
 
-    // FIREBASE INITIALIZATION
+    // FIREBASE INITIALIZATION (Zenith V4.7 Cleaned)
     const firebaseConfig = {
-       apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
-  authDomain: "viralreels-ai.firebaseapp.com",
-  projectId: "viralreels-ai",
-  storageBucket: "viralreels-ai.firebasestorage.app",
-  messagingSenderId: "592489150764",
-  appId: "1:592489150764:web:facdb8915f5c7a58d75489",
-  measurementId: "G-FNHMDWD7KC"
-};
+        apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
+        authDomain: "viralreels-ai.firebaseapp.com",
+        projectId: "viralreels-ai",
+        storageBucket: "viralreels-ai.appspot.com",
+        messagingSenderId: "36733221996",
+        appId: "1:36733221996:web:1186e88e8f80cbcd715494",
+        measurementId: "G-GDBXW9V89K"
+    };
+
+    let auth = null; // Scoped for entire initApp
 
     if (window.firebase) {
         try {
-            const firebaseConfig = {
-                apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
-                authDomain: "viralreels-ai.firebaseapp.com",
-                projectId: "viralreels-ai",
-                storageBucket: "viralreels-ai.appspot.com",
-                messagingSenderId: "36733221996",
-                appId: "1:36733221996:web:1186e88e8f80cbcd715494",
-                measurementId: "G-GDBXW9V89K"
-            };
-            firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
 
             // Handle Redirect Result (Restored for GitHub Pages compatibility)
             auth.getRedirectResult().then((result) => {
@@ -3060,6 +3177,14 @@ const initApp = () => {
             // Google Login
             if (googleLoginBtn) {
                 googleLoginBtn.addEventListener('click', () => {
+                    // Protocol Security Check (Zenith V4.7)
+                    if (window.location.protocol === 'file:') {
+                        window.vrAlert("Local Access Restriction", "Google Sign-In is restricted for security and cannot run from a local file (file://). Please use a web domain or local server (localhost) to test this module.");
+                        return;
+                    }
+
+                    if (!auth) return;
+
                     googleLoginBtn.innerHTML = '<div class="loader"></div> Securely Redirecting...';
                     const provider = new firebase.auth.GoogleAuthProvider();
                     // Using Redirect for better compatibility (Mobile/COOP/Popup blockers)

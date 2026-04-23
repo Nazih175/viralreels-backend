@@ -402,12 +402,23 @@
                             placeholder="e.g. AI / Tech, Fitness, Cooking...">
                     </div>
                     <div class="persona-stat-box">
-                        <label class="persona-label">Brand Voice (Relatable ↔ Aggressive)</label>
+                        <label class="persona-label">Strategy Architect</label>
+                        <div class="custom-select-wrapper">
+                            <select id="personaArchitect" class="text-sm border-none p-0 bg-transparent text-primary">
+                                <option value="disruptor" selected>The Creative Disruptor (Aggressive)</option>
+                                <option value="expert">The Growth Expert (Analytical)</option>
+                                <option value="minimalist">The Minimalist (Clean/Quiet)</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon" style="right:0;"></i>
+                        </div>
+                    </div>
+                    <div class="persona-stat-box">
+                        <label class="persona-label">Brand Voice Intensity</label>
                         <input type="range" id="personaTone" class="tone-slider" min="1" max="100" value="50">
                         <div class="flex justify-between text-xs text-muted mt-2">
-                            <span>Soft</span>
+                            <span>Relatable</span>
                             <span>Neutral</span>
-                            <span>Hype</span>
+                            <span>High-Energy</span>
                         </div>
                     </div>
                 </div>
@@ -424,6 +435,16 @@
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="themeToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between p-2 mb-2">
+                    <div>
+                        <strong class="text-primary font-bold text-sm block">Neural Soundscapes</strong>
+                        <span class="text-xs text-secondary">High-tech audio cues & haptics</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="audioToggle" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -587,16 +608,17 @@
                     <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGrad)" />
                     <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGrad)" />
                 </svg>
-                <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
-
+                <div class="flex-col">
+                    <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
+                    <div id="nicheTicker" class="text-[8px] font-black uppercase tracking-[0.2em] text-accent opacity-60 ml-1 hidden" style="line-height: 1;">Algorithm Syncing...</div>
+                </div>
             </div>
             <div class="flex gap-2">
                 <button class="btn-primary header-btn hidden" id="guestJoinBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
                     <i data-lucide="user-plus"></i> <span>Join Now</span>
                 </button>
-                <button class="btn-text header-btn" id="aboutBtn" aria-label="About ViralReels AI" title="Learn more about tools"><i data-lucide="info"></i> <span>About</span></button>
-                <button class="btn-text header-btn" id="settingsBtn" aria-label="App Settings and Profile" title="Manage account and data"><i data-lucide="settings"></i>
-                    <span>Settings</span></button>
+                <button class="btn-text header-btn" id="aboutBtn" aria-label="About ViralReels AI" title="Learn more about tools"><i data-lucide="info"></i></button>
+                <button class="btn-text header-btn" id="settingsBtn" aria-label="App Settings and Profile" title="Manage account and data"><i data-lucide="settings"></i></button>
             </div>
         </header>
 
@@ -671,7 +693,8 @@
                     </div>
 
                     <div id="resultsDashboard"
-                        class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4">
+                        class="results-dashboard hidden interactive-glow glass-card flush-card mb-6 p-4" style="position:relative; overflow:hidden;">
+                        <div id="analyzerScanner" class="elite-scanner hidden"></div>
                         <h3 class="font-bold text-lg mb-2">Viral Readiness</h3>
                         <div class="stats-grid">
                             <div class="stat-card standout-card primary-stat"><span class="stat-label">Viral

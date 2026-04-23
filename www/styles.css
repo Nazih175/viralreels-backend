@@ -57,6 +57,46 @@
     --z-paywall: 9500;
     --z-modal: 9999; /* Top level for alerts/confirms */
     --z-auth: 9999;
+
+    --accent-glow: var(--accent-purple);
+}
+
+/* --- ZENITH NICHE-PULSE THEMES --- */
+body.theme-tech {
+    --accent-purple: #22d3ee;
+    --accent-blue: #0ea5e9;
+    --accent-glow: #22d3ee;
+    --elite-purple: #22d3ee;
+}
+body.theme-fitness {
+    --accent-purple: #f97316;
+    --accent-blue: #ea580c;
+    --accent-glow: #f97316;
+    --elite-purple: #f97316;
+}
+body.theme-finance {
+    --accent-purple: #10b981;
+    --accent-blue: #059669;
+    --accent-glow: #10b981;
+    --elite-purple: #10b981;
+}
+body.theme-food {
+    --accent-purple: #f59e0b;
+    --accent-blue: #d97706;
+    --accent-glow: #f59e0b;
+    --elite-purple: #f59e0b;
+}
+body.theme-travel {
+    --accent-purple: #6366f1;
+    --accent-blue: #4f46e5;
+    --accent-glow: #6366f1;
+    --elite-purple: #6366f1;
+}
+body.theme-beauty {
+    --accent-purple: #ec4899;
+    --accent-blue: #db2777;
+    --accent-glow: #ec4899;
+    --elite-purple: #ec4899;
 }
 
 /* LIGHT MODE OVERRIDES */
@@ -1753,3 +1793,184 @@ body.keyboard-mobile .chat-input-anchored {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
     padding: 4px 20px;
 }
+/* --- HOLOGRAPHIC SCANNER (ZENITH V4.6) --- */
+.elite-scanner {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(var(--accent-purple-rgb, 157, 78, 221), 0.1), transparent);
+    z-index: 5;
+    pointer-events: none;
+    animation: scanner-sweep 2.5s infinite ease-in-out;
+    border-top: 1px solid var(--accent-purple);
+    box-shadow: 0 -10px 20px -10px var(--accent-purple);
+    opacity: 0.6;
+}
+
+@keyframes scanner-sweep {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+}
+
+.neural-active {
+    position: relative;
+    overflow: hidden;
+}
+.neural-active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(var(--accent-purple-rgb), 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Niche Ticker Anim */
+#nicheTicker {
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; filter: brightness(1); }
+    50% { opacity: 0.8; filter: brightness(1.5); }
+}
+
+/* Custom Select Styling */
+.custom-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    cursor: pointer;
+}
+.select-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 14px !important;
+    height: 14px !important;
+    opacity: 0.5;
+}
+
+/* =============================================
+   == MOBILE OPTIMIZATION (ZENITH V4.7-ELITE) ==
+   == Targeting: 390x844 & Small Viewports     ==
+   ============================================= */
+
+@media (max-width: 480px) {
+    :root {
+        --font-size-base: 14px;
+        --app-padding: 12px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    /* 1. App Container & Layout Fluidity */
+    .app-layout {
+        padding: 12px;
+        padding-bottom: 120px; /* Space for dual-row nav */
+    }
+
+    .auth-card {
+        width: 95vw;
+        max-width: 380px;
+        padding: 1.25rem !important;
+        margin: 0 auto;
+    }
+
+    .glass-card {
+        padding: 1rem !important;
+        border-radius: 12px;
+    }
+
+    /* 2. Typography Scaling */
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    
+    .hero-title { font-size: 2rem !important; }
+    .hero-subtitle { font-size: 0.9rem !important; }
+
+    /* 3. Bottom Nav Optimization (The Dual-Row Precision) */
+    .bottom-nav {
+        height: 110px;
+        padding: 8px 12px;
+        gap: 8px;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    .nav-btn {
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 4px;
+        font-size: 10px !important;
+    }
+
+    .nav-btn i {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* 4. Grid Density Refinement */
+    .pro-features-grid, 
+    .about-tools-grid {
+        grid-template-columns: 1fr !important; /* Single column on narrow screens */
+        gap: 12px;
+    }
+
+    .analytics-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-value { font-size: 1.25rem !important; }
+
+    /* 5. Component Specific Tweaks */
+    .chat-input-anchored {
+        width: calc(100% - 20px);
+        padding: 12px;
+        bottom: 115px;
+    }
+
+    .pill-tabs {
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        justify-content: flex-start !important;
+    }
+
+    .pill {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .analyzer-result-card {
+        padding: 12px;
+    }
+
+    .metric-row {
+        gap: 8px;
+    }
+
+    .action-btn, .btn-primary {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* Elite Scanner Adjustments */
+    .elite-scanner {
+        animation-duration: 3s; /* Slower for mobile performance */
+    }
+
+    /* Logo Scaling */
+    .app-logo-wrap svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+

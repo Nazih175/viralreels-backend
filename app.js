@@ -56,17 +56,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-    // =============================================
-    // == ZENITH V5 PERFORMANCE CORE (AUTONOMOUS) ==
-    // =============================================
-    const envMonitor = {
-        isLocal: window.location.protocol === 'file:',
-        hasValidAds: !document.documentElement.innerHTML.includes('PROD_ID_PENDING'),
-        log: (msg) => console.log(`%c[Zenith V5] %c${msg}`, 'color: #a855f7; font-weight: bold;', 'color: inherit;')
-    };
-    envMonitor.log("Premium Engine Hydrated.");
-
-    const initApp = () => {
+const initApp = () => {
     window.renderState = (module, state) => {
         const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
         const contentEl = document.getElementById(`${module}GeneratorsContent`);
@@ -3044,7 +3034,7 @@ if ('serviceWorker' in navigator) {
         });
     }
 
-    // FIREBASE INITIALIZATION (Zenith V5 Tech-Polish)
+    // FIREBASE INITIALIZATION (Zenith V4.7 Cleaned)
     const firebaseConfig = {
         apiKey: "AIzaSyChFSEi5V_4orJKvRLl35EuP4f25wd7xmw",
         authDomain: "viralreels-ai.firebaseapp.com",
@@ -3052,7 +3042,7 @@ if ('serviceWorker' in navigator) {
         storageBucket: "viralreels-ai.appspot.com",
         messagingSenderId: "36733221996",
         appId: "1:36733221996:web:1186e88e8f80cbcd715494",
-        measurementId: envMonitor.hasValidAds ? "G-GDBXW9V89K" : "G-DEV-MODE"
+        measurementId: "G-GDBXW9V89K"
     };
 
     let auth = null; // Scoped for entire initApp
