@@ -1878,11 +1878,6 @@ body.keyboard-mobile .chat-input-anchored {
         margin: 0 auto;
     }
 
-    .glass-card {
-        padding: 1rem !important;
-        border-radius: 12px;
-    }
-
     /* 2. Typography Scaling */
     h1 { font-size: 1.75rem !important; }
     h2 { font-size: 1.5rem !important; }
@@ -1960,6 +1955,26 @@ body.keyboard-mobile .chat-input-anchored {
 
     .pill-tabs::-webkit-scrollbar {
         display: none;
+    }
+
+    .content-padding {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .responsive-form-row {
+        flex-direction: column !important;
+    }
+    
+    .responsive-form-row button[type="submit"] {
+        width: 100% !important;
+        padding: 12px !important;
+        margin-top: 4px;
+    }
+    
+    .glass-card {
+        padding: 0.75rem !important;
+        border-radius: 12px;
     }
 
     .pill {
