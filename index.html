@@ -60,7 +60,7 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=4.7.1">
+    <link rel="stylesheet" href="styles.css?v=4.7.2">
 
     <!-- 
         GOOGLE VERIFICATION CONFIG 
@@ -795,7 +795,8 @@
                     <p>Payoff-first hook architecture grounded in premium retention math.</p>
                     <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
                 </div>
-                    <form id="customHookForm" class="mb-6 mt-4">
+                <div id="hooksGeneratorCard" class="glass-card interactive-glow p-4 border-accent mt-4 mobile-box-free">
+                    <form id="customHookForm" class="mb-4">
                         <div class="flex justify-between items-center mb-3 px-1">
                             <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Hook Strategy</label>
                             <div class="flex gap-2">
@@ -817,7 +818,7 @@
                     <div class="flex flex-col gap-3">
                         <div class="flex justify-between items-center px-1">
                             <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Adv. AI Controls</span>
-                            <button type="button" class="btn-text text-[10px]" onclick="this.closest('section').querySelector('.advanced-ai-panel').classList.toggle('hidden')">
+                            <button type="button" class="btn-text text-[10px]" onclick="this.closest('.mobile-box-free').querySelector('.advanced-ai-panel').classList.toggle('hidden')">
                                 <i data-lucide="settings-2" style="width:12px;"></i> Customize
                             </button>
                         </div>
@@ -826,6 +827,7 @@
                                 <label class="text-[9px] font-bold text-muted uppercase mb-1 block">Tone</label>
                                 <select id="hooksTone" class="text-xs w-full bg-card-dark p-2 border-subtle" style="border-radius:6px;">
                                     <option value="Aggressive">Aggressive</option>
+                                    <option value="Professional">Professional</option>
                                     <option value="Funny">Funny</option>
                                     <option value="Educational">Educational</option>
                                 </select>
@@ -841,6 +843,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 <div id="hooksGeneratorsEmpty" class="empty-state glass-card mt-2">
                     <i data-lucide="pen-tool" class="lg-icon mb-2" style="color:var(--accent-purple); opacity:0.5;"></i>
                     <h3>Type a Topic Above</h3>
@@ -1171,21 +1174,23 @@
                     <p>Input a niche to discover high-momentum content formats.</p>
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
-                <form id="trendsForm" class="mt-4 mb-6">
-                    <div class="flex justify-between items-center mb-3">
-                        <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Niche Explorer</label>
-                        <div class="flex gap-2">
-                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
-                                <i data-lucide="history" style="width:14px;"></i>
-                            </button>
-                            <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
-                                <i data-lucide="trash-2" style="width:14px;"></i>
-                            </button>
+                <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 mobile-box-free">
+                    <div class="p-3">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Niche Explorer</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
+                                    <i data-lucide="history" style="width:14px;"></i>
+                                </button>
+                                <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
+                                    <i data-lucide="trash-2" style="width:14px;"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex flex-col gap-2 w-full">
-                        <input type="text" id="trendsInput" placeholder="e.g. Finance, AI, Travel..." class="text-input w-full" style="width:100% !important;">
-                        <button type="submit" class="btn-primary w-full py-3" style="width: 100% !important;"><i data-lucide="trending-up"></i> Explore Trends</button>
+                        <div class="flex flex-col gap-2 w-full">
+                            <input type="text" id="trendsInput" placeholder="e.g. Finance, AI, Travel..." class="text-input w-full" style="width:100% !important;">
+                            <button type="submit" class="btn-primary w-full py-3" style="width: 100% !important;"><i data-lucide="trending-up"></i> Explore Trends</button>
+                        </div>
                     </div>
                 </form>
                 <div id="trendsEmpty" class="empty-state glass-card mt-2">
@@ -1551,13 +1556,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=4.7.1"></script>
+    <script src="app.js?v=4.7.2"></script>
     
     <!-- Zenith Certification Footer -->
     <footer class="version-badge-footer">
         <div class="flex items-center gap-2" style="opacity: 0.8;">
             <div class="w-1.5 h-1.5 bg-green rounded-full animate-pulse"></div>
-            <p class="text-xs text-muted mb-6 tracking-widest opacity-30">ZENITH V4.7.1-ULTIMATE (IRON LOCK SECURED)</p>
+            <p class="text-xs text-muted mb-6 tracking-widest opacity-30">ZENITH V4.7.2-ULTIMATE (IRON LOCK SECURED)</p>
         </div>
     </footer>
 
