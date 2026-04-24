@@ -3088,6 +3088,16 @@ const initApp = () => {
                     // 1. IMMEDIATE UI TRANSITION (Priority 1)
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
+                    
+                    // Update Settings Button for Authenticated User
+                    const logoutBtn = document.getElementById('btnLogout');
+                    if (logoutBtn) {
+                        logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
+                        logoutBtn.style.background = 'rgba(255,255,255,0.02)';
+                        logoutBtn.style.color = 'var(--text-primary)';
+                        logoutBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+                    }
+                    
                     updateIcons();
                     
                     // 2. ASYNC BACKGROUND SYNC (Non-blocking)
