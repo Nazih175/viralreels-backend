@@ -3239,8 +3239,11 @@ const initApp = () => {
         // Safety: If on a pro sub-tab, switch back to scout
         const activeSub = document.querySelector('.pill.active');
         if (activeSub && activeSub.dataset.subtab === 'sub-analyze-metrics') {
+            document.querySelectorAll('.item-list-container').forEach(c => c.classList.add('hidden'));
+            document.getElementById('sub-analyze-scout')?.classList.remove('hidden');
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
             const scoutPill = document.querySelector('[data-subtab="sub-analyze-scout"]');
-            if (scoutPill) scoutPill.click();
+            if (scoutPill) scoutPill.classList.add('active');
         }
         
         // Reveal Guest Join CTA

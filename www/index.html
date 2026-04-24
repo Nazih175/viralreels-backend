@@ -1175,20 +1175,22 @@
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
                 <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4">
-                    <div class="flex justify-between items-center mb-2 px-2 pt-2">
-                        <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Niche Explorer</label>
-                        <div class="flex gap-2">
-                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
-                                <i data-lucide="history" style="width:14px;"></i>
-                            </button>
-                            <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
-                                <i data-lucide="trash-2" style="width:14px;"></i>
-                            </button>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Niche Explorer</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
+                                    <i data-lucide="history" style="width:14px;"></i>
+                                </button>
+                                <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
+                                    <i data-lucide="trash-2" style="width:14px;"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex gap-2 p-2">
-                        <input type="text" id="trendsInput" placeholder="e.g. Finance..." class="w-full flex-grow text-input">
-                        <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i data-lucide="trending-up"></i></button>
+                        <div class="flex gap-2">
+                            <input type="text" id="trendsInput" placeholder="e.g. Finance..." class="w-full flex-grow text-input">
+                            <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i data-lucide="trending-up"></i></button>
+                        </div>
                     </div>
                 </form>
                 <div id="trendsEmpty" class="empty-state glass-card mt-2">
