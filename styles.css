@@ -462,12 +462,12 @@ button { cursor: pointer; outline: none; border: none; font-family: 'Inter'; }
 .glow-hover:hover { background: var(--gradient-primary); box-shadow: 0 0 15px rgba(157, 78, 221, 0.5); }
 
 /* Pill Tabs */
-.pill-tabs { display: flex; justify-content: center; width: 100%; border-radius: var(--border-radius-pill); background: rgba(0,0,0,0.4); padding: 6px; border: var(--border-subtle); margin-left: auto; margin-right: auto; }
-.pill { flex: 1; padding: 10px 16px; border-radius: var(--border-radius-pill); background: transparent; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; transition: all 0.2s; text-align: center; }
+.pill-tabs { display: flex; justify-content: center; width: 100%; border-radius: var(--border-radius-pill); background: rgba(0,0,0,0.4); padding: 6px; border: var(--border-subtle); margin-left: auto; margin-right: auto; overflow-x: auto; flex-shrink: 0; }
+.pill { flex: 1 0 auto; padding: 10px 16px; border-radius: var(--border-radius-pill); background: transparent; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; transition: all 0.2s; text-align: center; }
 .pill.active { background: var(--bg-card); color: var(--text-primary); border: var(--glass-border); box-shadow: var(--shadow-soft); }
 
 /* Inputs */
-.text-input, textarea, select { background: var(--bg-card-dark); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; -webkit-appearance: none; appearance: none; box-sizing: border-box; min-width: 0; }
+.text-input, textarea, select { background: var(--bg-card-dark); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100% !important; -webkit-appearance: none; appearance: none; box-sizing: border-box !important; min-width: 0 !important; max-width: 100% !important; }
 select option { background: var(--bg-card-dark); color: var(--text-primary); }
 .text-input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 0 2px rgba(157, 78, 221, 0.2); }
 textarea { resize: none; } .text-input::placeholder, textarea::placeholder { color: var(--text-muted); }
@@ -1978,12 +1978,22 @@ body.keyboard-mobile .chat-input-anchored {
     }
 
     .pill {
-        padding: 8px 16px !important;
+        padding: 8px 14px !important;
         font-size: 13px !important;
         white-space: nowrap !important;
         flex: 0 0 auto !important;
-        min-width: 120px !important;
+        min-width: 100px !important;
     }
+    
+    .pill-tabs {
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none;
+    }
+    .pill-tabs::-webkit-scrollbar { display: none; }
 
     .tab-header {
         padding-top: 1rem !important;
