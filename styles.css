@@ -1950,34 +1950,27 @@ body.keyboard-mobile .chat-input-anchored {
         letter-spacing: 0 !important;
     }
 
-    /* 4. Form Centering & Expansion */
+    /* 4. Form Expansion & Layout Fixes */
     .tab-view {
         width: 100vw !important;
         max-width: 100vw !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;
-        text-align: center !important;
         height: 100% !important;
     }
 
     .tab-header {
         padding-top: 1.5rem !important;
         padding-bottom: 0.75rem !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
     }
 
     .tab-header h2 {
         font-size: 1.4rem !important;
-        justify-content: center !important;
         margin-bottom: 0.25rem !important;
     }
     
     .tab-header p {
-        margin: 0 auto !important;
         max-width: 280px !important;
     }
 
