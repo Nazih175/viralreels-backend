@@ -1902,7 +1902,7 @@ body.keyboard-mobile .chat-input-anchored {
     .hero-title { font-size: 2rem !important; }
     .hero-subtitle { font-size: 0.9rem !important; }
 
-    /* 3. Bottom Nav Optimization (The Dual-Row Precision) */
+    /* 3. Bottom Nav Optimization (Premium Single-Row Scroll) */
     .bottom-nav {
         height: auto !important;
         display: flex !important;
@@ -1910,7 +1910,7 @@ body.keyboard-mobile .chat-input-anchored {
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         justify-content: flex-start !important;
-        padding: 12px !important;
+        padding: 12px 24px 12px 12px !important; /* Right padding for clue */
         gap: 16px !important;
         width: 100% !important;
         max-width: 100vw !important;
@@ -1920,17 +1920,20 @@ body.keyboard-mobile .chat-input-anchored {
         scrollbar-width: none;
         background: rgba(10, 10, 15, 0.98) !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
     }
     
     .bottom-nav::-webkit-scrollbar { display: none; }
 
     .nav-grid {
-        gap: 4px !important;
+        display: flex !important;
+        gap: 12px !important;
     }
 
     .nav-item {
         flex: 0 0 auto !important;
-        min-width: 65px !important;
+        min-width: 70px !important;
         flex-direction: column !important;
         gap: 4px !important;
         padding: 8px 4px !important;
@@ -1938,155 +1941,50 @@ body.keyboard-mobile .chat-input-anchored {
     }
 
     .nav-item i {
-        width: 18px !important;
-        height: 18px !important;
+        width: 20px !important;
+        height: 20px !important;
     }
 
     .nav-item span {
-        font-size: 8px !important;
+        font-size: 9px !important;
         letter-spacing: 0 !important;
     }
 
-    /* 4. Grid Density Refinement */
-    .pro-features-grid, 
-    .about-tools-grid {
-        grid-template-columns: 1fr !important; /* Single column on narrow screens */
-        gap: 12px;
-    }
-
-    .analytics-stats-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 8px;
-    }
-
-    .stat-card {
-        padding: 12px;
-    }
-
-    .stat-value { font-size: 1.25rem !important; }
-
-    /* 5. Component Specific Tweaks */
-    .chat-input-anchored {
-        width: calc(100% - 20px);
-        padding: 12px;
-        bottom: 115px;
-    }
-
-    .pill-tabs {
-        gap: 6px !important;
-        overflow-x: auto !important;
-        padding: 6px !important;
-        justify-content: flex-start !important;
-        flex-wrap: nowrap !important;
-        background: rgba(0,0,0,0.4) !important;
-        max-width: 100% !important;
-        height: auto !important;
-        min-height: 48px !important;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch !important;
-    }
-    
-    .pill {
-        flex: 1 0 auto !important;
-        min-width: 120px !important;
-        padding: 10px 14px !important;
-        font-size: 0.85rem !important;
-        white-space: nowrap !important;
-    }
-
-    .pill-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .content-padding {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
-    
+    /* 4. Grid Density & Form Centering */
     .tab-view {
         width: 100vw !important;
         max-width: 100vw !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;
+        text-align: center !important;
+    }
+
+    .tab-header {
+        padding-top: 1.5rem !important;
+        padding-bottom: 0.75rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .tab-header h2 {
+        font-size: 1.4rem !important;
+        justify-content: center !important;
+        margin-bottom: 0.25rem !important;
     }
     
+    .tab-header p {
+        margin: 0 auto !important;
+        max-width: 280px !important;
+    }
+
     .responsive-form-row {
         flex-direction: column !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-    }
-    
-    .responsive-form-row button[type="submit"] {
-        width: 100% !important;
-        padding: 12px !important;
-        margin-top: 8px !important;
-        flex-shrink: 0 !important;
-    }
-    
-    .glass-card {
-        padding: 0.75rem !important;
-        border-radius: 12px;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .pill {
-        padding: 8px 14px !important;
-        font-size: 13px !important;
-        white-space: nowrap !important;
-        flex: 0 0 auto !important;
-        min-width: 100px !important;
-    }
-    
-    .pill-tabs {
-        justify-content: flex-start !important;
-        overflow-x: auto !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-        -webkit-overflow-scrolling: touch !important;
-        scrollbar-width: none;
-    }
-    .pill-tabs::-webkit-scrollbar { display: none; }
-
-    .tab-header {
-        padding-top: 1rem !important;
-        padding-bottom: 0.5rem !important;
-    }
-
-    .tab-header h2 {
-        font-size: 1.3rem !important;
-    }
-
-    .btn-export {
-        padding: 6px 12px !important;
-        font-size: 0.8rem !important;
-    }
-
-    .usage-badge {
-        font-size: 0.65rem !important;
-        padding: 4px 10px !important;
-    }
-
-    .metric-row {
-        gap: 8px;
-    }
-
-    .action-btn, .btn-primary {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-    }
-
-    /* Elite Scanner Adjustments */
-    .elite-scanner {
-        animation-duration: 3s; /* Slower for mobile performance */
-    }
-
-    /* Logo Scaling */
-    .app-logo-wrap svg {
-        width: 32px;
-        height: 32px;
+        align-items: center !important;
     }
 
     .mobile-box-free {
@@ -2096,10 +1994,57 @@ body.keyboard-mobile .chat-input-anchored {
         box-shadow: none !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+        margin: 0 auto 1.5rem auto !important;
         width: 100% !important;
         max-width: 100% !important;
+        display: block !important;
+    }
+
+    .mobile-box-free .interactive-glow {
+        display: none !important;
+    }
+
+    .text-input {
+        text-align: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        border-radius: 12px !important;
+    }
+
+    .btn-primary {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .pill-tabs {
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        padding: 8px !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    }
+    .pill-tabs::-webkit-scrollbar { display: none; }
+
+    .pill {
+        flex: 0 0 auto !important;
+        min-width: 110px !important;
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Elite Scanner Adjustments */
+    .elite-scanner {
+        animation-duration: 3s; 
+    }
+
+    /* Logo Scaling */
+    .app-logo-wrap svg {
+        width: 32px;
+        height: 32px;
     }
 }
 
