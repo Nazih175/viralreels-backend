@@ -3213,6 +3213,7 @@ const initApp = () => {
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
             window.vrConfirm("Sign Out?", "Are you sure you want to log out of ViralReels AI?", () => {
+                localStorage.removeItem('vr_guest_mode');
                 if (window.firebase && firebase.auth().currentUser) {
                     firebase.auth().signOut().then(() => {
                         window.location.reload();
@@ -3228,6 +3229,7 @@ const initApp = () => {
     function setupMockAuth() {
         console.log("ViralReels AI: Activating Open Access (Guest Mode)...");
         window.isGuestMode = true;
+        localStorage.setItem('vr_guest_mode', 'true');
         
         // Reveal Guest Join CTA
         document.getElementById('guestJoinBtn')?.classList.remove('hidden');
@@ -3268,6 +3270,11 @@ const initApp = () => {
         });
     }
 
+    // Check for persisted guest mode
+    if (localStorage.getItem('vr_guest_mode') === 'true') {
+        setupMockAuth();
+    }
+
     updateIcons();
 };
 
@@ -3304,6 +3311,18 @@ document.addEventListener('click', (e) => {
 
     const target = document.getElementById(subtabId);
     if (target) {
+        // --- PREMIUM BLOCKER (Consolidated) ---
+        if (subtabId === 'sub-analyze-metrics' && (!isPro || window.isGuestMode)) {
+            const authOverlay = document.getElementById('authOverlay');
+            const paywallOverlay = document.getElementById('paywallOverlay');
+            if (window.isGuestMode) {
+                authOverlay?.classList.remove('hidden');
+            } else {
+                paywallOverlay?.classList.remove('hidden');
+            }
+            return; // Prevent tab switch!
+        }
+
         target.classList.remove('hidden');
         if (subtabId === 'sub-analyze-metrics') renderAnalytics();
     }
