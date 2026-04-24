@@ -3212,6 +3212,11 @@ const initApp = () => {
     // Sign Out Implementation
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
+            if (window.isGuestMode) {
+                // If guest, just show auth immediately
+                document.getElementById('authOverlay').classList.remove('hidden');
+                return;
+            }
             window.vrConfirm("Sign Out?", "Are you sure you want to log out of ViralReels AI?", () => {
                 localStorage.removeItem('vr_guest_mode');
                 if (window.firebase && firebase.auth().currentUser) {
@@ -3230,6 +3235,13 @@ const initApp = () => {
         console.log("ViralReels AI: Activating Open Access (Guest Mode)...");
         window.isGuestMode = true;
         localStorage.setItem('vr_guest_mode', 'true');
+        
+        // Safety: If on a pro sub-tab, switch back to scout
+        const activeSub = document.querySelector('.pill.active');
+        if (activeSub && activeSub.dataset.subtab === 'sub-analyze-metrics') {
+            const scoutPill = document.querySelector('[data-subtab="sub-analyze-scout"]');
+            if (scoutPill) scoutPill.click();
+        }
         
         // Reveal Guest Join CTA
         document.getElementById('guestJoinBtn')?.classList.remove('hidden');

@@ -795,18 +795,22 @@
                     <div id="usage-badge-hooks" class="usage-badge mt-2"></div>
                 </div>
                 <div id="hooksGeneratorCard" class="glass-card interactive-glow p-4 border-accent mt-4">
-                    <form id="customHookForm" class="flex gap-2 w-full mb-4">
-                        <button type="button" class="icon-button tool-reset-btn" data-view="view-hooks" title="Reset Engine">
-                            <i data-lucide="trash-2"></i>
-                        </button>
-                        <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
-                            <i data-lucide="history"></i>
-                        </button>
-                        <input type="text" id="customHookInput" placeholder="Enter topic to generate..."
-                            class="w-full flex-grow text-input"
-                            style="border:none; background:transparent; box-shadow:none;" >
-                        <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
-                                data-lucide="zap"></i></button>
+                    <form id="customHookForm" class="mb-4">
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Hook Strategy</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('hooks')" title="Recent Hooks">
+                                    <i data-lucide="history" style="width:14px;"></i>
+                                </button>
+                                <button type="button" class="icon-button tool-reset-btn" data-view="view-hooks" title="Reset Engine">
+                                    <i data-lucide="trash-2" style="width:14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="customHookInput" placeholder="Enter topic to generate..." class="w-full flex-grow text-input">
+                            <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i data-lucide="zap"></i></button>
+                        </div>
                     </form>
 
                     <!-- Advanced AI Controls for Hooks -->
