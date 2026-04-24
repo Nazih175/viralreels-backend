@@ -1949,7 +1949,7 @@ body.keyboard-mobile .chat-input-anchored {
         gap: 6px !important;
         overflow-x: auto !important;
         padding: 6px !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         flex-wrap: nowrap !important;
         background: rgba(0,0,0,0.4) !important;
         max-width: none !important;

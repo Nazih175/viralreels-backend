@@ -601,7 +601,6 @@
                 </svg>
                 <div class="flex-col">
                     <span class="brand-text" style="font-size:1.1rem; margin-left: 4px;">ViralReels AI</span>
-                    <div id="nicheTicker" class="text-[8px] font-black uppercase tracking-[0.2em] text-accent opacity-60 ml-1 hidden" style="line-height: 1;">Algorithm Syncing...</div>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -966,17 +965,22 @@
                     <h2 class="flex items-center gap-2">Hashtag Gen</h2>
                     <p>Optimized for 2026 Search Signals. Manifest 10-15 hyper-relevant tags to trigger reach velocity.</p>
                 </div>
-                <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 p-2 w-full">
-                    <button type="button" class="icon-button tool-reset-btn" data-view="view-tags" title="Reset Tags">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Niches" aria-label="View recent tag searches">
-                        <i data-lucide="history"></i>
-                    </button>
-                    <input type="text" id="dedTagsInput" class="text-input w-full flex-grow"
-                        style="border:none; background:transparent; box-shadow:none;" placeholder="Enter broad niche..."
-                        >
-                    <button type="submit" class="btn-primary"><i data-lucide="hash"></i></button>
+                <form id="dedTagsForm" class="glass-card interactive-glow mt-4 mb-6">
+                    <div class="flex justify-between items-center mb-2 px-2 pt-2">
+                        <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Hashtag Generator</label>
+                        <div class="flex gap-2">
+                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('tags')" title="Recent Tags">
+                                <i data-lucide="history" style="width:14px;"></i>
+                            </button>
+                            <button type="button" class="icon-button tool-reset-btn" data-view="view-tags" title="Reset Generator">
+                                <i data-lucide="trash-2" style="width:14px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 p-2">
+                        <input type="text" id="dedTagsInput" placeholder="e.g. Tech..." class="w-full flex-grow text-input">
+                        <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i data-lucide="zap"></i></button>
+                    </div>
                 </form>
                 <div id="dedTagsOutput" class="glass-card hidden glow-box interactive-glow">
                     <h4 class="mb-3 text-sm font-bold uppercase tracking-wide neon-text" style="color:var(--accent-red)"><i
@@ -1166,18 +1170,22 @@
                     <p>Input a niche to discover high-momentum content formats.</p>
                     <div id="usage-badge-trends" class="usage-badge mt-2"></div>
                 </div>
-                <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4 flex gap-2 w-full p-2">
-                    <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                    <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends" aria-label="View recent trending niches">
-                        <i data-lucide="history"></i>
-                    </button>
-                    <input type="text" id="trendsInput" placeholder="e.g. Finance..."
-                        class="w-full flex-grow text-input"
-                        style="border:none; background:transparent; box-shadow:none;" >
-                    <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i
-                            data-lucide="trending-up"></i></button>
+                <form id="trendsForm" class="glass-card interactive-glow mt-4 mb-4">
+                    <div class="flex justify-between items-center mb-2 px-2 pt-2">
+                        <label class="text-[10px] font-bold text-muted uppercase tracking-wider">Niche Explorer</label>
+                        <div class="flex gap-2">
+                            <button type="button" class="icon-button tool-history-btn" onclick="cycleHistory('trends')" title="Recent Trends">
+                                <i data-lucide="history" style="width:14px;"></i>
+                            </button>
+                            <button type="button" class="icon-button tool-reset-btn" data-view="view-trends" title="Reset Radar">
+                                <i data-lucide="trash-2" style="width:14px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 p-2">
+                        <input type="text" id="trendsInput" placeholder="e.g. Finance..." class="w-full flex-grow text-input">
+                        <button type="submit" class="btn-primary" style="padding: 10px 16px;"><i data-lucide="trending-up"></i></button>
+                    </div>
                 </form>
                 <div id="trendsEmpty" class="empty-state glass-card mt-2">
                     <div class="empty-icon-wrap">

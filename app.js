@@ -1064,8 +1064,12 @@ const initApp = () => {
                 const targetSub = btnTarget.getAttribute('data-subtab');
 
                 // --- PREMIUM BLOCKER ---
-                if (targetSub === 'sub-analyze-metrics' && !isPro) {
-                    paywallOverlay.classList.remove('hidden');
+                if (targetSub === 'sub-analyze-metrics' && (!isPro || window.isGuestMode)) {
+                    if (window.isGuestMode) {
+                        authOverlay.classList.remove('hidden');
+                    } else {
+                        paywallOverlay.classList.remove('hidden');
+                    }
                     return; // Prevent tab switch!
                 }
 
@@ -3227,6 +3231,15 @@ const initApp = () => {
         
         // Reveal Guest Join CTA
         document.getElementById('guestJoinBtn')?.classList.remove('hidden');
+        
+        // Update Log Out button to Log In for guests
+        const logoutBtn = document.getElementById('btnLogout');
+        if (logoutBtn) {
+            logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Log In / Sign Up';
+            logoutBtn.style.background = 'var(--gradient-premium)';
+            logoutBtn.style.color = 'black';
+            logoutBtn.style.borderColor = 'transparent';
+        }
         
         authOverlay.classList.add('hidden');
         appContainer.classList.remove('hidden');
