@@ -1894,22 +1894,30 @@ body.keyboard-mobile .chat-input-anchored {
 
     /* 3. Bottom Nav Optimization (The Dual-Row Precision) */
     .bottom-nav {
-        height: 110px;
-        padding: 8px 12px;
-        gap: 8px;
-        grid-template-rows: 1fr 1fr;
+        height: 120px !important;
+        padding: 8px 10px !important;
+        gap: 6px !important;
     }
 
-    .nav-btn {
-        flex-direction: column;
-        gap: 2px;
-        padding: 6px 4px;
-        font-size: 10px !important;
+    .nav-grid {
+        gap: 4px !important;
     }
 
-    .nav-btn i {
+    .nav-item {
+        flex-direction: column !important;
+        gap: 2px !important;
+        padding: 6px 2px !important;
+        font-size: 9px !important;
+    }
+
+    .nav-item i {
         width: 18px !important;
         height: 18px !important;
+    }
+
+    .nav-item span {
+        font-size: 8px !important;
+        letter-spacing: 0 !important;
     }
 
     /* 4. Grid Density Refinement */
@@ -1938,19 +1946,47 @@ body.keyboard-mobile .chat-input-anchored {
     }
 
     .pill-tabs {
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 4px;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        padding: 6px !important;
         justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        background: rgba(0,0,0,0.4) !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 48px !important;
+        scrollbar-width: none;
+    }
+
+    .pill-tabs::-webkit-scrollbar {
+        display: none;
     }
 
     .pill {
-        padding: 6px 12px;
-        font-size: 11px;
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+        white-space: nowrap !important;
+        flex: 0 0 auto !important;
+        min-width: 120px !important;
     }
 
-    .analyzer-result-card {
-        padding: 12px;
+    .tab-header {
+        padding-top: 1rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    .tab-header h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .btn-export {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .usage-badge {
+        font-size: 0.65rem !important;
+        padding: 4px 10px !important;
     }
 
     .metric-row {
