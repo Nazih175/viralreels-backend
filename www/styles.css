@@ -467,7 +467,7 @@ button { cursor: pointer; outline: none; border: none; font-family: 'Inter'; }
 .pill.active { background: var(--bg-card); color: var(--text-primary); border: var(--glass-border); box-shadow: var(--shadow-soft); }
 
 /* Inputs */
-.text-input, textarea, select { background: var(--bg-card-dark); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; -webkit-appearance: none; appearance: none; }
+.text-input, textarea, select { background: var(--bg-card-dark); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: var(--border-radius-md); color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; -webkit-appearance: none; appearance: none; box-sizing: border-box; min-width: 0; }
 select option { background: var(--bg-card-dark); color: var(--text-primary); }
 .text-input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 0 2px rgba(157, 78, 221, 0.2); }
 textarea { resize: none; } .text-input::placeholder, textarea::placeholder { color: var(--text-muted); }
