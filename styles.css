@@ -1786,12 +1786,7 @@ body.keyboard-mobile .chat-input-anchored {
 
 /* Version Badge (Elite Footer) */
 .version-badge-footer {
-    padding: 1rem 1rem 0.5rem;
-    text-align: center;
-    opacity: 0.2;
-    transition: opacity 0.5s ease;
-    cursor: default;
-    flex-shrink: 0;
+    display: none !important;
 }
 
 .version-badge-footer:hover { opacity: 0.9; }
@@ -1925,7 +1920,9 @@ body.keyboard-mobile .chat-input-anchored {
         margin: 0 !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none;
-        background: rgba(10, 10, 15, 0.98) !important;
+        background: transparent !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
         border-top: none !important;
         box-shadow: none !important; /* Removes the dark gradient bar glitch above nav */
         /* Scroll Clue Mask - Adjusted for better visibility */

@@ -9,7 +9,7 @@ window.VR_BOOT_TIME = Date.now();
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI System: Zenith V4.6.8-ULTIMATE Active");
+            console.log("ViralReels AI System: Engine Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
@@ -203,7 +203,7 @@ const initApp = () => {
         }, 500);
     }
 
-    console.log("ViralReels AI System: Zenith V4.6.8 Global Optimization Active");
+    console.log("ViralReels AI System: Global Optimization Active");
         
     // -- Hardening Helper: safeListen --
     const safeListen = (id, event, callback) => {
@@ -2743,7 +2743,7 @@ const initApp = () => {
             };
             localStorage.setItem('vr_persona', JSON.stringify(persona));
             applyNicheTheme(persona.niche);
-            showToast("Zenith Pulse Updated");
+            showToast("Profile Updated");
         };
 
         personaNicheEl.addEventListener('change', updatePersona);
@@ -3256,17 +3256,7 @@ const initApp = () => {
             if (scoutPill) scoutPill.classList.add('active');
         }
         
-        // Reveal Guest Join CTA
-        document.getElementById('guestJoinBtn')?.classList.remove('hidden');
-        
-        // Update Log Out button to Log In for guests
-        const logoutBtn = document.getElementById('btnLogout');
-        if (logoutBtn) {
-            logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Log In / Sign Up';
-            logoutBtn.style.background = 'var(--gradient-premium)';
-            logoutBtn.style.color = 'black';
-            logoutBtn.style.borderColor = 'transparent';
-        }
+        updateAuthUI(false, false);
         
         authOverlay.classList.add('hidden');
         appContainer.classList.remove('hidden');
