@@ -2001,7 +2001,7 @@ body.keyboard-mobile .chat-input-anchored {
 
     /* Fix visual dead-space above bottom nav */
     .pb-heavy {
-        padding-bottom: 80px !important; 
+        padding-bottom: 65px !important; 
     }
 
     /* Analyze Buttons Centering - Strictly Selective */
@@ -2088,7 +2088,8 @@ body.keyboard-mobile .chat-input-anchored {
     }
 
     .brand-text {
-        font-size: 1.1rem !important;
+        font-size: 1.0rem !important;
+        white-space: nowrap !important;
     }
 
     .app-logo-wrap svg {
