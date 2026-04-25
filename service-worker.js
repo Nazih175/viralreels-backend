@@ -1,4 +1,4 @@
-const CACHE_NAME = 'viralreels-v4.8.7-ultimate';
+const CACHE_NAME = 'viralreels-v4.8.8-ultimate';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

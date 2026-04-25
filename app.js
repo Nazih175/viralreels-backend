@@ -608,8 +608,8 @@ const initApp = () => {
             <h3 class="font-bold mb-2">Limit Reached!</h3>
             <p class="text-sm text-secondary mb-4">${msg}</p>
             <div class="flex flex-col gap-2">
-                <button class="btn-primary w-full" onclick="window.trackMilestone('CONVERSION_CLICK', { tool: '${tool}', type: 'LINK_AUTH' }); document.getElementById('authOverlay').classList.remove('hidden')">
-                    <i data-lucide="crown"></i> Start 7-Day Free Trial
+                <button class="btn-primary w-full" onclick="const target = window.isGuestMode ? 'authOverlay' : 'paywallOverlay'; window.trackMilestone('CONVERSION_CLICK', { tool: '${tool}', type: 'LINK_AUTH' }); document.getElementById(target).classList.remove('hidden')">
+                    <i data-lucide="crown"></i> ${window.isGuestMode ? 'Sign Up to Unlock' : 'Start 7-Day Free Trial'}
                 </button>
                 <button class="btn-secondary w-full" onclick="window.trackMilestone('CONVERSION_LATER', { tool: '${tool}' }); this.parentElement.parentElement.remove()">Later</button>
             </div>
@@ -2894,6 +2894,14 @@ const initApp = () => {
             // Save to persona system
             persona.niche = selectedNiche;
             localStorage.setItem('vr_persona', JSON.stringify(persona));
+            
+            // Sync to Firestore if user is logged in
+            if (auth && auth.currentUser) {
+                firebase.firestore().collection('users').doc(auth.currentUser.uid).set({
+                    niche: selectedNiche,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(e => console.error("Niche sync failed", e));
+            }
             
             // Update the settings input too
             const personaNicheEl = document.getElementById('personaNiche');
