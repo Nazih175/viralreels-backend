@@ -1904,6 +1904,8 @@ body.keyboard-mobile .chat-input-anchored {
 
     /* 3. Bottom Nav Optimization (Premium Single-Row Scroll) */
     .bottom-nav {
+        position: relative !important;
+        bottom: auto !important;
         height: auto !important;
         display: flex !important;
         flex-direction: row !important;
@@ -2001,7 +2003,7 @@ body.keyboard-mobile .chat-input-anchored {
 
     /* Fix visual dead-space above bottom nav */
     .pb-heavy {
-        padding-bottom: 65px !important; 
+        padding-bottom: 0px !important; 
     }
 
     /* Analyze Buttons Centering - Strictly Selective */
