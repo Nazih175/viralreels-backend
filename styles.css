@@ -1958,6 +1958,9 @@ body.keyboard-mobile .chat-input-anchored {
 
     /* 4. Layout Stabilization & Ratio Fix */
     .app-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100dvh !important;
         border-left: none !important;
         border-right: none !important;
         width: 100% !important;
@@ -1979,6 +1982,14 @@ body.keyboard-mobile .chat-input-anchored {
         padding-left: 0 !important;
         padding-right: 0 !important;
         width: 100% !important;
+    }
+
+    .content-area {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        overflow: hidden !important;
     }
 
     .tab-header {
