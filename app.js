@@ -721,6 +721,45 @@ const initApp = () => {
 
     const renderAllBadges = () => Object.keys(LIMITS).forEach(renderBadge);
 
+    window.updateAuthUI = (user) => {
+        const guestJoinBtn = document.getElementById('guestJoinBtn');
+        const logoutBtn = document.getElementById('btnLogout');
+        const billingStatePro = document.getElementById('billingStatePro');
+        const billingStateStandard = document.getElementById('billingStateStandard');
+
+        if (user) {
+            // AUTHENTICATED
+            guestJoinBtn?.classList.add('hidden');
+            if (logoutBtn) {
+                logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
+                logoutBtn.style.color = 'var(--text-primary)';
+            }
+            if (billingStatePro && billingStateStandard) {
+                if (isPro) {
+                    billingStatePro.classList.remove('hidden');
+                    billingStateStandard.classList.add('hidden');
+                } else {
+                    billingStatePro.classList.add('hidden');
+                    billingStateStandard.classList.remove('hidden');
+                }
+            }
+        } else {
+            // LOGGED OUT
+            if (window.isGuestMode) {
+                guestJoinBtn?.classList.remove('hidden');
+                if (logoutBtn) {
+                    logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Log In / Sign Up';
+                    logoutBtn.style.color = 'var(--accent)';
+                }
+            } else {
+                guestJoinBtn?.classList.add('hidden');
+            }
+            billingStatePro?.classList.add('hidden');
+            billingStateStandard?.classList.remove('hidden');
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
     // Render reset time string
     const getResetIn = () => {
         const now = new Date();
@@ -3190,15 +3229,8 @@ const initApp = () => {
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     
-                    // Update Settings Button for Authenticated User
-                    const logoutBtn = document.getElementById('btnLogout');
-                    if (logoutBtn) {
-                        logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
-                        logoutBtn.style.background = 'rgba(255,255,255,0.02)';
-                        logoutBtn.style.color = 'var(--text-primary)';
-                        logoutBtn.style.borderColor = 'rgba(255,255,255,0.1)';
-                    }
-                    
+                    // Centralized UI Update (V4.8.9)
+                    window.updateAuthUI(user);
                     updateIcons();
                     
                     // 2. ASYNC BACKGROUND SYNC (Non-blocking)
@@ -3218,6 +3250,8 @@ const initApp = () => {
                                     console.log(`[ViralReels] Niche Restored from DB: ${data.niche}`);
                                 }
                                 
+                                // Refresh UI with DB values
+                                window.updateAuthUI(user);
                                 renderAllBadges();
                                 
                                 // Update billing UI if visible
@@ -3245,9 +3279,17 @@ const initApp = () => {
                         if (localStorage.getItem('vr_guest_mode') === 'true') {
                             setupMockAuth();
                         } else {
+                            // Strictly logged out
+                            window.updateAuthUI(null);
                             authOverlay.classList.remove('hidden');
                             appContainer.classList.add('hidden');
                         }
+                    } else {
+                        // Bypass is active, show the app
+                        window.isGuestMode = false;
+                        window.updateAuthUI({ email: 'reviewer@viralreels.com' });
+                        authOverlay.classList.add('hidden');
+                        appContainer.classList.remove('hidden');
                     }
                 }
             });
@@ -3372,17 +3414,8 @@ const initApp = () => {
             if (scoutPill) scoutPill.classList.add('active');
         }
         
-        // Reveal Guest Join CTA
-        document.getElementById('guestJoinBtn')?.classList.remove('hidden');
-        
-        // Update Log Out button to Log In for guests
-        const logoutBtn = document.getElementById('btnLogout');
-        if (logoutBtn) {
-            logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Log In / Sign Up';
-            logoutBtn.style.background = 'var(--gradient-premium)';
-            logoutBtn.style.color = 'black';
-            logoutBtn.style.borderColor = 'transparent';
-        }
+        // Centralized UI Update for Guest Mode
+        window.updateAuthUI(null);
         
         authOverlay.classList.add('hidden');
         appContainer.classList.remove('hidden');
