@@ -1879,7 +1879,7 @@ body.keyboard-mobile .chat-input-anchored {
     /* 1. App Container & Layout Fluidity */
     .app-layout {
         padding: 12px;
-        padding-bottom: 120px; /* Space for dual-row nav */
+        padding-bottom: 80px; /* Reduced for single-row nav */
     }
 
     .auth-card {
@@ -1908,8 +1908,8 @@ body.keyboard-mobile .chat-input-anchored {
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         justify-content: flex-start !important;
-        padding: 12px 16px !important; 
-        padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 8px) !important;
+        padding: 10px 16px !important; 
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
         gap: 12px !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -1924,10 +1924,7 @@ body.keyboard-mobile .chat-input-anchored {
         backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
         border-top: none !important;
-        box-shadow: none !important; /* Removes the dark gradient bar glitch above nav */
-        /* Scroll Clue Mask - Adjusted for better visibility */
-        mask-image: linear-gradient(to right, black 85%, transparent 100%);
-        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        box-shadow: none !important;
     }
     
     .bottom-nav::-webkit-scrollbar { display: none; }

@@ -1878,7 +1878,7 @@ body.keyboard-mobile .chat-input-anchored {
     /* 1. App Container & Layout Fluidity */
     .app-layout {
         padding: 12px;
-        padding-bottom: 120px; /* Space for dual-row nav */
+        padding-bottom: 80px; /* Reduced for single-row nav */
     }
 
     .auth-card {
@@ -1905,7 +1905,8 @@ body.keyboard-mobile .chat-input-anchored {
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         justify-content: flex-start !important;
-        padding: 12px !important;
+        padding: 10px 16px !important;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
         gap: 16px !important;
         width: 100% !important;
         max-width: 100vw !important;
