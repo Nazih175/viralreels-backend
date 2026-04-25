@@ -1922,6 +1922,7 @@ body.keyboard-mobile .chat-input-anchored {
         scrollbar-width: none;
         background: rgba(10, 10, 15, 0.98) !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
+        box-shadow: none !important; /* Removes the dark gradient bar glitch above nav */
         /* Scroll Clue Mask - Adjusted for better visibility */
         mask-image: linear-gradient(to right, black 85%, transparent 100%);
         -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
