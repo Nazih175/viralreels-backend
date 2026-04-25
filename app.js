@@ -3165,6 +3165,9 @@ const initApp = () => {
                 const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
                 if (!user && isBypassActive) {
                     console.log("[ViralReels] Re-activating Reviewer Bypass Session...");
+                    window.isGuestMode = false; // Fix: Bypass user is NOT a guest
+                    localStorage.removeItem('vr_guest_mode');
+                    document.getElementById('guestJoinBtn')?.classList.add('hidden');
                     authOverlay.classList.add('hidden');
                     appContainer.classList.remove('hidden');
                     return;
@@ -3200,6 +3203,13 @@ const initApp = () => {
                                 isPro = !!data.isPro; 
                                 localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
                                 console.log(`[ViralReels] Pro Status Refreshed: ${isPro ? 'PRO' : 'FREE'}`);
+                                
+                                // Restore User Niche from DB
+                                if (data.niche) {
+                                    localStorage.setItem('vr_selected_niche', data.niche);
+                                    console.log(`[ViralReels] Niche Restored from DB: ${data.niche}`);
+                                }
+                                
                                 renderAllBadges();
                                 
                                 // Update billing UI if visible
@@ -3246,6 +3256,9 @@ const initApp = () => {
                     if (email.toLowerCase() === 'reviewer@viralreels.com' && pass === 'ViralReview2026!') {
                         localStorage.setItem('vr_pro_status', 'true');
                         localStorage.setItem('vr_bypass_active', 'true');
+                        window.isGuestMode = false;
+                        localStorage.removeItem('vr_guest_mode');
+                        document.getElementById('guestJoinBtn')?.classList.add('hidden');
                         // Fake a success login to satisfy the crawler
                         // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
