@@ -3083,6 +3083,7 @@ const initApp = () => {
 
                 if (user) {
                     window.isGuestMode = false;
+                    localStorage.removeItem('vr_guest_mode');
                     document.getElementById('guestJoinBtn')?.classList.add('hidden');
 
                     // 1. IMMEDIATE UI TRANSITION (Priority 1)
@@ -3133,8 +3134,13 @@ const initApp = () => {
                 } else {
                     // Only show login if NO BYPASS and NO USER
                     if (!isBypassActive) {
-                        authOverlay.classList.remove('hidden');
-                        appContainer.classList.add('hidden');
+                        // Check for persisted guest mode
+                        if (localStorage.getItem('vr_guest_mode') === 'true') {
+                            setupMockAuth();
+                        } else {
+                            authOverlay.classList.remove('hidden');
+                            appContainer.classList.add('hidden');
+                        }
                     }
                 }
             });
@@ -3295,8 +3301,9 @@ const initApp = () => {
         });
     }
 
-    // Check for persisted guest mode
-    if (localStorage.getItem('vr_guest_mode') === 'true') {
+    // Check for persisted guest mode — but only if Firebase auth is NOT active
+    // (If Firebase is active, onAuthStateChanged will handle login vs guest)
+    if (!auth && localStorage.getItem('vr_guest_mode') === 'true') {
         setupMockAuth();
     }
 
