@@ -117,7 +117,7 @@ body.light-theme {
 body.light-theme .cal-day { background: #f9fafb; border-color: rgba(0,0,0,0.05); }
 body.light-theme .cal-day .day-num { color: #111827; }
 body.light-theme .hashtag { background: rgba(0,0,0,0.03); color: #111827; border-color: rgba(0,0,0,0.08); }
-body.light-theme .bottom-nav { background: rgba(255,255,255,0.98); border-top: 1px solid rgba(0,0,0,0.1); box-shadow: 0 -4px 20px rgba(0,0,0,0.03); }
+body.light-theme .bottom-nav { background: rgba(255,255,255,0.98); border-top: none; box-shadow: none; }
 body.light-theme .nav-item { color: #6b7280; }
 body.light-theme .nav-item.active { background: #f3f4f6; color: #111827; }
 body.light-theme .nav-item:hover { background: #f3f4f6; }
