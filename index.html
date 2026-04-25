@@ -645,9 +645,6 @@
                 <button class="btn-primary header-btn hidden" id="guestJoinBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
                     <i data-lucide="user-plus"></i> <span>Join Now</span>
                 </button>
-                <button class="btn-primary header-btn hidden" id="headerGoProBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
-                    <i data-lucide="crown"></i> <span>Go Pro</span>
-                </button>
                 <button class="btn-text header-btn" id="aboutBtn" aria-label="About ViralReels AI" title="Learn more about tools"><i data-lucide="info"></i></button>
                 <button class="btn-text header-btn" id="settingsBtn" aria-label="App Settings and Profile" title="Manage account and data"><i data-lucide="settings"></i></button>
             </div>
@@ -1509,8 +1506,50 @@
                 </div>
             </section>
 
-
+            <!-- Zenith Certification Footer (Now inside scrollable area) -->
+            <footer class="version-badge-footer" style="padding-bottom: 2rem; opacity: 0.3;">
+                <div class="flex items-center gap-2 justify-center">
+                    <div class="w-1.5 h-1.5 bg-green rounded-full animate-pulse"></div>
+                    <p class="text-[8px] text-muted tracking-widest">ZENITH V4.9.0-ULTIMATE (IRON LOCK SECURED)</p>
+                </div>
+            </footer>
         </main>
+
+        <!-- 12-Icon Bottom Navigation -->
+        <nav class="bottom-nav">
+            <!-- Row 1 -->
+            <button class="nav-item active nav-strategy" id="navAnalyze" data-tab="analyze" aria-label="Analyze View"><i
+                    data-lucide="bar-chart-2"></i><span>Analyze</span></button>
+            <button class="nav-item nav-creation" id="navHooks" data-tab="hooks" aria-label="Hooks Engine"><i
+                    data-lucide="magnet"></i><span>Hooks</span></button>
+            <button class="nav-item nav-strategy" id="navTracker" data-tab="tracker" aria-label="Hook Tracker"><i
+                    data-lucide="archive"></i><span>Tracker</span></button>
+            <button class="nav-item nav-workflow" id="navCalendar" data-tab="calendar" aria-label="Content Calendar"><i
+                    data-lucide="calendar"></i><span>Calendar</span></button>
+            <button class="nav-item nav-creation" id="navCaptions" data-tab="captions" aria-label="Captions Generator"><i
+                    data-lucide="type"></i><span>Captions</span></button>
+            <button class="nav-item nav-creation" id="navTags" data-tab="tags" aria-label="Hashtag Generator"><i
+                    data-lucide="hash"></i><span>Tags</span></button>
+
+            <!-- Row 2 -->
+            <button class="nav-item nav-workflow" id="navChecklist" data-tab="checklist" aria-label="Pre-publish Checklist"><i
+                    data-lucide="check-square"></i><span>Checklist</span></button>
+            <button class="nav-item nav-strategy" id="navTrends" data-tab="trends" aria-label="Trends Radar"><i
+                    data-lucide="trending-up"></i><span>Trends</span></button>
+            <button class="nav-item nav-creation" id="navRewrite" data-tab="rewrite" aria-label="Script Rewriter"><i
+                    data-lucide="file-text"></i><span>Rewrite</span></button>
+            <button class="nav-item nav-workflow" id="navSaved" data-tab="saved" aria-label="Saved Vault"><i
+                    data-lucide="save"></i><span>Saved</span></button>
+
+            <button class="nav-item premium-nav-item nav-premium" id="navVideoAI" data-tab="videoai"
+                aria-label="Pro Video AI Scanning">
+                <i data-lucide="video" class="text-purple"></i><span>Video AI</span><i data-lucide="crown" class="crown-badge"></i>
+            </button>
+            <button class="nav-item premium-nav-item nav-premium" id="navAiChat" data-tab="chat"
+                aria-label="Pro AI Consultant Chat">
+                <i data-lucide="sparkles" class="text-purple"></i><span>AI Chat</span><i data-lucide="crown" class="crown-badge"></i>
+            </button>
+        </nav>
 
         <!-- Add Event Modal -->
         <div id="calendarEventModal" class="fullscreen-overlay z-paywall hidden">
@@ -1570,43 +1609,7 @@
         </div>
     </div>
 
-    <!-- 12-Icon Bottom Navigation (Direct Body Child for perfect bottom anchoring) -->
-    <nav class="bottom-nav">
-        <!-- Row 1 -->
-        <button class="nav-item active nav-strategy" id="navAnalyze" data-tab="analyze" aria-label="Analyze View"><i
-                data-lucide="bar-chart-2"></i><span>Analyze</span></button>
-        <button class="nav-item nav-creation" id="navHooks" data-tab="hooks" aria-label="Hooks Engine"><i
-                data-lucide="magnet"></i><span>Hooks</span></button>
-        <button class="nav-item nav-strategy" id="navTracker" data-tab="tracker" aria-label="Hook Tracker"><i
-                data-lucide="archive"></i><span>Tracker</span></button>
-        <button class="nav-item nav-workflow" id="navCalendar" data-tab="calendar" aria-label="Content Calendar"><i
-                data-lucide="calendar"></i><span>Calendar</span></button>
-        <button class="nav-item nav-creation" id="navCaptions" data-tab="captions" aria-label="Captions Generator"><i
-                data-lucide="type"></i><span>Captions</span></button>
-        <button class="nav-item nav-creation" id="navTags" data-tab="tags" aria-label="Hashtag Generator"><i
-                data-lucide="hash"></i><span>Tags</span></button>
-
-        <!-- Row 2 -->
-        <button class="nav-item nav-workflow" id="navChecklist" data-tab="checklist" aria-label="Pre-publish Checklist"><i
-                data-lucide="check-square"></i><span>Checklist</span></button>
-        <button class="nav-item nav-strategy" id="navTrends" data-tab="trends" aria-label="Trends Radar"><i
-                data-lucide="trending-up"></i><span>Trends</span></button>
-        <button class="nav-item nav-creation" id="navRewrite" data-tab="rewrite" aria-label="Script Rewriter"><i
-                data-lucide="file-text"></i><span>Rewrite</span></button>
-        <button class="nav-item nav-workflow" id="navSaved" data-tab="saved" aria-label="Saved Vault"><i
-                data-lucide="save"></i><span>Saved</span></button>
-
-        <button class="nav-item premium-nav-item nav-premium" id="navVideoAI" data-tab="videoai"
-            aria-label="Pro Video AI Scanning">
-            <i data-lucide="video" class="text-purple"></i><span>Video AI</span><i data-lucide="crown" class="crown-badge"></i>
-        </button>
-        <button class="nav-item premium-nav-item nav-premium" id="navAiChat" data-tab="chat"
-            aria-label="Pro AI Consultant Chat">
-            <i data-lucide="sparkles" class="text-purple"></i><span>AI Chat</span><i data-lucide="crown" class="crown-badge"></i>
-        </button>
-    </nav>
-
-    <!-- Third-Party Integrations -->
+    <!-- Third-Party Integrations for Monetization & Persistence -->
     <script src="https://js.stripe.com/v3/"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>

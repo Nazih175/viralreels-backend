@@ -9,7 +9,7 @@ window.VR_BOOT_TIME = Date.now();
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-
+            console.log("ViralReels AI System: Zenith V4.6.8-ULTIMATE Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
@@ -203,7 +203,7 @@ const initApp = () => {
         }, 500);
     }
 
-
+    console.log("ViralReels AI System: Zenith V4.6.8 Global Optimization Active");
         
     // -- Hardening Helper: safeListen --
     const safeListen = (id, event, callback) => {
@@ -723,7 +723,6 @@ const initApp = () => {
 
     window.updateAuthUI = (user) => {
         const guestJoinBtn = document.getElementById('guestJoinBtn');
-        const headerGoProBtn = document.getElementById('headerGoProBtn');
         const logoutBtn = document.getElementById('btnLogout');
         const billingStatePro = document.getElementById('billingStatePro');
         const billingStateStandard = document.getElementById('billingStateStandard');
@@ -731,13 +730,6 @@ const initApp = () => {
         if (user) {
             // AUTHENTICATED
             guestJoinBtn?.classList.add('hidden');
-            
-            if (isPro) {
-                headerGoProBtn?.classList.add('hidden');
-            } else {
-                headerGoProBtn?.classList.remove('hidden');
-            }
-
             if (logoutBtn) {
                 logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
                 logoutBtn.style.color = 'var(--text-primary)';
@@ -753,7 +745,6 @@ const initApp = () => {
             }
         } else {
             // LOGGED OUT
-            headerGoProBtn?.classList.add('hidden');
             if (window.isGuestMode) {
                 guestJoinBtn?.classList.remove('hidden');
                 if (logoutBtn) {
@@ -2791,7 +2782,7 @@ const initApp = () => {
             };
             localStorage.setItem('vr_persona', JSON.stringify(persona));
             applyNicheTheme(persona.niche);
-            showToast("Profile Updated");
+            showToast("Zenith Pulse Updated");
         };
 
         personaNicheEl.addEventListener('change', updatePersona);
@@ -3442,12 +3433,6 @@ const initApp = () => {
     document.getElementById('guestJoinBtn')?.addEventListener('click', () => {
         window.triggerHaptic('heavy');
         document.getElementById('authOverlay').classList.remove('hidden');
-    });
-
-    // Wire Header Go Pro Button
-    document.getElementById('headerGoProBtn')?.addEventListener('click', () => {
-        window.triggerHaptic('heavy');
-        document.getElementById('paywallOverlay').classList.remove('hidden');
     });
 
     // Wire Guest Button

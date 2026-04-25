@@ -1784,7 +1784,30 @@ body.keyboard-mobile .chat-input-anchored {
     line-height: 1.6;
 }
 
+/* Version Badge (Elite Footer) */
+.version-badge-footer {
+    padding: 4rem 1rem 6rem;
+    text-align: center;
+    opacity: 0.2;
+    transition: opacity 0.5s ease;
+    cursor: default;
+}
 
+.version-badge-footer:hover { opacity: 0.9; }
+
+.seal-wrap { 
+    display: flex; flex-direction: column; align-items: center; gap: 8px; 
+}
+
+.zenith-seal {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    padding: 4px 20px;
+}
 /* --- HOLOGRAPHIC SCANNER (ZENITH V4.6) --- */
 .elite-scanner {
     position: absolute;
