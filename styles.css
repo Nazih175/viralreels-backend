@@ -1998,6 +1998,11 @@ body.keyboard-mobile .chat-input-anchored {
         text-align: left !important;
     }
 
+    /* Fix visual dead-space above bottom nav */
+    .pb-heavy {
+        padding-bottom: 80px !important; 
+    }
+
     /* Analyze Buttons Centering - Strictly Selective */
     .analyze-btn-row {
         flex-direction: column !important;
