@@ -60,7 +60,7 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=4.7.9">
+    <link rel="stylesheet" href="styles.css?v=4.8.0">
 
     <!-- 
         GOOGLE VERIFICATION CONFIG 
@@ -576,6 +576,43 @@
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Niche Picker Gate Modal -->
+    <div id="nichePickerOverlay" class="fullscreen-overlay z-auth hidden">
+        <div class="auth-card" style="max-width:400px; padding:2rem 1.5rem;">
+            <div class="flex justify-center mb-4">
+                <div style="width:56px; height:56px; border-radius:16px; background: var(--gradient-primary); display:flex; align-items:center; justify-content:center;">
+                    <i data-lucide="compass" style="width:28px; height:28px; color:white;"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold mb-1">What's Your Niche?</h2>
+            <p class="text-sm text-secondary mb-4">Pick your content focus so our AI can tailor every response to your audience.</p>
+            
+            <div id="nicheChips" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:1.25rem;">
+                <button class="niche-chip" data-niche="AI / Tech">🤖 AI / Tech</button>
+                <button class="niche-chip" data-niche="Fitness">💪 Fitness</button>
+                <button class="niche-chip" data-niche="Finance">💰 Finance</button>
+                <button class="niche-chip" data-niche="Food / Cooking">🍳 Food</button>
+                <button class="niche-chip" data-niche="Travel">✈️ Travel</button>
+                <button class="niche-chip" data-niche="Fashion / Beauty">💄 Beauty</button>
+                <button class="niche-chip" data-niche="Gaming">🎮 Gaming</button>
+                <button class="niche-chip" data-niche="Music">🎵 Music</button>
+                <button class="niche-chip" data-niche="Education">📚 Education</button>
+                <button class="niche-chip" data-niche="Comedy">😂 Comedy</button>
+                <button class="niche-chip" data-niche="Health / Wellness">🧘 Wellness</button>
+                <button class="niche-chip" data-niche="Real Estate">🏠 Real Estate</button>
+            </div>
+
+            <div style="position:relative; width:100%; margin-bottom:1rem;">
+                <input type="text" id="nicheCustomInput" class="text-input w-full" placeholder="Or type your own niche..." style="padding-right:48px;">
+            </div>
+
+            <button id="nicheConfirmBtn" class="btn-primary w-full pulse-btn" disabled>
+                <i data-lucide="check-circle"></i> Lock In My Niche
+            </button>
+            <p class="text-xs text-muted mt-3" style="opacity:0.5;">You can change this anytime in Settings.</p>
         </div>
     </div>
 
@@ -1556,13 +1593,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=4.7.9"></script>
+    <script src="app.js?v=4.8.0"></script>
     
     <!-- Zenith Certification Footer -->
     <footer class="version-badge-footer">
         <div class="flex items-center gap-2" style="opacity: 0.8;">
             <div class="w-1.5 h-1.5 bg-green rounded-full animate-pulse"></div>
-            <p class="text-xs text-muted mb-6 tracking-widest opacity-30">ZENITH V4.7.9-ULTIMATE (IRON LOCK SECURED)</p>
+            <p class="text-xs text-muted mb-6 tracking-widest opacity-30">ZENITH V4.8.0-ULTIMATE (IRON LOCK SECURED)</p>
         </div>
     </footer>
 

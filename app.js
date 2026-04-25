@@ -2826,11 +2826,100 @@ const initApp = () => {
 
     function endTour() {
         onboardingOverlay.classList.add('hidden');
-        isOnboardingComplete = true; // Sync internal variable
+        isOnboardingComplete = true;
         localStorage.setItem('vr_onboarding_complete', 'true');
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('highlight-nav'));
-        showToast("Tour complete! You're ready to dominate.");
+        
+        // After tour, show niche picker if niche not already set
+        const currentPersona = safeGet('vr_persona', { niche: '', tone: 50 });
+        if (!currentPersona.niche || currentPersona.niche.trim() === '') {
+            setTimeout(() => showNichePicker(), 400);
+        } else {
+            showToast("Tour complete! You're ready to dominate.");
+        }
     }
+
+    // --- NICHE PICKER GATE SYSTEM ---
+    function showNichePicker() {
+        const overlay = document.getElementById('nichePickerOverlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    function hasNicheSet() {
+        const p = safeGet('vr_persona', { niche: '', tone: 50 });
+        return p.niche && p.niche.trim() !== '';
+    }
+
+    // Niche chip selection
+    const nicheChipsContainer = document.getElementById('nicheChips');
+    const nicheCustomInput = document.getElementById('nicheCustomInput');
+    const nicheConfirmBtn = document.getElementById('nicheConfirmBtn');
+    let selectedNiche = '';
+
+    if (nicheChipsContainer) {
+        nicheChipsContainer.addEventListener('click', (e) => {
+            const chip = e.target.closest('.niche-chip');
+            if (!chip) return;
+            
+            document.querySelectorAll('.niche-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            selectedNiche = chip.dataset.niche;
+            if (nicheCustomInput) nicheCustomInput.value = '';
+            if (nicheConfirmBtn) nicheConfirmBtn.disabled = false;
+            window.triggerHaptic?.('light');
+        });
+    }
+
+    if (nicheCustomInput) {
+        nicheCustomInput.addEventListener('input', () => {
+            const val = nicheCustomInput.value.trim();
+            if (val.length > 0) {
+                document.querySelectorAll('.niche-chip').forEach(c => c.classList.remove('selected'));
+                selectedNiche = val;
+                if (nicheConfirmBtn) nicheConfirmBtn.disabled = false;
+            } else if (!document.querySelector('.niche-chip.selected')) {
+                selectedNiche = '';
+                if (nicheConfirmBtn) nicheConfirmBtn.disabled = true;
+            }
+        });
+    }
+
+    if (nicheConfirmBtn) {
+        nicheConfirmBtn.addEventListener('click', () => {
+            if (!selectedNiche) return;
+            
+            // Save to persona system
+            persona.niche = selectedNiche;
+            localStorage.setItem('vr_persona', JSON.stringify(persona));
+            
+            // Update the settings input too
+            const personaNicheEl = document.getElementById('personaNiche');
+            if (personaNicheEl) personaNicheEl.value = selectedNiche;
+            
+            // Apply niche theme
+            if (typeof applyNicheTheme === 'function') applyNicheTheme(selectedNiche);
+            
+            // Close modal
+            document.getElementById('nichePickerOverlay')?.classList.add('hidden');
+            
+            showToast(`Niche locked: ${selectedNiche}. AI is now tailored to you!`);
+            window.triggerHaptic?.('heavy');
+        });
+    }
+
+    // Gate: Intercept nav clicks if no niche is set
+    document.querySelectorAll('.nav-item').forEach(navBtn => {
+        navBtn.addEventListener('click', (e) => {
+            if (!hasNicheSet() && localStorage.getItem('vr_onboarding_complete') === 'true') {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                showNichePicker();
+            }
+        }, true); // 'true' = capture phase, fires BEFORE the normal nav handler
+    });
 
 
     if (onboardingNextBtn) {
