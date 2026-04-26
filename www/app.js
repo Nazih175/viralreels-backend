@@ -864,11 +864,18 @@ const initApp = () => {
     const showToast = (msg, duration = 3000) => {
         const t = document.createElement('div');
         t.className = 'toast';
-        t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
+        
+        // Smart Icon Detection
+        let icon = 'info';
+        if (msg.toLowerCase().includes('success') || msg.toLowerCase().includes('complete') || msg.toLowerCase().includes('locked')) icon = 'check-circle';
+        if (msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('danger')) icon = 'alert-triangle';
+        if (msg.toLowerCase().includes('activat') || msg.toLowerCase().includes('zenith')) icon = 'zap';
+
+        t.innerHTML = `<i data-lucide="${icon}" style="width:16px; margin-right:8px;"></i> ${msg}`;
         document.body.appendChild(t);
-        window.triggerHaptic('light');
-        window.playNeuralSound('click'); // ViralReels Feedback pulse
+        window.triggerHaptic(icon === 'alert-triangle' ? 'medium' : 'light');
         updateIcons();
+        
         setTimeout(() => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
@@ -2632,7 +2639,14 @@ const initApp = () => {
             // AI thinking
             const aiDiv = document.createElement('div');
             aiDiv.className = 'chat-bubble bubble-ai elite-bubble result-appear ai-streaming';
-            aiDiv.innerHTML = '<div class="chat-bubble-content"><div class="loader" style="width:12px; height:12px;"></div></div>';
+            aiDiv.innerHTML = `
+                <div class="chat-bubble-content">
+                    <div class="flex flex-col gap-2">
+                        <div class="skeleton-bubble" style="width: 140px;"></div>
+                        <div class="skeleton-bubble" style="width: 90px;"></div>
+                    </div>
+                </div>
+            `;
             chatMessages.appendChild(aiDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 

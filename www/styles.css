@@ -2439,8 +2439,71 @@ body.keyboard-mobile .chat-input-anchored {
 .tab-view {
     animation: tab-fade-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* --- ELITE UX POLISH (V6.4.0) --- */
+.shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
 
-@keyframes tab-fade-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+}
+
+/* Tactile Button Feedback */
+button:active, .nav-item:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease;
+}
+
+.interactive-glow:hover {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Horizontal Scroll Fades */
+.daily-pulse-section, .storyboard-gallery {
+    position: relative;
+}
+
+.daily-pulse-section::after, .storyboard-gallery::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(to left, var(--bg-dark), transparent);
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Enhanced Toasts */
+.toast {
+    background: rgba(20, 20, 30, 0.9) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 10px rgba(168, 85, 247, 0.2) !important;
+    padding: 12px 20px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Smooth Skeleton Bubbles for Chat */
+.skeleton-bubble {
+    width: 70%;
+    height: 40px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px 12px 12px 2px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-bubble::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite;
 }
