@@ -632,11 +632,17 @@ const initApp = () => {
     };
     const isInTrial = () => getTrialInfo().active;
 
+    // --- MISSING LOGIC: LIMIT BLOCKER (V4.6.6) ---
     const getUsage = () => {
         const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
+        const isTrial = isInTrial();
+        const baseLimits = isTrial ? 
+            { analyze: 50, hooks: 50, captions: 50, trends: 50, rewrite: 50 } : 
+            LIMITS;
+
         if (!stored || stored.date !== getToday() || typeof stored.analyze === 'undefined') {
             // New day — reset to full limits
-            const fresh = { date: getToday(), ...LIMITS };
+            const fresh = { date: getToday(), ...baseLimits };
             localStorage.setItem('vr_usage', JSON.stringify(fresh));
             return fresh;
         }
@@ -647,12 +653,11 @@ const initApp = () => {
 
     const getRemainingUses = (tool) => {
         if (isPro) return 999;
-        if (isInTrial()) return TRIAL_LIMIT;
         return getUsage()[tool] ?? LIMITS[tool];
     };
 
     const consumeUse = (tool) => {
-        if (isPro || isInTrial()) return; // no consumption during trial or pro
+        if (isPro) return; // no consumption during pro
         const usage = getUsage();
         if (usage[tool] > 0) usage[tool]--;
         saveUsage(usage);
@@ -3285,8 +3290,11 @@ const initApp = () => {
         });
     }
 
-    // Check for persisted guest mode
-    if (localStorage.getItem('vr_guest_mode') === 'true') {
+    // Check for persisted guest mode — but only if Firebase auth is NOT active
+    // And ensure we aren't in the middle of a Firebase redirect
+    const isRedirecting = window.location.search.includes('apiKey') || window.location.hash.includes('access_token');
+    
+    if (!auth && localStorage.getItem('vr_guest_mode') === 'true' && !isRedirecting) {
         setupMockAuth();
     }
 
