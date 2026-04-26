@@ -3045,7 +3045,55 @@ const initApp = () => {
         
         // Initial Theme Apply
         applyNicheTheme(persona.niche);
-    }
+
+        // -- PRIVACY & NOTIFICATION POLISH (V6.3.1) --
+        const privacyLockToggle = document.getElementById('privacyLockToggle');
+        const notifToggle = document.getElementById('notifToggle');
+        const savedView = document.getElementById('view-saved');
+        const trackerView = document.getElementById('view-tracker');
+
+        if (privacyLockToggle) {
+            privacyLockToggle.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    savedView.classList.add('vault-locked');
+                    trackerView.classList.add('vault-locked');
+                    window.triggerHaptic('medium');
+                    showToast("Vault Locked 🔒");
+                } else {
+                    savedView.classList.remove('vault-locked');
+                    trackerView.classList.remove('vault-locked');
+                    window.triggerHaptic('light');
+                    showToast("Vault Unlocked");
+                }
+                localStorage.setItem('vr_privacy_lock', e.target.checked);
+            });
+            // Initial State
+            if (localStorage.getItem('vr_privacy_lock') === 'true') {
+                privacyLockToggle.checked = true;
+                savedView.classList.add('vault-locked');
+                trackerView.classList.add('vault-locked');
+            }
+        }
+
+        if (notifToggle) {
+            notifToggle.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    if ("Notification" in window) {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === "granted") {
+                                showToast("Smart Alerts Activated! ⚡");
+                                window.triggerHaptic('success');
+                            } else {
+                                showToast("Notifications blocked.");
+                                notifToggle.checked = false;
+                            }
+                        });
+                    }
+                }
+                localStorage.setItem('vr_notifs_enabled', e.target.checked);
+            });
+            if (localStorage.getItem('vr_notifs_enabled') === 'true') notifToggle.checked = true;
+        }
 
     // -- EXPORT LOGIC --
     function downloadCSV(data, filename) {

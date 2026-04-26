@@ -436,16 +436,30 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
-                <div class="flex items-center justify-between p-2 mb-2">
-                    <div>
-                        <strong class="text-primary font-bold text-sm block">App Language</strong>
                     </div>
-                    <div class="custom-select-wrapper" style="width: 120px;">
-                        <select class="text-sm bg-card-dark" style="padding: 6px;">
-                            <option>English</option>
-                            <option>Español</option>
-                            <option>Français</option>
-                        </select><i data-lucide="chevron-down" class="select-icon"></i>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-xs text-secondary uppercase tracking-wide font-bold mb-3 border-bottom pb-2 border-subtle">Privacy & Smart Alerts</h4>
+                    <div class="flex items-center justify-between p-2 mb-2">
+                        <div>
+                            <strong class="text-primary font-bold text-sm block">Smart Notifications</strong>
+                            <span class="text-xs text-secondary">Get alerted for new viral concepts & trends</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notifToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between p-2 mb-2">
+                        <div>
+                            <strong class="text-primary font-bold text-sm block">Privacy Vault Lock</strong>
+                            <span class="text-xs text-secondary">Blur saved hooks & scripts for privacy</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="privacyLockToggle">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -1347,11 +1361,12 @@
 
                 <div id="savedEmpty" class="empty-state glass-card mt-4">
                     <div class="empty-icon-wrap">
-                        <i data-lucide="shield-check" class="lg-icon mb-2"></i>
+                        <i data-lucide="save" class="lg-icon mb-2"></i>
                         <div class="glow-ring"></div>
                     </div>
                     <h3 class="font-outfit uppercase tracking-tighter">Vault Empty</h3>
-                    <p>Your library of optimized scripts is waiting. Use the Rewrite engine to secure your viral templates here.</p>
+                    <p>Your library of optimized scripts is waiting. Secure your first viral template now.</p>
+                    <button class="btn-primary mt-4" onclick="document.getElementById('navRewrite').click()" style="padding: 10px 24px;">Rewrite Now</button>
                 </div>
                 <div id="savedList" class="flex flex-col gap-2 mt-4"></div>
             </section>
