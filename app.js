@@ -3618,6 +3618,7 @@ const initApp = () => {
                             appContainer.classList.add('hidden');
                         } else {
                             // Bypass is active, show the app
+                            isPro = true; // Reviewer gets full Pro access
                             window.updateAuthUI({ email: 'reviewer@viralreels.com' });
                             authOverlay.classList.add('hidden');
                             appContainer.classList.remove('hidden');
