@@ -17,57 +17,36 @@ let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
 let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
 let savedTheme = localStorage.getItem('vr_theme') || 'dark';
 let currentAnalyzedIdea = null;
+let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
 
-// Service Worker Registration (PWA)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    // --- SERVICE WORKER (PWA STABILITY) ---
+    if ('serviceWorker' in navigator) {
+        let refreshing = false;
         navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI System: Engine Active");
             reg.onupdatefound = () => {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // --- THE IRON LOCK (ViralReels V4.5) ---
-                        // 1. Temporal Shield: No reloads in first 5s (Extended for Auth stability)
-                        const isBooting = (Date.now() - window.VR_BOOT_TIME) < 5000;
-                        // 2. Redirect Awareness: No reloads during Firebase Redirect return
-                        const isRedirect = window.location.search.includes('apiKey') || window.location.search.includes('mode') || window.location.hash.includes('access_token');
-                        // 3. Activity Shield: No reloads during active auth
-                        const isAuthVisible = !document.getElementById('authOverlay')?.classList.contains('hidden');
-                        const isLoginSpinning = document.getElementById('authSubmitBtn')?.innerHTML.includes('loader');
-
-                        if (isBooting || isRedirect || isAuthVisible || isLoginSpinning) {
-                            console.log("ViralReels AI: SW Update ready but system is locked. Delaying reload.");
-                            return;
+                        // "Iron Lock": Prevent reload if we're in the middle of boot or critical auth.
+                        const isBooting = (Date.now() - window.VR_BOOT_TIME) < 10000;
+                        if (!isBooting) {
+                            console.log("ViralReels AI: Update ready, refreshing...");
+                            window.location.reload();
                         }
-                        
-                        console.log("New version detected, refreshing...");
-                        window.location.reload();
                     }
                 };
             };
         }).catch(err => console.log('SW setup failed', err));
-    });
 
-    // Handle the 'controllerchange' event (triggered by skipWaiting)
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        
-        const isBooting = (Date.now() - window.VR_BOOT_TIME) < 5000;
-        const isRedirect = window.location.search.includes('apiKey') || window.location.search.includes('mode') || window.location.hash.includes('access_token');
-        const isAuthVisible = !document.getElementById('authOverlay')?.classList.contains('hidden');
-        const isLoginSpinning = document.getElementById('authSubmitBtn')?.innerHTML.includes('loader');
-        
-        if (isBooting || isRedirect || isAuthVisible || isLoginSpinning) {
-            console.log("ViralReels AI: SW Controller change ignored (Iron Lock active).");
-            return;
-        }
-        
-        refreshing = true;
-        window.location.reload();
-    });
-}
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            const isBooting = (Date.now() - window.VR_BOOT_TIME) < 10000;
+            if (isBooting) return; 
+            
+            refreshing = true;
+            window.location.reload();
+        });
+    }
 
 const initApp = () => {
     // 1. Immediate UI Reveal (Dismiss Splash) - MUST BE FIRST
@@ -769,7 +748,7 @@ const initApp = () => {
             headerGoProBtn?.classList.add('hidden');
             if (logoutBtn) {
                 logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Sign In';
-                logoutBtn.style.color = 'var(--text-primary)';
+                logoutBtn.style.color = 'var(--accent-purple)';
             }
             billingStatePro?.classList.add('hidden');
             billingStateStandard?.classList.remove('hidden');
@@ -3561,25 +3540,32 @@ const initApp = () => {
                 }
             });
 
-            // Check Auth State
-            // Zenith V6.0.1: Hardened Auth Persistence Engine
+            // 3. ATTACH AUTH LISTENER
+            if (window.VR_AUTH_LISTENER_ACTIVE) return;
+            window.VR_AUTH_LISTENER_ACTIVE = true;
+
             auth.onAuthStateChanged(async (user) => {
                 try {
-                    // --- PERSISTENT REVIEWER BYPASS ---
                     const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
-                    if (user) {
-                        console.log("[ViralReels] AUTH_RESOLVED: User logged in.", user.email);
-                        localStorage.removeItem('vr_guest_mode');
-
-                        // 1. IMMEDIATE UI TRANSITION (Priority 1)
+                    
+                    // --- IMMEDIATE UI RECOVERY (Priority 1) ---
+                    // This prevents the "Infinite Login Loop" where the overlay flashes back
+                    if (user || isBypassActive) {
                         authOverlay.classList.add('hidden');
                         appContainer.classList.remove('hidden');
+                    }
+
+                    if (user) {
+                        console.log("[ViralReels] AUTH_RESOLVED: Active Session Found", user.email);
                         
-                        // Centralized UI Update (V6.0.1 Robust)
+                        // 1. SYNC LOCAL STATE
+                        isPro = localStorage.getItem('vr_pro_status') === 'true'; 
+                        
+                        // 2. HYDRATE UI
                         window.updateAuthUI(user);
-                        updateIcons();
+                        try { updateIcons(); } catch(e){}
                         
-                        // 2. ASYNC BACKGROUND SYNC (Non-blocking)
+                        // 3. BACKGROUND SYNC
                         (async () => {
                             try {
                                 const db = firebase.firestore();
@@ -3588,56 +3574,39 @@ const initApp = () => {
                                     const data = userDoc.data();
                                     isPro = !!data.isPro; 
                                     localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                                    
-                                    if (data.hasUsedTrial) {
-                                        localStorage.setItem('vr_had_pro', 'true');
-                                    }
-                                    
-                                    if (data.niche) {
-                                        localStorage.setItem('vr_selected_niche', data.niche);
-                                        window.applyNicheTheme?.(data.niche);
-                                    }
-                                    
                                     window.updateAuthUI(user);
-                                    renderAllBadges();
-                                    
-                                    const proManageBtn = document.getElementById('manageBillingBtn');
-                                    if (proManageBtn) {
-                                        proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
-                                        updateIcons();
-                                    }
+                                    try { renderAllBadges(); } catch(e){}
                                 }
                             } catch (dbErr) {
-                                console.warn("[ViralReels] Firestore sync failed. Using local state.", dbErr);
+                                console.warn("[ViralReels] Firestore sync delayed.", dbErr);
                             }
                         })();
 
-                        initTrial();
-                        renderAllBadges();
+                        // 4. SECONDARY INIT
+                        try { initTrial(); } catch(e){}
+                        try { renderAllBadges(); } catch(e){}
                         
                         if (!isOnboardingComplete && !localStorage.getItem('vr_onboarding_complete')) {
-                            document.getElementById('onboardingOverlay').classList.remove('hidden');
+                            document.getElementById('onboardingOverlay')?.classList.remove('hidden');
                         }
                     } else {
                         // NO USER detected
-                        if (!isBypassActive) {
-                            // Strictly logged out - Ensure the login screen is forced
-                            console.log("[ViralReels] AUTH_RESOLVED: User logged out.");
+                        if (isBypassActive) {
+                            console.log("[ViralReels] BYPASS: Reviewer session active.");
+                            isPro = true;
+                            window.updateAuthUI({ email: 'reviewer@viralreels.com' });
+                        } else {
+                            console.log("[ViralReels] AUTH_REQUIRED: Redirecting to login.");
                             window.updateAuthUI(null);
                             authOverlay.classList.remove('hidden');
                             appContainer.classList.add('hidden');
-                        } else {
-                            // Bypass is active, show the app
-                            isPro = true; // Reviewer gets full Pro access
-                            window.updateAuthUI({ email: 'reviewer@viralreels.com' });
-                            authOverlay.classList.add('hidden');
-                            appContainer.classList.remove('hidden');
                         }
                     }
-                } catch (fatalAuthErr) {
-                    console.error("[ViralReels] Fatal Auth Logic Error:", fatalAuthErr);
-                    // Fallback: don't leave user stuck on a broken screen
-                    authOverlay.classList.remove('hidden');
+                } catch (err) {
+                    console.error("[ViralReels] Critical Auth Logic Failure:", err);
+                    if (!auth.currentUser && !localStorage.getItem('vr_bypass_active')) {
+                        authOverlay.classList.remove('hidden');
+                    }
                 }
             });
 
