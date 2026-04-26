@@ -192,6 +192,82 @@ body.no-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 .glow-box { box-shadow: 0 0 40px rgba(67, 97, 238, 0.15) inset; }
 
 /* The Requested Interactive Box Glow */
+/* V6.0 - THE PRECISION UPDATE: Advanced Motion & Glassmorphism */
+.typing-effect {
+    overflow: hidden;
+    border-right: 2px solid var(--accent-purple);
+    white-space: pre-wrap;
+    animation: typing-blink 0.7s step-end infinite;
+}
+
+@keyframes typing-blink {
+    from, to { border-color: transparent }
+    50% { border-color: var(--accent-purple) }
+}
+
+.spring-in {
+    animation: spring-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes spring-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.magnetic-item {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.magnetic-item:active {
+    transform: scale(0.96);
+}
+
+/* Elite Glassmorphism V2 */
+.glass-v2 {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* V6.0 Refine Chips */
+.refine-chip {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.refine-chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-purple);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.refine-chip:active {
+    transform: scale(0.95);
+}
+
+.refinement-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 .interactive-glow { 
     border: 1px solid rgba(157, 78, 221, 0.4) !important; 
     box-shadow: 0 0 25px rgba(157, 78, 221, 0.1) !important; 
@@ -493,12 +569,11 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 /* APP LAYOUT - ELITE INTERACTIVE ENGINE */
 .app-layout { 
     display: flex; flex-direction: column; height: 100%; height: 100dvh; 
-    max-width: 600px; margin: 0 auto; 
+    width: 100%; max-width: 100%; margin: 0; 
     background: rgba(10, 10, 15, 0.25); /* Ultra-Transparent for Maximum Particle Depth */
     position: relative; overflow: hidden;
-    border-left: 1px solid rgba(157, 78, 221, 0.15);
-    border-right: 1px solid rgba(157, 78, 221, 0.15);
-    box-shadow: 0 0 120px rgba(0,0,0,0.95), 0 0 60px rgba(157, 78, 221, 0.15);
+    border: none;
+    box-shadow: none;
     z-index: 10;
     backdrop-filter: blur(8px); /* Maintains Glassmorphism */
 }
@@ -593,8 +668,8 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
     border-top: none; padding: 8px; padding-bottom: env(safe-area-inset-bottom, 12px);
     z-index: var(--z-nav); flex-shrink: 0;
     box-shadow: none;
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 600px;
+    position: fixed; bottom: 0; left: 0; 
+    width: 100%; max-width: 100%;
 }
 .nav-item { 
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; 
@@ -1014,7 +1089,7 @@ textarea { resize: none; } .text-input::placeholder, textarea::placeholder { col
 
 /* Cookie Banner */
 .cookie-banner { position: fixed; bottom: env(safe-area-inset-bottom, 20px); left: 0; right: 0; background: rgba(15, 15, 23, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(157, 78, 221, 0.3); z-index: 50000; padding: 16px 20px; box-shadow: 0 -8px 25px rgba(0,0,0,0.6); }
-.cookie-content { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.cookie-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
 
 /* Button States */
 button:disabled {
@@ -1584,7 +1659,7 @@ body.keyboard-mobile #chatMessages {
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 32px);
-    max-width: 600px;
+    max-width: 1200px;
     background: rgba(10, 10, 15, 0.95);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
@@ -2083,6 +2158,13 @@ body.keyboard-mobile .chat-input-anchored {
         white-space: nowrap !important;
     }
 
+    /* Prevent Logo Overlap on super narrow screens */
+    @media (max-width: 380px) {
+        .brand-text {
+            display: none !important;
+        }
+    }
+
     .top-bar .flex {
         gap: 0.35rem !important;
     }
@@ -2160,4 +2242,144 @@ body.keyboard-mobile .chat-input-anchored {
     color: white;
     box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
     transform: scale(1.05);
+}
+
+/* --- INTEL BADGES (V6.0.2) --- */
+.intel-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent-gold);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.code-snippet {
+    background: rgba(0,0,0,0.3);
+    color: var(--accent-green);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+}
+
+.ai-streaming .chat-bubble-content {
+    border-left: 2px solid var(--accent-purple);
+    padding-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.saved-item-card strong {
+    color: var(--accent-purple);
+}
+
+/* --- VISION INTEGRATION (V6.0.3) --- */
+.image-preview-chip {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--accent-purple);
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
+}
+
+.image-preview-chip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-preview {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--accent-red);
+    color: white;
+    border: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.chat-image-attachment {
+    max-width: 100%;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.chat-image-attachment:hover {
+    transform: scale(1.02);
+}
+/* --- DAILY VIRAL PULSE (V6.3.0) --- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.pulse-card {
+    min-width: 240px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.pulse-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.pulse-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(157, 78, 221, 0.4);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.pulse-card:hover::before {
+    opacity: 1;
+}
+
+.pulse-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(0, 245, 212, 0.1);
+    color: var(--accent-cyan);
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    width: fit-content;
+}
+
+/* Ensure pulse cards look great on mobile */
+@media (max-width: 480px) {
+    .pulse-card {
+        min-width: 200px;
+        padding: 16px;
+    }
 }

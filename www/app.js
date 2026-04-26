@@ -14,7 +14,7 @@ if ('serviceWorker' in navigator) {
                 const installingWorker = reg.installing;
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // --- THE IRON LOCK (Zenith V4.5) ---
+                        // --- THE IRON LOCK (ViralReels V4.5) ---
                         // 1. Temporal Shield: No reloads in first 5s (Extended for Auth stability)
                         const isBooting = (Date.now() - window.VR_BOOT_TIME) < 5000;
                         // 2. Redirect Awareness: No reloads during Firebase Redirect return
@@ -233,6 +233,14 @@ const initApp = () => {
     let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
     let savedTheme = localStorage.getItem('vr_theme') || 'dark';
     let persona = safeGet('vr_persona', { niche: '', tone: 50 });
+    
+    // --- V6.0 BOOT ENGINE: Apply Niche Identity ---
+    // We defer this slightly to ensure the DOM is ready if called from initApp
+    setTimeout(() => {
+        if (typeof applyNicheTheme === 'function' && persona.niche) {
+            window.applyNicheTheme(persona.niche);
+        }
+    }, 100);
 
     // Apply Saved Theme
     if (savedTheme === 'light') document.body.classList.add('light-theme');
@@ -349,9 +357,11 @@ const initApp = () => {
     window.vrCelebrate = (type = 'basic') => {
         if (type === 'basic') {
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#9d4edd', '#4361ee', '#00f5d4'] });
+            window.playNeuralSound?.('generate');
         } else if (type === 'viral') {
             const end = Date.now() + (2 * 1000);
             const colors = ['#ffb703', '#9d4edd', '#ffffff'];
+            window.playNeuralSound?.('pro');
             (function frame() {
                 confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
                 confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
@@ -444,11 +454,8 @@ const initApp = () => {
                 const token = await user.getIdToken();
                 if (!options.headers) options.headers = {};
                 options.headers['Authorization'] = `Bearer ${token}`;
-            } else if (window.isGuestMode) {
-                // Bridge: Send guest token to allow trials without account
-                if (!options.headers) options.headers = {};
-                options.headers['Authorization'] = `Bearer guest-token`;
             }
+
         } catch (authErr) {
             console.warn("[Auth Header] Token fetch issue:", authErr.message);
         }
@@ -536,11 +543,15 @@ const initApp = () => {
             medium: 35,
             heavy: [50, 100, 50],
             success: [30, 50, 30],
+            notification: [20, 100, 20],
             error: [100, 50, 100]
         };
         
         try {
             navigator.vibrate(patterns[type] || 10);
+            if (type === 'success' || type === 'notification') window.playNeuralSound?.('generate');
+            else if (type === 'heavy') window.playNeuralSound?.('pro');
+            else window.playNeuralSound?.('tap');
         } catch (e) {
             console.warn("Haptic Pulse Blocked:", e);
         }
@@ -590,11 +601,10 @@ const initApp = () => {
 
     const getToday = () => new Date().toISOString().split('T')[0];
 
-    // ── TRIAL ENGINE ──
-    const initTrial = () => {
-        if (!localStorage.getItem('vr_trial_start')) {
-            localStorage.setItem('vr_trial_start', new Date().toISOString());
-        }
+    // ── TRIAL ENGINE (DEPRECATED: Using Stripe Trials) ──
+    const initTrial = async () => {
+        // App trial removed per user request: "stripe payment applied before free trial"
+        localStorage.removeItem('vr_trial_start');
     };
 
     // --- MISSING LOGIC: LIMIT BLOCKER (V4.6.6) ---
@@ -608,8 +618,8 @@ const initApp = () => {
             <h3 class="font-bold mb-2">Limit Reached!</h3>
             <p class="text-sm text-secondary mb-4">${msg}</p>
             <div class="flex flex-col gap-2">
-                <button class="btn-primary w-full" onclick="window.trackMilestone('CONVERSION_CLICK', { tool: '${tool}', type: 'LINK_AUTH' }); document.getElementById('authOverlay').classList.remove('hidden')">
-                    <i data-lucide="crown"></i> Start 7-Day Free Trial
+                <button class="btn-primary w-full" onclick="if(window.showProPaywall) window.showProPaywall(); window.trackMilestone('CONVERSION_CLICK', { tool: '${tool}', type: 'LINK_UPGRADE' });">
+                    <i data-lucide="crown"></i> Upgrade to Pro
                 </button>
                 <button class="btn-secondary w-full" onclick="window.trackMilestone('CONVERSION_LATER', { tool: '${tool}' }); this.parentElement.parentElement.remove()">Later</button>
             </div>
@@ -635,10 +645,7 @@ const initApp = () => {
     // --- MISSING LOGIC: LIMIT BLOCKER (V4.6.6) ---
     const getUsage = () => {
         const stored = JSON.parse(localStorage.getItem('vr_usage') || 'null');
-        const isTrial = isInTrial();
-        const baseLimits = isTrial ? 
-            { analyze: 50, hooks: 50, captions: 50, trends: 50, rewrite: 50 } : 
-            LIMITS;
+        const baseLimits = LIMITS;
 
         if (!stored || stored.date !== getToday() || typeof stored.analyze === 'undefined') {
             // New day — reset to full limits
@@ -705,16 +712,11 @@ const initApp = () => {
             return;
         }
 
-        // Trial badge
+        // Trial badge removed - using standard limits until Stripe Pro
+        /* 
         const trial = getTrialInfo();
-        if (trial.active) {
-            el.className = `usage-badge plenty`;
-            el.style.background = 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(251,146,60,0.1))';
-            el.style.borderColor = 'rgba(234,179,8,0.3)';
-            el.style.color = '#fbbf24';
-            el.innerHTML = `🎁 ${trial.daysLeft}d free trial`;
-            return;
-        }
+        ...
+        */
 
         let cls = 'plenty', icon = '⚡';
         if (rem === 0) { cls = 'empty'; icon = '🔒'; }
@@ -725,6 +727,88 @@ const initApp = () => {
     };
 
     const renderAllBadges = () => Object.keys(LIMITS).forEach(renderBadge);
+
+    window.updateAuthUI = (user) => {
+        const headerGoProBtn = document.getElementById('headerGoProBtn');
+        const logoutBtn = document.getElementById('btnLogout');
+        const billingStatePro = document.getElementById('billingStatePro');
+        const billingStateStandard = document.getElementById('billingStateStandard');
+
+        if (user) {
+            // AUTHENTICATED
+            if (isPro) {
+                headerGoProBtn?.classList.add('hidden');
+            } else {
+                headerGoProBtn?.classList.remove('hidden');
+            }
+
+            if (logoutBtn) {
+                logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
+                logoutBtn.style.color = 'var(--text-primary)';
+            }
+            if (billingStatePro && billingStateStandard) {
+                if (isPro) {
+                    billingStatePro.classList.remove('hidden');
+                    billingStateStandard.classList.add('hidden');
+                } else {
+                    billingStatePro.classList.add('hidden');
+                    billingStateStandard.classList.remove('hidden');
+                }
+            }
+        } else {
+            // LOGGED OUT
+            headerGoProBtn?.classList.add('hidden');
+            if (logoutBtn) {
+                logoutBtn.innerHTML = '<i data-lucide="log-in"></i> Sign In';
+                logoutBtn.style.color = 'var(--text-primary)';
+            }
+            billingStatePro?.classList.add('hidden');
+            billingStateStandard?.classList.remove('hidden');
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    // Helper to show paywall with one-time trial check
+    window.showProPaywall = async () => {
+        const paywallOverlay = document.getElementById('paywallOverlay');
+        const paywallTitle = document.getElementById('paywallTitle');
+        const paywallDesc = document.getElementById('paywallDesc');
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        const trialBadgeText = document.getElementById('paywallTrialBadgeText');
+        const cancelNotice = document.getElementById('paywallCancelNotice');
+        
+        const user = window.firebase && firebase.auth().currentUser;
+        let hasUsedTrial = localStorage.getItem('vr_had_pro') === 'true';
+
+        if (user && !hasUsedTrial) {
+            try {
+                const db = firebase.firestore();
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().hasUsedTrial) {
+                    hasUsedTrial = true;
+                    localStorage.setItem('vr_had_pro', 'true');
+                }
+            } catch (e) {}
+        }
+
+        if (hasUsedTrial) {
+            if (paywallTitle) paywallTitle.innerHTML = 'Upgrade to <span class="gradient-premium-text">ViralReels PRO</span>';
+            if (paywallDesc) paywallDesc.innerText = 'Unlimited access to all AI tools, trends, and elite metrics.';
+            if (trialBadgeText) trialBadgeText.innerText = 'PREMIUM PLAN';
+            if (cancelNotice) cancelNotice.innerText = 'Instant activation. Cancel anytime.';
+            if (upgradeBtn) upgradeBtn.innerHTML = '<i data-lucide="zap" style="width:16px;"></i> Upgrade Now';
+        } else {
+            // Reset to trial mode
+            if (paywallTitle) paywallTitle.innerHTML = 'Start Your <span class="gradient-premium-text">7-Day Free Trial</span>';
+            if (paywallDesc) paywallDesc.innerText = 'Try everything free for 7 days. No charge until day 8.';
+            if (trialBadgeText) trialBadgeText.innerText = 'FREE for 7 days';
+            if (cancelNotice) cancelNotice.innerText = 'Cancel anytime before day 8 — you won\'t be charged.';
+            if (upgradeBtn) upgradeBtn.innerHTML = '<i data-lucide="gift" style="width:16px;"></i> Start Free Trial';
+        }
+
+        paywallOverlay?.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
 
     // Render reset time string
     const getResetIn = () => {
@@ -756,6 +840,26 @@ const initApp = () => {
         });
     };
 
+    // Typing effect for V6.0 - Immersive AI Streaming
+    window.typeWriter = (element, text, speed = 15) => {
+        element.innerHTML = '';
+        element.classList.add('typing-effect');
+        let i = 0;
+        return new Promise(resolve => {
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.classList.remove('typing-effect');
+                    resolve();
+                }
+            }
+            type();
+        });
+    };
+
     // Toast notification
     const showToast = (msg, duration = 3000) => {
         const t = document.createElement('div');
@@ -763,7 +867,7 @@ const initApp = () => {
         t.innerHTML = `<i data-lucide="info" style="width:16px;"></i> ${msg}`;
         document.body.appendChild(t);
         window.triggerHaptic('light');
-        window.playNeuralSound('click'); // Zenith Feedback pulse
+        window.playNeuralSound('click'); // ViralReels Feedback pulse
         updateIcons();
         setTimeout(() => {
             t.style.opacity = '0';
@@ -866,9 +970,11 @@ const initApp = () => {
     // Auth (Logic handed off to Firebase at the bottom of the file)
 
     // Header Modals
-    document.getElementById('aboutBtn').addEventListener('click', () => aboutModal.classList.remove('hidden'));
+    document.getElementById('aboutBtn').addEventListener('click', () => {
+        document.getElementById('aboutModal').classList.remove('hidden');
+    });
     document.getElementById('settingsBtn').addEventListener('click', () => {
-        settingsModal.classList.remove('hidden');
+        document.getElementById('settingsModal').classList.remove('hidden');
         updateBillingUI();
     });
     document.getElementById('settingsGoProBtn').addEventListener('click', () => {
@@ -989,17 +1095,11 @@ const initApp = () => {
                 window.resetToolState(currentView.id);
             }
 
-            // 0. Pro Gating (Intercept Video AI / Chat for Guests/Free Users)
-            if (['videoai', 'chat'].includes(targetId) && (!isPro || window.isGuestMode)) {
-                if (window.isGuestMode) {
-                    showToast("Register to Unlock Pro Feature: " + targetId.toUpperCase());
-                    authOverlay.classList.remove('hidden');
-                    return;
-                } else if (!isPro) {
-                    // Existing users without Pro see the Paywall
-                    if (window.showProPaywall) window.showProPaywall();
-                    return;
-                }
+            // 0. Pro Gating (Intercept Video AI / Chat for Free Users)
+            if (['videoai', 'chat'].includes(targetId) && !isPro) {
+                // Users without Pro see the Paywall
+                if (window.showProPaywall) window.showProPaywall();
+                return;
             }
 
             // Identify target view for entrance (animation)
@@ -1103,24 +1203,90 @@ const initApp = () => {
         return { topic, shortTopic: words[0] || "it" };
     };
 
-    const toItemCard = (text, type) => {
+    // -- ZENITH MARKDOWN ENGINE (V6.0.2 Premium) --
+    window.renderMarkdown = (text) => {
+        if (!text) return "";
+        let html = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`(.*?)`/g, '<code class="code-snippet">$1</code>')
+            .replace(/\n- (.*?)/g, '<br>• $1')
+            .replace(/\n/g, '<br>');
+        return html;
+    };
+
+    const toItemCard = (text, type, streamId = null) => {
         const escapedText = text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
         const typeClass = type === 'hook' ? 'type-hook' : (type === 'rewrite' ? 'type-rewrite' : '');
         const tagLabel = type === 'hook' ? 'REEL HOOK' : (type === 'rewrite' ? 'AI REWRITE' : 'SUGGESTION');
         
+        // --- VIRAL INTEL GENERATOR (Mock logic for premium feel) ---
+        const viralBadges = [
+            { label: 'Pattern Interrupt', icon: 'zap' },
+            { label: 'Curiosity Gap', icon: 'help-circle' },
+            { label: 'High Retention', icon: 'trending-up' },
+            { label: 'Share Worthy', icon: 'share-2' }
+        ];
+        const selectedBadge = type === 'hook' ? viralBadges[Math.floor(Math.random() * viralBadges.length)] : null;
+        
         return `
-            <div class="saved-item-card ${typeClass} result-appear">
+            <div class="saved-item-card ${typeClass} result-appear glass-v2 spring-in">
                 <div class="saved-card-header">
-                    <span class="saved-tag">${tagLabel}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="saved-tag">${tagLabel}</span>
+                        ${selectedBadge ? `<span class="intel-badge animate-pulse-slow"><i data-lucide="${selectedBadge.icon}" style="width:10px;"></i> ${selectedBadge.label}</span>` : ''}
+                    </div>
                     <button class="icon-button" onclick="copyToClipboard('${escapedText}', this)" title="Copy"><i data-lucide="copy"></i></button>
                 </div>
-                <p class="saved-content-text" style="white-space:pre-wrap;">${text}</p>
+                <p class="saved-content-text" ${streamId ? `id="${streamId}"` : ''} style="white-space:pre-wrap;">${window.renderMarkdown(text)}</p>
                 <div class="saved-card-actions">
-                    <button class="action-btn-mini" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
-                    ${(type === 'hook' || type === 'rewrite') ? `<button class="action-btn-mini" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i> Save to Vault</button>` : ''}
+                    <button class="action-btn-mini magnetic-item" onclick="nativeShare('${escapedText}')"><i data-lucide="share-2"></i> Share</button>
+                    ${(type === 'hook' || type === 'rewrite') ? `<button class="action-btn-mini magnetic-item" onclick="saveToVault('${escapedText}', '${type}', this)"><i data-lucide="archive"></i> Save</button>` : ''}
                 </div>
+                ${(type === 'hook' || type === 'rewrite') ? `
+                <div class="refinement-bar mt-3 pt-2 border-t border-white-5 flex gap-2 overflow-x-auto no-scrollbar">
+                    <button class="refine-chip" onclick="refineResult('${escapedText}', 'punchier', this)">⚡ Punchier</button>
+                    <button class="refine-chip" onclick="refineResult('${escapedText}', 'viral', this)">🤩 Viral Boost</button>
+                    <button class="refine-chip" onclick="refineResult('${escapedText}', 'shorter', this)">✂️ Shorter</button>
+                </div>
+                ` : ''}
             </div>
         `;
+    };
+
+    window.refineResult = async (originalText, type, btnElem) => {
+        const originalHtml = btnElem.innerHTML;
+        btnElem.innerHTML = '<div class="loader" style="width:12px; height:12px; border-width:2px;"></div>';
+        btnElem.disabled = true;
+        
+        try {
+            const res = await fetchWithTimeout(`${API_BASE}/rewrite`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    text: originalText, 
+                    type: type, // 'punchier', 'viral', 'negative'
+                    isPro: isPro 
+                })
+            });
+            
+            if (!res.ok) throw new Error("Refinement failed");
+            const data = await res.json();
+            
+            const cardText = btnElem.closest('.saved-item-card').querySelector('.saved-content-text');
+            if (cardText && data.rewrite) {
+                await window.typeWriter(cardText, data.rewrite, 10);
+                window.triggerHaptic('light');
+                showToast(`Polished to be ${type}!`);
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Refinement failed.");
+        } finally {
+            btnElem.innerHTML = originalHtml;
+            btnElem.disabled = false;
+            updateIcons();
+        }
     };
 
     window.saveToVault = (text, type, btnElem) => {
@@ -1370,15 +1536,32 @@ const initApp = () => {
             if (data.hooks) {
                 renderState('hooks', 'result');
                 logUsage('hooks'); // Log success
-                const grid = document.getElementById('hookResultsGrid');
+                
+                const list = document.getElementById('sub-hooks-list');
+                list.innerHTML = ''; // Clear for streaming
+                
+                // --- V6.0 STREAMING ENGINE ---
+                for (let i = 0; i < data.hooks.length; i++) {
+                    const h = data.hooks[i];
+                    const tempId = `streaming-hook-${i}`;
+                    const cardHtml = toItemCard('', 'hook', tempId); // Create empty card with streaming container
+                    list.insertAdjacentHTML('beforeend', cardHtml);
+                    
+                    const streamTarget = document.getElementById(tempId);
+                    if (streamTarget) {
+                        await window.typeWriter(streamTarget, h, 10); // Type into card
+                        updateIcons(); // Re-render Lucide icons for the new card
+                    }
+                }
             }
+            
             document.getElementById('hooksGeneratorsContent').classList.remove('hidden');
             
             btn.disabled = false;
             if (btn.querySelector('.loader')) btn.querySelector('.loader').remove();
             (btn.querySelector('i, svg'))?.classList.remove('hidden');
 
-            document.getElementById('sub-hooks-list').innerHTML = (data.hooks || []).map(h => toItemCard(h, 'hook')).join('');
+            // Captions (Standard render for now to keep focus on hooks)
             document.getElementById('sub-captions-list').innerHTML = (data.captions || []).map(c => toItemCard(c, null)).join('');
         } catch (err) {
             console.error(err);
@@ -1581,15 +1764,35 @@ const initApp = () => {
             const captions = data.captions || [];
 
             const out = document.getElementById('dedCapOutput');
-            out.innerHTML = (captions || []).map(txt => {
-                const html = toItemCard(txt, null);
-                return html.replace('class="item-card glass-card', 'class="item-card glass-card result-appear');
-            }).join('');
+            out.innerHTML = '';
+            out.classList.remove('hidden');
+
+            // --- STREAMING UI ENGAGEMENT (V6.0.1) ---
+            for (let i = 0; i < captions.length; i++) {
+                const txt = captions[i];
+                const cardId = `cap-result-${Date.now()}-${i}`;
+                const cardHtml = toItemCard('', null).replace('class="item-card glass-card', `id="${cardId}" class="item-card glass-card result-appear`);
+                out.insertAdjacentHTML('beforeend', cardHtml);
+                
+                const cardContent = document.querySelector(`#${cardId} .item-text`);
+                if (cardContent) {
+                    await window.typeWriter(txt, cardContent, 10);
+                }
+                
+                // Add context actions after typing
+                const cardActions = document.querySelector(`#${cardId} .item-actions`);
+                if (cardActions) {
+                    cardActions.innerHTML = `
+                        <button class="btn-primary w-full" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${txt.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'caption', this)"><i data-lucide="archive"></i> Save to Vault</button>
+                        <button class="btn-secondary w-full" onclick="copyToClipboard('${txt.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy"></i> Copy</button>
+                    `;
+                }
+                updateIcons();
+                window.playNeuralSound?.('generate');
+            }
             
             // --- CONTEXTUAL NAV PULSE ---
             window.pulseNavItem('navTags');
-
-            out.classList.remove('hidden');
         } catch (e) {
             console.error(e);
             showToast("Caption generation failed.");
@@ -1920,14 +2123,21 @@ const initApp = () => {
             const data = await res.json();
             const rewritten = data.rewritten;
 
-            document.getElementById('rewriteOutput').innerHTML = `
+            const out = document.getElementById('rewriteOutput');
+            out.classList.remove('hidden');
+            out.innerHTML = `
                 <h4 class="font-bold text-accent mb-3 flex items-center gap-2"><i data-lucide="bot"></i> Viral AI Rewrite</h4>
-                <div class="p-4 bg-card-dark result-appear" style="border-radius:8px; font-size:1rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05); color:white;">${rewritten}</div>
-                <div class="item-actions flex-col gap-2 mt-4">
+                <div id="streamingRewrite" class="p-4 bg-card-dark result-appear" style="border-radius:8px; font-size:1rem; line-height:1.6; white-space:pre-wrap; border:1px solid rgba(255,255,255,0.05); color:white;"></div>
+                <div id="rewriteActions" class="item-actions flex-col gap-2 mt-4 hidden">
                     <button class="btn-primary w-full" style="background: var(--gradient-primary); color:white;" onclick="saveToVault('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', 'rewrite', this)"><i data-lucide="archive"></i> Save to Vault</button>
                     <button class="btn-secondary w-full" onclick="copyToClipboard('${rewritten.replace(/\n/g, "\\n").replace(/'/g, "\\'")}', this)"><i data-lucide="copy"></i> Copy Script</button>
                 </div>
             `;
+            
+            const contentBox = document.getElementById('streamingRewrite');
+            await window.typeWriter(rewritten, contentBox, 5);
+            document.getElementById('rewriteActions').classList.remove('hidden');
+            window.playNeuralSound?.('generate');
             
             // --- CONTEXTUAL NAV PULSE ---
             window.pulseNavItem('navSaved');
@@ -2269,6 +2479,52 @@ const initApp = () => {
     // Initialize Voice Chat
     initVoiceChat();
 
+    // -- AI VISION CHAT (IMAGE UPLOAD) --
+    let pendingChatImage = null;
+    function initChatUpload() {
+        const uploadBtn = document.getElementById('chatUploadBtn');
+        const fileInput = document.getElementById('chatFileInput');
+        const previewArea = document.getElementById('chatImagePreview');
+
+        if (!uploadBtn || !fileInput) return;
+
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast("File too large. Max 5MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (re) => {
+                pendingChatImage = re.target.result;
+                previewArea.innerHTML = `
+                    <div class="image-preview-chip result-appear">
+                        <img src="${pendingChatImage}" alt="Preview">
+                        <button class="remove-preview" id="removeChatImage"><i data-lucide="x"></i></button>
+                    </div>
+                `;
+                previewArea.classList.remove('hidden');
+                updateIcons();
+                window.triggerHaptic('light');
+
+                document.getElementById('removeChatImage').onclick = () => {
+                    pendingChatImage = null;
+                    previewArea.classList.add('hidden');
+                    previewArea.innerHTML = '';
+                    fileInput.value = '';
+                    window.triggerHaptic('light');
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    initChatUpload();
+
     // Initialize Persistent Memory (ChatGPT Style)
     window.chatSession = [];
 
@@ -2342,9 +2598,27 @@ const initApp = () => {
             // Add user bubble
             const uEl = document.createElement('div');
             uEl.className = 'chat-bubble bubble-user result-appear';
-            uEl.textContent = msg;
+            
+            let bubbleContent = '';
+            if (pendingChatImage) {
+                bubbleContent += `<img src="${pendingChatImage}" class="chat-image-attachment mb-2 rounded-lg border border-white-10" style="max-width:200px; display:block;">`;
+                window.triggerHaptic('heavy'); // Vision scan pulse
+            }
+            bubbleContent += `<div>${msg}</div>`;
+            uEl.innerHTML = bubbleContent;
+            
             chatMessages.appendChild(uEl);
             chatInput.value = '';
+
+            // Clear Image Preview
+            const previewArea = document.getElementById('chatImagePreview');
+            if (previewArea) {
+                previewArea.classList.add('hidden');
+                previewArea.innerHTML = '';
+            }
+            const finalMsg = pendingChatImage ? `[VISION: Analyzing uploaded image/thumbnail] ${msg}` : msg;
+            pendingChatImage = null;
+            document.getElementById('chatFileInput').value = '';
             
             // Auto-scroll
             chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
@@ -2353,7 +2627,7 @@ const initApp = () => {
             sendChatBtn.innerHTML = '<div class="loader" style="width:14px; height:14px;"></div>';
 
             // Push to current session context
-            window.chatSession.push({ role: 'user', content: msg });
+            window.chatSession.push({ role: 'user', content: finalMsg });
 
             // AI thinking
             const aiDiv = document.createElement('div');
@@ -2408,8 +2682,8 @@ const initApp = () => {
                             const parsed = JSON.parse(raw);
                             if (parsed.token) {
                                 fullReply += parsed.token;
-                                // Smooth text injection - prevents layout flashing
-                                contentArea.textContent = fullReply; 
+                                // Smooth text injection with Markdown support
+                                contentArea.innerHTML = window.renderMarkdown(fullReply); 
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
                             }
                         } catch {}
@@ -2723,14 +2997,24 @@ const initApp = () => {
 
     const getSystemContext = () => {
         const archMap = {
-            'disruptor': 'You are the Creative Disruptor. Your goal is high-virality, controversial, and polarizing content that breaks the scroll.',
-            'expert': 'You are the Growth Expert. Your goal is data-driven, analytical, and educational content that builds long-term authority.',
-            'minimalist': 'You are the Minimalist. Your goal is clean, quiet, and high-status content that says more with less.'
+            'disruptor': 'You are the Creative Disruptor. Your goal is high-virality, controversial, and polarizing content that breaks the scroll using Pattern Interruption.',
+            'expert': 'You are the Growth Expert. Your goal is data-driven, analytical, and authority-building content using the PAS (Problem-Agitation-Solution) framework.',
+            'minimalist': 'You are the Minimalist. Your goal is clean, quiet, and high-status content that leverages exclusivity and "Quiet Luxury" vibes.'
         };
         const toneVal = parseInt(persona.tone);
         const toneDesc = toneVal < 30 ? 'relatable and soft' : (toneVal > 70 ? 'high-energy and aggressive' : 'neutral and balanced');
         
-        return `${archMap[persona.architect || 'disruptor']} Persona: expert strategist in the "${persona.niche || 'General Content'}" niche. Tone requirement: ${toneDesc}. Response must be 100% niche-dependent.`;
+        // --- V6.1.0: ELITE VIRAL ARCHITECTURE MANDATE ---
+        const viralFrameworks = `
+            CRITICAL INSTRUCTIONS:
+            1. DEPTH: Do not give generic advice. Provide deep, actionable blueprints.
+            2. PSYCHOLOGY: Leverage Pattern Interruption, Curiosity Gaps, and the Zeigarnik Effect.
+            3. VISION: If the prompt contains [VISION], perform a visual audit of the described thumbnail/image based on Contrast, Legibility, and Emotional Trigger.
+            4. ACCURACY: All suggestions must be 100% specific to the "${persona.niche || 'General Content'}" niche.
+            5. STRUCTURE: Use Markdown for headers and bolding. Be concise but strategic.
+        `;
+
+        return `${archMap[persona.architect || 'disruptor']} Persona: Lead Growth Architect. Tone: ${toneDesc}. ${viralFrameworks}`;
     };
 
     if (personaNicheEl && personaToneEl) {
@@ -2831,11 +3115,126 @@ const initApp = () => {
 
     function endTour() {
         onboardingOverlay.classList.add('hidden');
-        isOnboardingComplete = true; // Sync internal variable
+        isOnboardingComplete = true;
         localStorage.setItem('vr_onboarding_complete', 'true');
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('highlight-nav'));
-        showToast("Tour complete! You're ready to dominate.");
+        
+        // After tour, show niche picker if niche not already set
+        const currentPersona = safeGet('vr_persona', { niche: '', tone: 50 });
+        if (!currentPersona.niche || currentPersona.niche.trim() === '') {
+            setTimeout(() => showNichePicker(), 400);
+        } else {
+            showToast("Tour complete! You're ready to dominate.");
+        }
     }
+
+    // --- NICHE PICKER GATE SYSTEM ---
+    function showNichePicker() {
+        const overlay = document.getElementById('nichePickerOverlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    function hasNicheSet() {
+        const p = safeGet('vr_persona', { niche: '', tone: 50 });
+        return p.niche && p.niche.trim() !== '';
+    }
+
+    // Niche chip selection
+    const nicheChipsContainer = document.getElementById('nicheChips');
+    const nicheCustomInput = document.getElementById('nicheCustomInput');
+    const nicheConfirmBtn = document.getElementById('nicheConfirmBtn');
+    let selectedNiche = '';
+
+    if (nicheChipsContainer) {
+        nicheChipsContainer.addEventListener('click', (e) => {
+            const chip = e.target.closest('.niche-chip');
+            if (!chip) return;
+            
+            document.querySelectorAll('.niche-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            selectedNiche = chip.dataset.niche;
+            if (nicheCustomInput) nicheCustomInput.value = '';
+            if (nicheConfirmBtn) nicheConfirmBtn.disabled = false;
+            window.triggerHaptic?.('light');
+        });
+    }
+
+    if (nicheCustomInput) {
+        nicheCustomInput.addEventListener('input', () => {
+            const val = nicheCustomInput.value.trim();
+            if (val.length > 0) {
+                document.querySelectorAll('.niche-chip').forEach(c => c.classList.remove('selected'));
+                selectedNiche = val;
+                if (nicheConfirmBtn) nicheConfirmBtn.disabled = false;
+            } else if (!document.querySelector('.niche-chip.selected')) {
+                selectedNiche = '';
+                if (nicheConfirmBtn) nicheConfirmBtn.disabled = true;
+            }
+        });
+    }
+
+    // --- V6.0 DYNAMIC THEME ENGINE ---
+    window.applyNicheTheme = (niche) => {
+        if (!niche) return;
+        const body = document.body;
+        // Clear old themes
+        body.classList.remove('theme-tech', 'theme-fitness', 'theme-finance', 'theme-food', 'theme-travel', 'theme-beauty');
+        
+        const n = niche.toLowerCase();
+        if (n.includes('tech') || n.includes('ai')) body.classList.add('theme-tech');
+        else if (n.includes('fitness') || n.includes('health') || n.includes('gym')) body.classList.add('theme-fitness');
+        else if (n.includes('finance') || n.includes('money') || n.includes('crypto')) body.classList.add('theme-finance');
+        else if (n.includes('food') || n.includes('cook')) body.classList.add('theme-food');
+        else if (n.includes('travel')) body.classList.add('theme-travel');
+        else if (n.includes('beauty') || n.includes('fashion')) body.classList.add('theme-beauty');
+        
+        console.log(`[ViralReels] Theme Applied: ${niche}`);
+    };
+
+    if (nicheConfirmBtn) {
+        nicheConfirmBtn.addEventListener('click', () => {
+            if (!selectedNiche) return;
+            
+            // Save to persona system
+            persona.niche = selectedNiche;
+            localStorage.setItem('vr_persona', JSON.stringify(persona));
+            
+            // Sync to Firestore if user is logged in
+            if (auth && auth.currentUser) {
+                firebase.firestore().collection('users').doc(auth.currentUser.uid).set({
+                    niche: selectedNiche,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(e => console.error("Niche sync failed", e));
+            }
+            
+            // Update the settings input too
+            const personaNicheEl = document.getElementById('personaNiche');
+            if (personaNicheEl) personaNicheEl.value = selectedNiche;
+            
+            // Apply niche theme
+            if (typeof applyNicheTheme === 'function') applyNicheTheme(selectedNiche);
+            
+            // Close modal
+            document.getElementById('nichePickerOverlay')?.classList.add('hidden');
+            
+            showToast(`Niche locked: ${selectedNiche}. AI is now tailored to you!`);
+            window.triggerHaptic?.('heavy');
+        });
+    }
+
+    // Gate: Intercept nav clicks if no niche is set
+    document.querySelectorAll('.nav-item').forEach(navBtn => {
+        navBtn.addEventListener('click', (e) => {
+            if (!hasNicheSet() && localStorage.getItem('vr_onboarding_complete') === 'true') {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                showNichePicker();
+            }
+        }, true); // 'true' = capture phase, fires BEFORE the normal nav handler
+    });
 
 
     if (onboardingNextBtn) {
@@ -2924,7 +3323,11 @@ const initApp = () => {
                     const res = await fetchWithTimeout(`${API_BASE}/checkout`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null })
+                        body: JSON.stringify({ 
+                            uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null,
+                            email: firebase.auth().currentUser ? firebase.auth().currentUser.email : null,
+                            hasUsedTrial: localStorage.getItem('vr_had_pro') === 'true'
+                        })
                     });
                     const data = await res.json();
                     if (data.url) {
@@ -2976,7 +3379,17 @@ const initApp = () => {
                 if (data.success) {
                     // UNLOCK PRO PERMANENTLY
                     localStorage.setItem('vr_pro_status', 'true');
+                    localStorage.setItem('vr_had_pro', 'true');
                     isPro = true; // Update global state
+                    
+                    // Sync to Firestore
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        firebase.firestore().collection('users').doc(user.uid).set({
+                            hasUsedTrial: true,
+                            isPro: true
+                        }, { merge: true }).catch(e => console.error("Pro sync failed", e));
+                    }
                     
                     verifyOverlay.innerHTML = `
                         <div class="card p-8 max-w-sm w-full animate-appear" style="background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);">
@@ -2988,6 +3401,7 @@ const initApp = () => {
                     `;
                     
                     window.vrCelebrate('viral');
+                    window.triggerHaptic('heavy');
                     
                     document.getElementById('closeVerifyBtn').addEventListener('click', () => {
                         verifyOverlay.remove();
@@ -3076,71 +3490,81 @@ const initApp = () => {
             });
 
             // Check Auth State
+            // Zenith V6.0.1: Hardened Auth Persistence Engine
             auth.onAuthStateChanged(async (user) => {
-                // --- PERSISTENT REVIEWER BYPASS ---
-                const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
-                if (!user && isBypassActive) {
-                    console.log("[ViralReels] Re-activating Reviewer Bypass Session...");
-                    authOverlay.classList.add('hidden');
-                    appContainer.classList.remove('hidden');
-                    return;
-                }
+                try {
+                    // --- PERSISTENT REVIEWER BYPASS ---
+                    const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
+                    if (user) {
+                        console.log("[ViralReels] AUTH_RESOLVED: User logged in.", user.email);
+                        localStorage.removeItem('vr_guest_mode');
 
-                if (user) {
-                    window.isGuestMode = false;
-                    document.getElementById('guestJoinBtn')?.classList.add('hidden');
-
-                    // 1. IMMEDIATE UI TRANSITION (Priority 1)
-                    authOverlay.classList.add('hidden');
-                    appContainer.classList.remove('hidden');
-                    
-                    // Update Settings Button for Authenticated User
-                    const logoutBtn = document.getElementById('btnLogout');
-                    if (logoutBtn) {
-                        logoutBtn.innerHTML = '<i data-lucide="log-out"></i> Log Out';
-                        logoutBtn.style.background = 'rgba(255,255,255,0.02)';
-                        logoutBtn.style.color = 'var(--text-primary)';
-                        logoutBtn.style.borderColor = 'rgba(255,255,255,0.1)';
-                    }
-                    
-                    updateIcons();
-                    
-                    // 2. ASYNC BACKGROUND SYNC (Non-blocking)
-                    (async () => {
-                        try {
-                            const db = firebase.firestore();
-                            const userDoc = await db.collection('users').doc(user.uid).get();
-                            if (userDoc.exists) {
-                                const data = userDoc.data();
-                                isPro = !!data.isPro; 
-                                localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                                console.log(`[ViralReels] Pro Status Refreshed: ${isPro ? 'PRO' : 'FREE'}`);
-                                renderAllBadges();
-                                
-                                // Update billing UI if visible
-                                const proManageBtn = document.getElementById('manageBillingBtn');
-                                if (proManageBtn) {
-                                    proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
-                                    updateIcons();
+                        // 1. IMMEDIATE UI TRANSITION (Priority 1)
+                        authOverlay.classList.add('hidden');
+                        appContainer.classList.remove('hidden');
+                        
+                        // Centralized UI Update (V6.0.1 Robust)
+                        window.updateAuthUI(user);
+                        updateIcons();
+                        
+                        // 2. ASYNC BACKGROUND SYNC (Non-blocking)
+                        (async () => {
+                            try {
+                                const db = firebase.firestore();
+                                const userDoc = await db.collection('users').doc(user.uid).get();
+                                if (userDoc.exists) {
+                                    const data = userDoc.data();
+                                    isPro = !!data.isPro; 
+                                    localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
+                                    
+                                    if (data.hasUsedTrial) {
+                                        localStorage.setItem('vr_had_pro', 'true');
+                                    }
+                                    
+                                    if (data.niche) {
+                                        localStorage.setItem('vr_selected_niche', data.niche);
+                                        window.applyNicheTheme?.(data.niche);
+                                    }
+                                    
+                                    window.updateAuthUI(user);
+                                    renderAllBadges();
+                                    
+                                    const proManageBtn = document.getElementById('manageBillingBtn');
+                                    if (proManageBtn) {
+                                        proManageBtn.innerText = isPro ? 'Manage Billing' : 'Go Pro';
+                                        updateIcons();
+                                    }
                                 }
+                            } catch (dbErr) {
+                                console.warn("[ViralReels] Firestore sync failed. Using local state.", dbErr);
                             }
-                        } catch (dbErr) {
-                            console.warn("[ViralReels] Firestore sync failed. Using local state.", dbErr);
-                        }
-                    })();
+                        })();
 
-                    initTrial();
-                    renderAllBadges();
-                    
-                    if (!isOnboardingComplete && !localStorage.getItem('vr_onboarding_complete')) {
-                        document.getElementById('onboardingOverlay').classList.remove('hidden');
+                        initTrial();
+                        renderAllBadges();
+                        
+                        if (!isOnboardingComplete && !localStorage.getItem('vr_onboarding_complete')) {
+                            document.getElementById('onboardingOverlay').classList.remove('hidden');
+                        }
+                    } else {
+                        // NO USER detected
+                        if (!isBypassActive) {
+                            // Strictly logged out - Ensure the login screen is forced
+                            console.log("[ViralReels] AUTH_RESOLVED: User logged out.");
+                            window.updateAuthUI(null);
+                            authOverlay.classList.remove('hidden');
+                            appContainer.classList.add('hidden');
+                        } else {
+                            // Bypass is active, show the app
+                            window.updateAuthUI({ email: 'reviewer@viralreels.com' });
+                            authOverlay.classList.add('hidden');
+                            appContainer.classList.remove('hidden');
+                        }
                     }
-                } else {
-                    // Only show login if NO BYPASS and NO USER
-                    if (!isBypassActive) {
-                        authOverlay.classList.remove('hidden');
-                        appContainer.classList.add('hidden');
-                    }
+                } catch (fatalAuthErr) {
+                    console.error("[ViralReels] Fatal Auth Logic Error:", fatalAuthErr);
+                    // Fallback: don't leave user stuck on a broken screen
+                    authOverlay.classList.remove('hidden');
                 }
             });
 
@@ -3156,6 +3580,7 @@ const initApp = () => {
                     if (email.toLowerCase() === 'reviewer@viralreels.com' && pass === 'ViralReview2026!') {
                         localStorage.setItem('vr_pro_status', 'true');
                         localStorage.setItem('vr_bypass_active', 'true');
+                        localStorage.removeItem('vr_guest_mode');
                         // Fake a success login to satisfy the crawler
                         // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
@@ -3216,86 +3641,33 @@ const initApp = () => {
                 });
             }
         } catch (e) {
-            console.warn("Firebase Auth bypassed for testing.", e);
-            setupMockAuth();
+            console.error("Firebase Auth initialization failed:", e);
+            showToast("Critical: Auth System Offline. Please refresh.");
         }
     } else {
-        console.warn("Firebase scripts not loaded. Mock Auth Active.");
-        setupMockAuth();
+        console.error("Firebase scripts not loaded.");
+        showToast("System Error: Security layer missing.");
     }
 
     // Sign Out Implementation
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            if (window.isGuestMode) {
-                // If guest, just show auth immediately
-                document.getElementById('authOverlay').classList.remove('hidden');
-                return;
-            }
             window.vrConfirm("Sign Out?", "Are you sure you want to log out of ViralReels AI?", () => {
                 localStorage.removeItem('vr_guest_mode');
+                localStorage.removeItem('vr_pro_status');
+                localStorage.removeItem('vr_had_pro');
+                localStorage.removeItem('vr_bypass_active');
+                isPro = false;
+                
                 if (window.firebase && firebase.auth().currentUser) {
                     firebase.auth().signOut().then(() => {
                         window.location.reload();
                     });
                 } else {
-                    window.location.reload(); // Simple reload for mock state reset
+                    window.location.reload(); // Simple reload for state reset
                 }
             });
         });
-    }
-
-    // Guest / Mock Access Implementation
-    function setupMockAuth() {
-        console.log("ViralReels AI: Activating Open Access (Guest Mode)...");
-        window.isGuestMode = true;
-        localStorage.setItem('vr_guest_mode', 'true');
-        
-        // Safety: If on a pro sub-tab, switch back to scout
-        const activeSub = document.querySelector('.pill.active');
-        if (activeSub && activeSub.dataset.subtab === 'sub-analyze-metrics') {
-            document.querySelectorAll('.item-list-container').forEach(c => c.classList.add('hidden'));
-            document.getElementById('sub-analyze-scout')?.classList.remove('hidden');
-            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-            const scoutPill = document.querySelector('[data-subtab="sub-analyze-scout"]');
-            if (scoutPill) scoutPill.classList.add('active');
-        }
-        
-        updateAuthUI(false, false);
-        
-        authOverlay.classList.add('hidden');
-        appContainer.classList.remove('hidden');
-        updateIcons();
-        
-        // Ensure onboarding shows for new guests
-        if (!localStorage.getItem('vr_onboarding_complete')) {
-            document.getElementById('onboardingOverlay')?.classList.remove('hidden');
-        }
-        
-        showToast("Open Access Active. Browse freely!");
-    }
-
-    // Wire Guest Join Button
-    document.getElementById('guestJoinBtn')?.addEventListener('click', () => {
-        window.triggerHaptic('heavy');
-        document.getElementById('authOverlay').classList.remove('hidden');
-    });
-
-    // Wire Guest Button
-    const guestLoginBtn = document.getElementById('guestLoginBtn');
-    if (guestLoginBtn) {
-        guestLoginBtn.addEventListener('click', () => {
-            window.triggerHaptic('medium');
-            setupMockAuth();
-        });
-    }
-
-    // Check for persisted guest mode — but only if Firebase auth is NOT active
-    // And ensure we aren't in the middle of a Firebase redirect
-    const isRedirecting = window.location.search.includes('apiKey') || window.location.hash.includes('access_token');
-    
-    if (!auth && localStorage.getItem('vr_guest_mode') === 'true' && !isRedirecting) {
-        setupMockAuth();
     }
 
     updateIcons();
@@ -3307,7 +3679,7 @@ if (document.readyState === 'loading') {
     initApp();
 }
 // =============================================
-// == SUB-TAB & PRECISION LOGIC (ZENITH V3.9) ==
+// == SUB-TAB & PRECISION LOGIC (VIRALREELS V3.9) ==
 // =============================================
 
 // 1. Generic Sub-Tab Switching (Pill Tabs)
@@ -3335,14 +3707,9 @@ document.addEventListener('click', (e) => {
     const target = document.getElementById(subtabId);
     if (target) {
         // --- PREMIUM BLOCKER (Consolidated) ---
-        if (subtabId === 'sub-analyze-metrics' && (!isPro || window.isGuestMode)) {
-            const authOverlay = document.getElementById('authOverlay');
+        if (subtabId === 'sub-analyze-metrics' && !isPro) {
             const paywallOverlay = document.getElementById('paywallOverlay');
-            if (window.isGuestMode) {
-                authOverlay?.classList.remove('hidden');
-            } else {
-                paywallOverlay?.classList.remove('hidden');
-            }
+            paywallOverlay?.classList.remove('hidden');
             return; // Prevent tab switch!
         }
 
@@ -3387,4 +3754,37 @@ window.renderAnalytics = () => {
         }
     }
 };
+
+// -- NEURAL DURATION ESTIMATOR (V6.2.0) --
+const rewriteInput = document.getElementById('rewriteInput');
+const timerBadge = document.getElementById('scriptTimer');
+const wordCountEl = document.getElementById('wordCount');
+const readTimeEl = document.getElementById('readTime');
+
+if (rewriteInput) {
+    rewriteInput.addEventListener('input', () => {
+        const text = rewriteInput.value.trim();
+        if (!text) {
+            timerBadge.classList.add('hidden');
+            return;
+        }
+        timerBadge.classList.remove('hidden');
+        
+        const words = text.split(/\s+/).filter(w => w.length > 0).length;
+        const seconds = Math.ceil((words / 150) * 60); // 150 WPM average
+        
+        wordCountEl.textContent = words;
+        readTimeEl.textContent = seconds;
+
+        // Warning colors
+        if (seconds > 60) {
+            readTimeEl.style.color = 'var(--accent-red)';
+            timerBadge.style.borderColor = 'rgba(239, 71, 111, 0.4)';
+            if (seconds === 61) window.triggerHaptic('medium'); 
+        } else {
+            readTimeEl.style.color = 'var(--accent-blue-light)';
+            timerBadge.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        }
+    });
+}
 

@@ -130,11 +130,7 @@
             
             <div class="auth-actions" id="authBaseActions">
                 <button class="btn-primary w-full" id="googleLoginBtn" style="margin-bottom: 0.75rem; height: 52px;"><i data-lucide="globe"></i> Continue with Google</button>
-                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1.5rem; height: 52px;"><i data-lucide="mail"></i> Continue with Email</button>
-                
-                <button class="btn-secondary w-full" id="guestLoginBtn" style="background:transparent; border: none; color:rgba(255,255,255,0.4); font-size: 0.8rem; text-decoration: underline; margin-bottom: 1.5rem;">
-                    Or Browse as Guest
-                </button>
+                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1rem; height: 52px;"><i data-lucide="mail"></i> Continue with Email</button>
             </div>
 
             <p class="text-muted" style="font-size: 10px; margin-top: 1rem; opacity: 0.5;">By continuing, you acknowledge that you have read and agree to our <a href="terms.html" class="text-accent" style="text-decoration: underline;">Terms of Service</a> and <a href="privacy.html" class="text-accent" style="text-decoration: underline;">Privacy Policy</a>.</p>
@@ -166,11 +162,11 @@
             <div class="hero-premium-bg mb-2">
                 <div class="pro-badge mb-1 mx-auto" style="padding: 4px 10px; font-size: 0.7rem;"><i
                         data-lucide="crown"></i> PRO</div>
-                <h2 class="paywall-title" style="font-size: 1.25rem;">Start Your <span
+                <h2 class="paywall-title" id="paywallTitle" style="font-size: 1.25rem;">Start Your <span
                         class="gradient-premium-text">7-Day Free Trial</span></h2>
             </div>
 
-            <p class="paywall-desc text-secondary text-xs mb-2">Try everything free for 7 days. No charge until day 8.</p>
+            <p class="paywall-desc text-secondary text-xs mb-2" id="paywallDesc">Try everything free for 7 days. No charge until day 8.</p>
 
             <div class="pro-features-grid mb-3 text-left">
                 <!-- 1. Unlimited Uses -->
@@ -223,7 +219,7 @@
 
             <div class="price-box mb-2 bg-card-dark p-2 rounded-lg border-subtle flex justify-between items-center">
                 <div class="text-left">
-                    <span style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 700; display: block;">FREE for 7 days</span>
+                    <span id="paywallTrialBadgeText" style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 700; display: block;">FREE for 7 days</span>
                     <span class="price text-gold"
                         style="color:var(--accent-gold); font-size: 1.1rem; font-weight: 800;">$9.99<span
                             class="period text-xs text-muted" style="font-weight: 500;">/mo after</span></span>
@@ -232,7 +228,7 @@
                     style="background:var(--gradient-premium); color:black; padding: 10px 16px; font-size: 0.8rem;"
                     id="upgradeBtn"><i data-lucide="gift" style="width:16px;"></i> Start Free Trial</button>
             </div>
-            <p class="text-xs text-muted text-center mb-1" style="font-size: 0.65rem; opacity: 0.6;">Cancel anytime before day 8 — you won't be charged.</p>
+            <p class="text-xs text-muted text-center mb-1" id="paywallCancelNotice" style="font-size: 0.65rem; opacity: 0.6;">Cancel anytime before day 8 — you won't be charged.</p>
             <div class="stripe-secure-msg">
                 <i data-lucide="lock" style="width:12px;"></i>
                 <span>Checkout Secured by <strong>Stripe</strong></span>
@@ -642,11 +638,9 @@
                 </div>
             </div>
             <div class="flex gap-2">
-                <button class="btn-primary header-btn hidden" id="guestJoinBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
-                    <i data-lucide="user-plus"></i> <span>Join Now</span>
-                </button>
+
                 <button class="btn-primary header-btn hidden" id="headerGoProBtn" style="background:var(--gradient-premium); color:black; border:none; padding:6px 12px; font-size:0.75rem; font-weight:800;">
-                    <i data-lucide="crown"></i> <span>Go Pro</span>
+                    <i data-lucide="crown"></i> <span>Join Pro</span>
                 </button>
                 <button class="btn-text header-btn" id="aboutBtn" aria-label="About ViralReels AI" title="Learn more about tools"><i data-lucide="info"></i></button>
                 <button class="btn-text header-btn" id="settingsBtn" aria-label="App Settings and Profile" title="Manage account and data"><i data-lucide="settings"></i></button>
@@ -665,6 +659,33 @@
                     </div>
                     <p class="text-sm text-secondary">Predict satisfaction-per-swipe and engineer high-retention gaming hits.</p>
                     <div id="usage-badge-analyze" class="usage-badge mt-2"></div>
+                </div>
+
+                <!-- DAILY VIRAL PULSE (V6.3.0) -->
+                <div class="daily-pulse-section content-padding mt-6 mb-2">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-[11px] font-bold text-muted uppercase tracking-widest flex items-center gap-2">
+                            <i data-lucide="zap" class="text-accent" style="width:14px;"></i> Daily Viral Pulse
+                        </h3>
+                        <span class="text-[9px] opacity-60">AI Strategy Core</span>
+                    </div>
+                    <div id="dailyPulseGallery" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                        <div class="pulse-card interactive-glow" onclick="document.getElementById('analyzerInput').value = 'The Glitch Loop: A video that ends exactly where it starts for infinite views'; document.getElementById('analyzerForm').requestSubmit();">
+                            <span class="pulse-tag">High Retention</span>
+                            <h4 class="text-sm font-bold mb-1">The Glitch Loop</h4>
+                            <p class="text-[10px] text-secondary">A psychological trick that forces the algorithm to count 2-3 views per user.</p>
+                        </div>
+                        <div class="pulse-card interactive-glow" onclick="document.getElementById('analyzerInput').value = 'The Hidden Truth: Debunking a common myth in my niche'; document.getElementById('analyzerForm').requestSubmit();">
+                            <span class="pulse-tag" style="background:rgba(239, 71, 111, 0.1); color:var(--accent-red);">Controversial</span>
+                            <h4 class="text-sm font-bold mb-1">The Hidden Truth</h4>
+                            <p class="text-[10px] text-secondary">Polarize your audience immediately to skyrocket the comment-to-view ratio.</p>
+                        </div>
+                        <div class="pulse-card interactive-glow" onclick="document.getElementById('analyzerInput').value = 'The Split-Screen Hook: ASMR visual paired with high-value narration'; document.getElementById('analyzerForm').requestSubmit();">
+                            <span class="pulse-tag" style="background:rgba(157, 78, 221, 0.1); color:var(--accent-purple);">Sensory</span>
+                            <h4 class="text-sm font-bold mb-1">Split-Screen Hook</h4>
+                            <p class="text-[10px] text-secondary">Use secondary visual stimulation to maintain attention during deep-dive tips.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pill-tabs mb-4 sticky-pill interactive-glow mx-auto mt-4" style="justify-content:center !important;">
@@ -909,7 +930,7 @@
             </section>
 
             <!-- 3. TRACKER -->
-            <section id="view-tracker" class="tab-view hidden scroll-container content-padding pb-heavy">
+            <section id="view-tracker" class="tab-view hidden scroll-container flush-container pb-heavy">
                 <div class="flex items-center justify-between gap-4 mb-2">
                     <h2>Hook Tracker</h2>
                     <div class="flex gap-2">
@@ -1262,8 +1283,13 @@
                         </button>
                     </div>
                     <form id="rewriteFormEl" class="glass-card interactive-glow p-4 border-accent">
-                        <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
-                            rows="6" class="w-full text-input mb-4 bg-card-dark" ></textarea>
+                        <div class="relative">
+                            <textarea id="rewriteInput" placeholder="I went to the store today and found a cool apple..."
+                                rows="6" class="w-full text-input mb-2 bg-card-dark" ></textarea>
+                            <div id="scriptTimer" class="absolute bottom-4 right-3 px-2 py-1 bg-black/60 rounded text-[9px] font-bold text-accent-blue-light border border-white/10 hidden">
+                                <span id="wordCount">0</span> words | <span id="readTime">0</span>s
+                            </div>
+                        </div>
                         
                         <div class="flex flex-col gap-3 mb-4">
                             <div class="flex justify-between items-center px-1">
@@ -1331,7 +1357,7 @@
             </section>
 
             <!-- 11. VIDEO AI (PRO) -->
-            <section id="view-videoai" class="tab-view hidden scroll-container content-padding pb-heavy">
+            <section id="view-videoai" class="tab-view hidden scroll-container flush-container pb-heavy">
                  <div class="tab-header pt-4 pb-2">
                     <div class="flex justify-between items-center w-full">
                         <h2 class="flex items-center gap-2">Video AI <i data-lucide="crown" class="text-accent" style="display:inline; width:20px;"></i></h2>
@@ -1478,10 +1504,19 @@
                 <!-- PERFECTLY ANCHORED TYPING AREA -->
                 <div class="chat-input-anchored">
                     <div id="typingIndicator" class="hidden py-2"><span class="text-xs text-secondary italic flex items-center gap-2"><div class="loader" style="width:10px; height:10px;"></div> Architect is calculating...</span></div>
+                    
+                    <div id="chatImagePreview" class="hidden px-4 mb-2 flex items-center gap-2">
+                        <!-- Image preview chip will appear here -->
+                    </div>
+
                     <div class="chat-input-area">
                         <div class="flex-grow relative">
+                            <input type="file" id="chatFileInput" class="hidden" accept="image/*">
                             <input type="text" id="chatInput" class="chat-input elite-bubble" placeholder="Message the Architect..." style="width:100%;">
                         </div>
+                        <button id="chatUploadBtn" class="voice-record-btn" title="Upload Thumbnail/Image">
+                            <i data-lucide="image"></i>
+                        </button>
                         <button id="voiceChatBtn" class="voice-record-btn" title="Speak to Architect">
                             <i data-lucide="mic"></i>
                         </button>
@@ -1513,7 +1548,7 @@
             <footer class="version-badge-footer" style="padding-bottom: 2rem; opacity: 0.3;">
                 <div class="flex items-center gap-2 justify-center">
                     <div class="w-1.5 h-1.5 bg-green rounded-full animate-pulse"></div>
-                    <p class="text-[8px] text-muted tracking-widest">ZENITH V4.9.0-ULTIMATE (IRON LOCK SECURED)</p>
+                    <p class="text-[8px] text-muted tracking-widest">VIRALREELS AI V6.0.1 (ZENITH ULTIMATE)</p>
                 </div>
             </footer>
         </main>
