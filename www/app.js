@@ -1,9 +1,22 @@
-/**
- * ViralReels AI - App Logic (V3.2-PRO-RESTORED)
- */
-
 // ViralReels System Boot (Auth Protection)
 window.VR_BOOT_TIME = Date.now();
+
+// -- Global Utilities & State (V6.4.2 Zenith) --
+window.safeGet = (key, fallback) => {
+    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
+    catch (e) { return fallback; }
+};
+
+let isPro = localStorage.getItem('vr_pro_status') === 'true';
+let persona = window.safeGet('vr_persona', { niche: '', tone: 50 });
+let savedEvents = window.safeGet('viralreels_events', {});
+let savedHooks = window.safeGet('viralreels_tracked_hooks', []);
+let savedRewrites = window.safeGet('viralreels_saved_rewrites', []);
+let analyticsData = window.safeGet('vr_analytics_data', []);
+let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
+let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
+let savedTheme = localStorage.getItem('vr_theme') || 'dark';
+let currentAnalyzedIdea = null;
 
 // Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
@@ -57,6 +70,18 @@ if ('serviceWorker' in navigator) {
 }
 
 const initApp = () => {
+    // 1. Immediate UI Reveal (Dismiss Splash) - MUST BE FIRST
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => { 
+            splash.style.visibility = 'hidden'; 
+            splash.style.display = 'none'; 
+            if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 500);
+    }
+    console.log("ViralReels AI: Boot Sequence Initiated");
+
     window.renderState = (module, state) => {
         const emptyEl = document.getElementById(`${module}GeneratorsEmpty`);
         const contentEl = document.getElementById(`${module}GeneratorsContent`);
@@ -129,8 +154,6 @@ const initApp = () => {
     initAuroraParticles();
 
     // -- Global Keyboard Protection System --
-    // -- Global Keyboard Protection System (Zenith V4.1 Robust) --
-    // Uses event delegation to ensure dynamic inputs (Chat, Rewrite) are always covered.
     const setupKeyboardProtection = () => {
         window.addEventListener('focusin', (e) => {
             const target = e.target;
@@ -148,60 +171,55 @@ const initApp = () => {
     setupKeyboardProtection();
     
     // -- ZENITH NEURAL AUDIO ENGINE (V4.6) --
-    const neuralCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let neuralCtx = null;
+    try {
+        neuralCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+        console.warn("ViralReels AI: Neural Audio Engine initialization failed.", e);
+    }
+
     window.playNeuralSound = (type) => {
-        if (!persona.audio || neuralCtx.state === 'suspended') {
-            if (neuralCtx.state === 'suspended') neuralCtx.resume();
-            if (!persona.audio) return;
+        if (!neuralCtx || !persona.audio || neuralCtx.state === 'suspended') {
+            if (neuralCtx && neuralCtx.state === 'suspended') neuralCtx.resume().catch(() => {});
+            if (!persona.audio || !neuralCtx) return;
         }
 
-        const osc = neuralCtx.createOscillator();
-        const gain = neuralCtx.createGain();
-        osc.connect(gain);
-        gain.connect(neuralCtx.destination);
+        try {
+            const osc = neuralCtx.createOscillator();
+            const gain = neuralCtx.createGain();
+            osc.connect(gain);
+            gain.connect(neuralCtx.destination);
 
-        const now = neuralCtx.currentTime;
+            const now = neuralCtx.currentTime;
 
-        if (type === 'success') {
-            // Harmonic Rise
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'scanning') {
-            // High-Tech Pulse
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(20, now);
-            osc.frequency.linearRampToValueAtTime(40, now + 0.1);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        } else if (type === 'click') {
-            // Sharp Blip
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(1000, now);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-            osc.start(now);
-            osc.stop(now + 0.05);
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'scanning') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(20, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.1);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1000, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        } catch (e) {
+            console.error("Neural Audio playback failed", e);
         }
     };
-
-    // 1. Immediate UI Reveal (Dismiss Splash)
-    const splash = document.getElementById('splashScreen');
-    if (splash) {
-        splash.style.opacity = '0';
-        setTimeout(() => { 
-            splash.style.visibility = 'hidden'; 
-            splash.style.display = 'none'; 
-            // Fallback: if it's still there, force removal
-            if (splash.parentNode) splash.parentNode.removeChild(splash);
-        }, 500);
-    }
 
     console.log("ViralReels AI System: Global Optimization Active");
         
@@ -223,16 +241,7 @@ const initApp = () => {
         STRIPE_TEST_MODE: false, // Flip to false for sk_live
     };
 
-    let currentAnalyzedIdea = null;
-    let savedEvents = safeGet('viralreels_events', {});
-    let savedHooks = safeGet('viralreels_tracked_hooks', []);
-    let savedRewrites = safeGet('viralreels_saved_rewrites', []);
-    let analyticsData = safeGet('vr_analytics_data', []);
-    let isPro = localStorage.getItem('vr_pro_status') === 'true';
-    let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
-    let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
-    let savedTheme = localStorage.getItem('vr_theme') || 'dark';
-    let persona = safeGet('vr_persona', { niche: '', tone: 50 });
+    // (Global states moved to top level for reliability)
     
     // --- V6.0 BOOT ENGINE: Apply Niche Identity ---
     // We defer this slightly to ensure the DOM is ready if called from initApp
@@ -3108,6 +3117,7 @@ const initApp = () => {
             });
             if (localStorage.getItem('vr_notifs_enabled') === 'true') notifToggle.checked = true;
         }
+    }
 
     // -- EXPORT LOGIC --
     function downloadCSV(data, filename) {
@@ -3736,11 +3746,8 @@ const initApp = () => {
     updateIcons();
 };
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
-}
+// Initialization moved to end of file to ensure all helpers are defined.
+
 // =============================================
 // == SUB-TAB & PRECISION LOGIC (VIRALREELS V3.9) ==
 // =============================================
@@ -3781,11 +3788,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// -- Global Storage Helper --
-window.safeGet = (key, fallback) => {
-    try { const val = localStorage.getItem(key); return val ? JSON.parse(val) : fallback; }
-    catch (e) { return fallback; }
-};
+// Global safeGet moved to top for dependency resolution
 
 // 2. Resolve Analytics Hydration (V2 Stats + Chart)
 const originalRenderAnalytics = window.renderAnalytics;
@@ -3851,3 +3854,10 @@ if (rewriteInput) {
     });
 }
 
+// --- BOOT ENGINE (V6.4.2) ---
+// We execute this at the very end to ensure all safeGet and global helpers are ready.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
