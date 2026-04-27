@@ -1600,10 +1600,13 @@
     </div>
 
     <!-- ============================================= -->
-    <!-- ENTRANCE PAGE (OPERATION PRO ENTRANCE) -->
+    <!-- ENTRANCE PAGE (OPERATION PRO ENTRANCE V6.9.1) -->
     <!-- ============================================= -->
-    <div id="authOverlay" class="auth-landing-page hidden">
-        <div class="auth-container animate-appear">
+    <div id="authOverlay" class="auth-landing-page hidden" style="background: radial-gradient(circle at top right, #1a1a2e 0%, #0a0a0f 100%);">
+        <!-- Floating Particles Effect -->
+        <div class="particles" id="authParticles"></div>
+        
+        <div class="auth-container animate-appear" style="background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 50px 150px rgba(0,0,0,0.8);">
             <div class="auth-header mb-8 text-center">
                 <img src="assets/logo.svg" alt="Logo" class="w-16 h-16 mx-auto mb-4" onerror="this.src='https://img.icons8.com/fluency/96/lightning-bolt.png'">
                 <h1 class="text-4xl font-bold text-gradient mb-2">ViralReels AI</h1>
@@ -1663,7 +1666,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=6.9.0"></script>
+    <script src="app.js?v=6.9.1"></script>
 
 </body>
 

@@ -3577,9 +3577,11 @@ const initApp = () => {
                                 const onboardingOverlay = document.getElementById('onboardingOverlay');
                                 if (onboardingOverlay) {
                                     onboardingOverlay.classList.remove('hidden');
+                                    // Ensure Lucide icons inside the tour are rendered
+                                    if (window.lucide) window.lucide.createIcons();
                                     showTourStep();
                                 }
-                            }, 1000);
+                            }, 1500); // 1.5s delay for workspace hydration
                         }
                         return;
                     }
@@ -3587,6 +3589,21 @@ const initApp = () => {
                     console.error("[ViralReels] Auth Logic Failure:", err);
                 }
             });
+
+            // ENTRANCE PARTICLES (V6.9.1)
+            const authParticles = document.getElementById('authParticles');
+            if (authParticles) {
+                for (let i = 0; i < 20; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.top = Math.random() * 100 + '%';
+                    p.style.width = Math.random() * 4 + 'px';
+                    p.style.height = p.style.width;
+                    p.style.animationDelay = Math.random() * 5 + 's';
+                    authParticles.appendChild(p);
+                }
+            }
 
             document.getElementById('showEmailFormBtn')?.addEventListener('click', () => {
                 const authBaseActions = document.getElementById('authBaseActions');
