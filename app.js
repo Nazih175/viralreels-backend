@@ -37,12 +37,10 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         const hasUID = !!localStorage.getItem('vr_uid');
         if (isBypass || hasUID) {
             localStorage.setItem('vr_gate_locked', 'true'); // PERSISTENT LOCK
+            window.VR_AUTH_RESOLVED = true; 
             const overlay = document.getElementById('authOverlay');
             const app = document.getElementById('appContainer');
-            if (overlay) {
-                overlay.classList.add('hidden');
-                overlay.style.display = 'none'; // FORCE HIDE
-            }
+            if (overlay) overlay.remove(); // PHYSICAL DELETE
             if (app) app.classList.remove('hidden');
         }
     })();
@@ -3534,9 +3532,10 @@ const initApp = () => {
             auth.getRedirectResult().then((result) => {
                 if (result && result.user) {
                     console.log("[ViralReels] GOOGLE_AUTH: Redirect Success", result.user.email);
+                    window.VR_AUTH_RESOLVED = true;
                     localStorage.setItem('vr_gate_locked', 'true');
                     localStorage.setItem('vr_uid', result.user.uid);
-                    document.getElementById('authOverlay')?.classList.add('hidden');
+                    document.getElementById('authOverlay')?.remove(); // DELETE
                     document.getElementById('appContainer')?.classList.remove('hidden');
                     document.getElementById('settingsModal')?.classList.add('hidden');
                     showToast(`Success! Welcome back, ${result.user.displayName || 'Creator'}!`);
@@ -3560,35 +3559,36 @@ const initApp = () => {
                 appContainer.classList.remove('hidden');
             }
 
-            // --- OPERATION PERSISTENT LOCKDOWN (V6.7.0) ---
+            // --- OPERATION DOM PURGE (V6.7.1) ---
             auth.onAuthStateChanged((user) => {
                 try {
                     const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
                     const persistentLock = localStorage.getItem('vr_gate_locked') === 'true';
                     
                     if (user || dynamicBypass || persistentLock) {
+                        window.VR_AUTH_RESOLVED = true;
                         localStorage.setItem('vr_gate_locked', 'true');
-                        authOverlay.classList.add('hidden');
-                        authOverlay.style.display = 'none';
+                        if (authOverlay && authOverlay.parentNode) authOverlay.remove(); // DELETE FROM DOM
                         appContainer.classList.remove('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
-                        return; // Exit immediately, we are good.
+                        return;
                     }
 
-                    // If we are already inside, never show the gate again.
-                    if (persistentLock) return;
+                    if (window.VR_AUTH_RESOLVED) return; // GLOBAL KILL-SWITCH
 
                     // If no user/bypass, wait for a grace period before showing the gate
                     if (!window.VR_AUTH_GRACE_TIMER) {
                         window.VR_AUTH_GRACE_TIMER = setTimeout(() => {
+                            if (window.VR_AUTH_RESOLVED) return; 
                             const stillLocked = localStorage.getItem('vr_gate_locked') === 'true';
                             if (!auth.currentUser && !localStorage.getItem('vr_bypass_active') && !stillLocked) {
-                                console.log("[ViralReels] Grace Period Expired: Showing Gate");
-                                authOverlay.classList.remove('hidden');
-                                authOverlay.style.display = 'flex';
-                                appContainer.classList.add('hidden');
+                                if (authOverlay) {
+                                    authOverlay.classList.remove('hidden');
+                                    authOverlay.style.display = 'flex';
+                                    appContainer.classList.add('hidden');
+                                }
                             }
-                        }, 5000); // Increased to 5s for slower mobile connections
+                        }, 5000); 
                     }
 
                     if (user) {
@@ -3625,8 +3625,9 @@ const initApp = () => {
                         // Fake a success login to satisfy the crawler
                         // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
+                            window.VR_AUTH_RESOLVED = true;
                             localStorage.setItem('vr_gate_locked', 'true');
-                            authOverlay.classList.add('hidden');
+                            authOverlay?.remove(); // DELETE
                             appContainer.classList.remove('hidden');
                             updateIcons();
                             showToast("Reviewer Account Verified. Pro Access Unlocked.");
