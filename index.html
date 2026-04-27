@@ -1595,130 +1595,97 @@
             <div class="flex gap-3 w-full" id="vrModalActions">
                 <button class="btn-secondary w-full" id="vrModalCancel">Cancel</button>
                 <button class="btn-primary w-full" id="vrModalConfirm">Confirm</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================= -->
-    <!-- ULTIMATE PIXEL PERFECT ENTRANCE (V7.2.0) -->
+         <!-- ============================================= -->
+    <!-- PRO CREATOR ENTRANCE (V7.3.0 - MOBILE OPT) -->
     <!-- ============================================= -->
     <div id="authOverlay" class="auth-landing-page hidden">
-        <!-- Background Assets -->
-        <div class="floating-asset" style="top: 25%; left: 12%;"><div class="glass-card" style="padding: 10px 15px; border-radius: 12px; font-size: 11px;"><i data-lucide="play" class="mr-2 inline w-3 h-3 fill-white"></i> 12.5M</div></div>
-        <div class="floating-asset" style="bottom: 25%; left: 8%;"><div class="glass-card" style="padding: 18px; border-radius: 16px;"><i data-lucide="zap" class="w-6 h-6 text-purple-400"></i></div></div>
-        <div class="floating-asset" style="top: 15%; right: 18%;"><i data-lucide="sparkles" class="w-5 h-5 text-purple-300 opacity-60"></i></div>
-        <div class="floating-asset" style="bottom: 30%; right: 12%;"><div class="glass-card" style="padding: 14px; border-radius: 18px; text-align: left;"><span class="block text-[9px] opacity-50 uppercase tracking-tighter">Viral Score</span><span class="block text-xl font-bold">98<span class="text-xs opacity-50">/100</span></span></div></div>
+        <div class="auth-mesh"></div>
         
         <div class="auth-container">
-            <!-- Header Logo -->
-            <div class="flex items-center justify-center gap-3 mb-10 font-bold text-lg">
-                <div class="w-9 h-9">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Branded Logo Header -->
+            <div class="flex flex-col items-center mb-12">
+                <div class="w-24 h-24 mb-6">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 20px rgba(168,85,247,0.4));">
                         <defs>
-                            <linearGradient id="neonGradAuthMain" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <linearGradient id="neonGradAuthPro" x1="0%" y1="100%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="#a855f7" />
                                 <stop offset="50%" stop-color="#ec4899" />
                                 <stop offset="100%" stop-color="#eab308" />
                             </linearGradient>
                         </defs>
-                        <rect x="0" y="0" width="100" height="100" rx="22" fill="#1a1a24" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
-                        <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAuthMain)" />
-                        <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAuthMain)" />
-                        <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuthMain)" />
+                        <rect x="0" y="0" width="100" height="100" rx="28" fill="#111118" stroke="rgba(168,85,247,0.2)" stroke-width="2" />
+                        <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAuthPro)" />
+                        <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAuthPro)" />
+                        <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuthPro)" />
                     </svg>
                 </div>
-                <span>Viral Reels <span class="text-purple-500">AI</span></span>
-            </div>
-
-            <div class="flex justify-center mb-6">
-                <div class="w-20 h-20 bg-purple-600/10 border border-purple-500/20 rounded-[28px] flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-12 h-12">
-                        <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAuthMain)" />
-                        <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAuthMain)" />
-                        <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuthMain)" />
-                    </svg>
-                </div>
+                <h1 class="text-4xl font-extrabold text-white tracking-tighter mb-2">ViralReels <span class="text-purple-500">AI</span></h1>
+                <p class="text-white-40 text-lg">Next-gen creator intelligence.</p>
             </div>
 
             <div class="auth-header">
-                <h1>Welcome back 👋</h1>
-                <p>Sign in to continue to Viral Reels AI</p>
+                <h2 class="text-2xl font-bold text-white mb-2">Welcome back 👋</h2>
+                <p class="text-white-40 mb-10">Sign in to your creator dashboard</p>
             </div>
 
             <!-- LOGIN SELECTION -->
             <div id="authBaseActions">
-                <button class="btn-google-pixel mb-4" id="googleLoginBtn">
-                    <svg viewBox="0 0 48 48" class="w-6 h-6 mr-4">
+                <button class="btn-google-pixel w-full mb-6 flex items-center justify-center gap-4 bg-white text-black font-bold py-4 rounded-2xl shadow-xl shadow-white/5" id="googleLoginBtn">
+                    <svg viewBox="0 0 48 48" class="w-6 h-6">
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         <path fill="none" d="M0 0h48v48H0z"/>
                     </svg>
-                    Sign in with Google
+                    Continue with Google
                 </button>
 
-                <div class="auth-divider-pixel">OR</div>
+                <div class="auth-divider-pixel mb-6">OR</div>
 
-                <button class="btn-email-pixel" id="showEmailFormBtn">
-                    <i data-lucide="mail" class="w-5 h-5"></i>
-                    Sign in with Email
+                <button class="btn-email-pixel w-full py-4 rounded-2xl" id="showEmailFormBtn">
+                    <i data-lucide="mail" class="w-6 h-6 mr-3"></i>
+                    Continue with Email
                 </button>
 
-                <div class="mt-8 text-sm">
-                    <span class="opacity-40">No account?</span>
-                    <a href="#" class="text-purple-400 font-bold ml-1 hover:underline">Sign up</a>
+                <div class="mt-10 text-sm">
+                    <span class="opacity-40">Don't have an account?</span>
+                    <a href="#" class="text-purple-400 font-bold ml-1 hover:underline">Join the Elite</a>
                 </div>
             </div>
 
             <!-- EMAIL FORM (HIDDEN) -->
             <form id="emailLoginForm" class="hidden text-left">
-                <div class="mb-4">
-                    <label class="block text-[10px] font-bold text-white-40 mb-2 uppercase tracking-widest">Email Address</label>
-                    <input type="email" id="authEmail" class="text-input" style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border-color: rgba(255,255,255,0.1);" placeholder="creator@reels.ai" required>
-                </div>
                 <div class="mb-6">
-                    <label class="block text-[10px] font-bold text-white-40 mb-2 uppercase tracking-widest">Password</label>
-                    <input type="password" id="authPass" class="text-input" style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border-color: rgba(255,255,255,0.1);" placeholder="••••••••" required>
+                    <label class="block text-xs font-bold text-white-40 mb-2 uppercase tracking-widest">Creator Email</label>
+                    <input type="email" id="authEmail" class="text-input" style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 16px; border-color: rgba(255,255,255,0.1);" placeholder="creator@reels.ai" required>
                 </div>
-                <button type="submit" class="btn-primary w-full py-4 rounded-xl mb-4 font-bold tracking-wide" id="authSubmitBtn">Sign In</button>
-                <button type="button" class="w-full text-xs opacity-50 hover:opacity-100 transition-opacity" id="btnBackToSelection">← Use another method</button>
+                <div class="mb-8">
+                    <label class="block text-xs font-bold text-white-40 mb-2 uppercase tracking-widest">Secure Password</label>
+                    <input type="password" id="authPass" class="text-input" style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 16px; border-color: rgba(255,255,255,0.1);" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-5 rounded-2xl mb-6 font-bold tracking-widest shadow-2xl shadow-purple-500/20" id="authSubmitBtn">SIGN IN</button>
+                <button type="button" class="w-full text-sm opacity-50 hover:opacity-100 transition-opacity" id="btnBackToSelection">← BACK TO METHODS</button>
             </form>
 
-            <!-- Features Grid -->
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <div class="feature-icon"><i data-lucide="zap" class="w-4 h-4"></i></div>
-                    <div class="feature-title">AI-Powered</div>
-                    <div class="feature-desc">Create smarter reels, 10X faster</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
-                    <div class="feature-title">Auto Creation</div>
-                    <div class="feature-desc">Captions, visuals & music in one click</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
-                    <div class="feature-title">Built to Go Viral</div>
-                    <div class="feature-desc">Optimized for reach & engagement</div>
-                </div>
-            </div>
-
             <!-- Security Box -->
-            <div class="security-box">
-                <div class="security-icon"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                <div style="flex: 1;">
-                    <div class="text-[11px] font-bold">Your data is 100% secure</div>
-                    <div class="text-[9px] opacity-40">We never share your data with anyone. Your privacy matters.</div>
+            <div class="security-box mt-16 p-6 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full border border-purple-500 flex items-center justify-center text-purple-500 shadow-lg shadow-purple-500/20">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div class="text-left">
+                    <div class="text-sm font-bold text-white">Your data is 100% secure</div>
+                    <div class="text-[10px] text-white-40">End-to-end encryption for every creator.</div>
                 </div>
             </div>
 
-            <p class="text-[10px] mt-12 opacity-30 leading-relaxed">
-                By continuing, you agree to our <br>
-                <a href="#" class="underline">Terms of Service</a> &nbsp; <a href="#" class="underline">Privacy Policy</a>
+            <p class="text-[10px] mt-12 opacity-30 leading-relaxed uppercase tracking-widest font-bold">
+                By entering, you agree to our <br>
+                <a href="#" class="underline">Terms of Service</a> &nbsp; &bull; &nbsp; <a href="#" class="underline">Privacy Policy</a>
             </p>
         </div>
     </div>
+
 
     <!-- Success Animation Overlay -->
     <div id="successOverlay" class="success-overlay hidden" style="z-index: 10000 !important;">
@@ -1736,7 +1703,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=7.2.1"></script>
+    <script src="app.js?v=7.3.0"></script>
 
 </body>
 

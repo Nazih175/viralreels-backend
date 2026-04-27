@@ -2702,3 +2702,45 @@ button:active, .nav-item:active {
 .feature-grid { border-top: 1px solid rgba(255,255,255,0.1) !important; margin-top: 40px !important; padding-top: 24px !important; }
 .security-box { background: rgba(124, 58, 237, 0.05) !important; border: 1px solid rgba(124, 58, 237, 0.15) !important; }
 
+
+/* --- PRO CREATOR ENTRANCE (V7.3.0) --- */
+.auth-landing-page {
+    position: fixed; inset: 0; 
+    background: radial-gradient(circle at top right, #1e1040 0%, #000000 100%) !important;
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.auth-container {
+    width: 100% !important; max-width: 440px !important;
+    height: 100% !important; max-height: 100vh !important;
+    display: flex; flex-direction: column; justify-content: center;
+    background: rgba(10, 10, 15, 0.9) !important;
+    backdrop-filter: blur(40px);
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 3rem 2rem !important;
+    text-align: center;
+}
+@media (min-width: 768px) {
+    .auth-container {
+        height: auto !important; max-height: 90vh !important;
+        border-radius: 40px !important;
+        border: 1px solid rgba(124, 58, 237, 0.2) !important;
+    }
+}
+.auth-header h1 { font-size: 32px !important; font-weight: 800 !important; margin-bottom: 12px !important; color: #fff !important; }
+.auth-header p { font-size: 16px !important; color: rgba(255,255,255,0.5) !important; margin-bottom: 40px !important; }
+.btn-google-pixel {
+    background: #fff !important; color: #000 !important; font-weight: 700 !important;
+    height: 56px !important; border-radius: 16px !important;
+}
+.btn-email-pixel {
+    background: rgba(124, 58, 237, 0.1) !important;
+    color: #a855f7 !important;
+    border: 1px solid rgba(124, 58, 237, 0.3) !important;
+    height: 56px !important; border-radius: 16px !important;
+    font-weight: 700 !important;
+}
+.auth-divider-pixel { margin: 2.5rem 0 !important; color: rgba(255,255,255,0.2) !important; font-weight: 800 !important; letter-spacing: 2px !important; }
+
