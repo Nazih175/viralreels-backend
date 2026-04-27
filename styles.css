@@ -2675,3 +2675,30 @@ button:active, .nav-item:active {
 .floating-asset { position: absolute; z-index: -1; pointer-events: none; opacity: 0.4; animation: float 10s infinite ease-in-out; }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
 
+
+/* --- THE ULTIMATE PIXEL PERFECT PUSH (V7.2.0) --- */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+.auth-landing-page {
+    font-family: 'Outfit', sans-serif !important;
+    background: radial-gradient(circle at center, #180d31 0%, #000 100%) !important;
+}
+.auth-container {
+    width: 420px !important;
+    background: #0d0d12 !important;
+    border: 1px solid rgba(124, 58, 237, 0.3) !important;
+    border-radius: 28px !important;
+    padding: 3rem 2.5rem !important;
+}
+.auth-header h1 { font-size: 26px !important; font-weight: 700 !important; color: #fff !important; margin-bottom: 8px !important; }
+.auth-header p { font-size: 14px !important; color: rgba(255,255,255,0.4) !important; margin-bottom: 32px !important; }
+.btn-google-pixel { 
+    border-radius: 12px !important; height: 54px !important; font-size: 15px !important; 
+    box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+}
+.btn-email-pixel { 
+    border-radius: 12px !important; height: 54px !important; font-size: 15px !important; 
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+.feature-grid { border-top: 1px solid rgba(255,255,255,0.1) !important; margin-top: 40px !important; padding-top: 24px !important; }
+.security-box { background: rgba(124, 58, 237, 0.05) !important; border: 1px solid rgba(124, 58, 237, 0.15) !important; }
+
