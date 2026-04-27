@@ -2744,3 +2744,75 @@ button:active, .nav-item:active {
 }
 .auth-divider-pixel { margin: 2.5rem 0 !important; color: rgba(255,255,255,0.2) !important; font-weight: 800 !important; letter-spacing: 2px !important; }
 
+
+/* --- MOBILE POLISH & FIXES (V7.4.0) --- */
+/* Settings Page Glitch Fix */
+.settings-page { padding: 20px !important; }
+.settings-card { width: 100% !important; margin: 10px 0 !important; border-radius: 20px !important; }
+.settings-grid { grid-template-columns: 1fr !important; gap: 15px !important; }
+
+/* AI Chat Mobile Layout Fix */
+.chat-input-container {
+    padding: 12px 16px !important;
+    background: rgba(15, 15, 20, 0.95) !important;
+    border-top: 1px solid rgba(255,255,255,0.05) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 100 !important;
+}
+
+.chat-input-wrapper { 
+    flex: 1 !important;
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    min-height: 48px !important;
+}
+
+.chat-input-field {
+    background: transparent !important;
+    border: none !important;
+    color: #fff !important;
+    padding: 10px 0 !important;
+    font-size: 14px !important;
+    flex: 1 !important;
+    outline: none !important;
+}
+
+.chat-action-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    color: rgba(255,255,255,0.6) !important;
+    transition: all 0.2s !important;
+    flex-shrink: 0 !important;
+}
+
+.chat-send-btn {
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--accent-purple) !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 15px rgba(168,85,247,0.3) !important;
+}
+
+/* Ensure app container has padding for the fixed bottom bar */
+#appContainer { padding-bottom: 80px !important; }
+

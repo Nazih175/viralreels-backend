@@ -104,6 +104,7 @@
         <div class="paywall-card glass-card interactive-glow flex-col premium-glow">
             <button class="close-btn modal-closer" id="closePaywallBtn" aria-label="Close Premium Upgrade" title="Close"><i data-lucide="x"></i></button>
 
+
             <div class="hero-premium-bg mb-2">
                 <div class="pro-badge mb-1 mx-auto" style="padding: 4px 10px; font-size: 0.7rem;"><i
                         data-lucide="crown"></i> PRO</div>
@@ -1475,19 +1476,23 @@
                         <!-- Image preview chip will appear here -->
                     </div>
 
-                    <div class="chat-input-area">
-                        <div class="flex-grow relative">
+                    <div class="chat-input-container">
+                        <div class="flex items-center gap-1">
                             <input type="file" id="chatFileInput" class="hidden" accept="image/*">
-                            <input type="text" id="chatInput" class="chat-input elite-bubble" placeholder="Message the Architect..." style="width:100%;">
+                            <button id="chatUploadBtn" class="chat-action-btn" title="Upload Image">
+                                <i data-lucide="image" class="w-5 h-5"></i>
+                            </button>
+                            <button id="voiceChatBtn" class="chat-action-btn" title="Voice Message">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                            </button>
                         </div>
-                        <button id="chatUploadBtn" class="voice-record-btn" title="Upload Thumbnail/Image">
-                            <i data-lucide="image"></i>
-                        </button>
-                        <button id="voiceChatBtn" class="voice-record-btn" title="Speak to Architect">
-                            <i data-lucide="mic"></i>
-                        </button>
-                        <button id="sendChatBtn" class="btn-primary rounded-pill" style="padding: 10px 18px; flex-shrink:0;">
-                            <i data-lucide="send"></i>
+
+                        <div class="chat-input-wrapper">
+                            <input type="text" id="chatInput" class="chat-input-field" placeholder="Message the Architect...">
+                        </div>
+
+                        <button class="chat-send-btn" id="sendChatBtn">
+                            <i data-lucide="send" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
@@ -1703,7 +1708,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=7.3.0"></script>
+    <script src="app.js?v=7.4.0"></script>
 
 </body>
 
