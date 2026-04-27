@@ -19,16 +19,29 @@ let savedTheme = localStorage.getItem('vr_theme') || 'dark';
 let currentAnalyzedIdea = null;
 let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
 
-    // --- SERVICE WORKER (PWA STABILITY) ---
-    // Lockdown V6.5.3: Disabling automatic reloads to prevent boot loops
+    // --- SERVICE WORKER LOCKDOWN (V6.5.4 PURGE) ---
+    // Decisively unregister any misconfigured or old Service Workers to stop reload loops.
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./service-worker.js').then(reg => {
-            console.log("ViralReels AI: SW Registered");
-        }).catch(err => console.log('SW setup failed', err));
-
-        // Note: ControllerChange reloads are disabled for launch stability.
-        // Updates will take effect on the next cold start.
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+                registration.unregister();
+                console.log("ViralReels AI: Legacy SW Purged");
+            }
+        });
     }
+
+    // --- IMMEDIATE AUTH SHIELD (Priority 0) ---
+    // Hide overlay immediately if bypass or session is cached to prevent flicker loops.
+    (function() {
+        const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
+        const hasUID = !!localStorage.getItem('vr_uid');
+        if (isBypass || hasUID) {
+            const overlay = document.getElementById('authOverlay');
+            const app = document.getElementById('appContainer');
+            if (overlay) overlay.classList.add('hidden');
+            if (app) app.classList.remove('hidden');
+        }
+    })();
 
 const initApp = () => {
     // 1. Immediate UI Reveal (Dismiss Splash) - MUST BE FIRST
@@ -3536,10 +3549,13 @@ const initApp = () => {
 
             auth.onAuthStateChanged(async (user) => {
                 try {
-                    // Sync UI for session OR bypass
+                    const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
+                    
+                    // --- DETERMINISTIC UI SYNC (V6.5.4) ---
                     if (user || isBypassActive) {
                         authOverlay.classList.add('hidden');
                         appContainer.classList.remove('hidden');
+                        if (user) localStorage.setItem('vr_uid', user.uid);
                     }
 
                     if (user) {
@@ -3563,6 +3579,7 @@ const initApp = () => {
                             document.getElementById('onboardingOverlay')?.classList.remove('hidden');
                         }
                     } else {
+                        localStorage.removeItem('vr_uid');
                         if (isBypassActive) {
                             isPro = true;
                             window.updateAuthUI({ email: 'reviewer@viralreels.com' });
@@ -3677,9 +3694,11 @@ const initApp = () => {
                     
                     if (window.firebase && firebase.auth().currentUser) {
                         firebase.auth().signOut().then(() => {
+                            localStorage.removeItem('vr_uid');
                             window.location.reload();
                         });
                     } else {
+                        localStorage.removeItem('vr_uid');
                         window.location.reload();
                     }
                 });
