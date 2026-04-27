@@ -30,24 +30,33 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         });
     }
 
-    // --- IMMEDIATE AUTH SHIELD (V6.8.0) ---
+    // --- IMMEDIATE AUTH SHIELD (V6.8.1 - ONE-TIME KEY) ---
     (function() {
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
         const isLocked = localStorage.getItem('vr_gate_locked') === 'true';
+        const tourDone = localStorage.getItem('vr_tour_completed') === 'true';
 
+        // If the system remembers you, or you finished the tour and are in a session
         if (isBypass || hasUID || isLocked) {
-            localStorage.setItem('vr_gate_locked', 'true');
             window.VR_AUTH_RESOLVED = true; 
-            // We hide the landing page immediately to avoid flicker
             const landing = document.getElementById('authOverlay');
-            if (landing) landing.remove(); 
+            if (landing) landing.remove(); // PHYSICAL REMOVAL
             const app = document.getElementById('appContainer');
             if (app) app.classList.remove('hidden');
         } else {
-            // New user or guest: Show the Landing Page
+            // New user: Show landing page
             const landing = document.getElementById('authOverlay');
-            if (landing) landing.classList.remove('hidden');
+            if (landing) {
+                landing.classList.remove('hidden');
+                // If they already did the tour but aren't logged in, skip straight to selection
+                if (tourDone) {
+                    const authTour = document.getElementById('authTour');
+                    const authBaseActions = document.getElementById('authBaseActions');
+                    if (authTour) authTour.classList.add('hidden');
+                    if (authBaseActions) authBaseActions.classList.remove('hidden');
+                }
+            }
         }
     })();
 
@@ -3603,12 +3612,14 @@ const initApp = () => {
                     currentTourStep++;
                     updateTour();
                 } else {
+                    localStorage.setItem('vr_tour_completed', 'true');
                     authTour.classList.add('hidden');
                     authBaseActions.classList.remove('hidden');
                 }
             });
 
             document.getElementById('btnSkipTour')?.addEventListener('click', () => {
+                localStorage.setItem('vr_tour_completed', 'true');
                 authTour.classList.add('hidden');
                 authBaseActions.classList.remove('hidden');
             });
