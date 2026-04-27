@@ -36,10 +36,13 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
         if (isBypass || hasUID) {
-            window.VR_GATE_DISMISSED = true; // LOCK GATE SHUT
+            localStorage.setItem('vr_gate_locked', 'true'); // PERSISTENT LOCK
             const overlay = document.getElementById('authOverlay');
             const app = document.getElementById('appContainer');
-            if (overlay) overlay.classList.add('hidden');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.style.display = 'none'; // FORCE HIDE
+            }
             if (app) app.classList.remove('hidden');
         }
     })();
@@ -3531,7 +3534,7 @@ const initApp = () => {
             auth.getRedirectResult().then((result) => {
                 if (result && result.user) {
                     console.log("[ViralReels] GOOGLE_AUTH: Redirect Success", result.user.email);
-                    window.VR_GATE_LOCKED = true; // LOCK GATE SHUT
+                    localStorage.setItem('vr_gate_locked', 'true');
                     localStorage.setItem('vr_uid', result.user.uid);
                     document.getElementById('authOverlay')?.classList.add('hidden');
                     document.getElementById('appContainer')?.classList.remove('hidden');
@@ -3557,32 +3560,35 @@ const initApp = () => {
                 appContainer.classList.remove('hidden');
             }
 
-            // --- OPERATION SILENT BOOT (V6.6.0) ---
+            // --- OPERATION PERSISTENT LOCKDOWN (V6.7.0) ---
             auth.onAuthStateChanged((user) => {
                 try {
                     const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
+                    const persistentLock = localStorage.getItem('vr_gate_locked') === 'true';
                     
-                    if (user || dynamicBypass) {
-                        window.VR_GATE_LOCKED = true; // Permanent Lock
+                    if (user || dynamicBypass || persistentLock) {
+                        localStorage.setItem('vr_gate_locked', 'true');
                         authOverlay.classList.add('hidden');
+                        authOverlay.style.display = 'none';
                         appContainer.classList.remove('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
                         return; // Exit immediately, we are good.
                     }
 
                     // If we are already inside, never show the gate again.
-                    if (window.VR_GATE_LOCKED) return;
+                    if (persistentLock) return;
 
                     // If no user/bypass, wait for a grace period before showing the gate
-                    // This prevents the "Flicker Loop" during session hydration.
                     if (!window.VR_AUTH_GRACE_TIMER) {
                         window.VR_AUTH_GRACE_TIMER = setTimeout(() => {
-                            if (!auth.currentUser && !localStorage.getItem('vr_bypass_active')) {
+                            const stillLocked = localStorage.getItem('vr_gate_locked') === 'true';
+                            if (!auth.currentUser && !localStorage.getItem('vr_bypass_active') && !stillLocked) {
                                 console.log("[ViralReels] Grace Period Expired: Showing Gate");
                                 authOverlay.classList.remove('hidden');
+                                authOverlay.style.display = 'flex';
                                 appContainer.classList.add('hidden');
                             }
-                        }, 2500); // 2.5s Grace Period
+                        }, 5000); // Increased to 5s for slower mobile connections
                     }
 
                     if (user) {
@@ -3619,7 +3625,7 @@ const initApp = () => {
                         // Fake a success login to satisfy the crawler
                         // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
-                            window.VR_GATE_LOCKED = true; // LOCK GATE SHUT
+                            localStorage.setItem('vr_gate_locked', 'true');
                             authOverlay.classList.add('hidden');
                             appContainer.classList.remove('hidden');
                             updateIcons();
