@@ -880,9 +880,12 @@ const initApp = () => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
             setTimeout(() => t.remove(), 300);
+        }, duration);
+    };
+
     // -- AD MODAL ENGINE (REWARD VIDEO ADS) --
     // TODO: Replace this simulated timer with the Google AdSense H5 Games SDK for Reward Video Ads
-    // Script: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID"    <script src="app.js?v=6.7.4"></script>
+    // Script: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script>
     const adModal = document.getElementById('adModal');
     const adProgressBar = document.getElementById('adProgressBar');
     const adSeconds = document.getElementById('adSeconds');
