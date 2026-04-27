@@ -98,61 +98,6 @@
         </svg>
     </div>
 
-    <!-- Auth Overlay (Reverted/Standardized) -->
-    <div id="authOverlay" class="fullscreen-overlay z-auth hidden">
-        <div class="auth-card glass-card w-full interactive-glow" style="border: var(--glass-border); padding: 3rem 2rem;">
-            <div class="auth-logo-bg mb-4">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
-                    style="width: 70px; height: 70px; filter: drop-shadow(0 0 15px rgba(168,85,247,0.4));">
-                    <defs>
-                        <linearGradient id="neonGradAuth" x1="0%" y1="100%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#a855f7" />
-                            <stop offset="50%" stop-color="#ec4899" />
-                            <stop offset="100%" stop-color="#eab308" />
-                        </linearGradient>
-                    </defs>
-                    <rect x="0" y="0" width="100" height="100" rx="22" fill="#0f0f13" stroke="#2a2a35"
-                        stroke-width="2" />
-                    <!-- Ascending Bars -->
-                    <rect x="22" y="55" width="12" height="25" rx="4" fill="url(#neonGradAuth)" />
-                    <rect x="44" y="35" width="12" height="45" rx="4" fill="url(#neonGradAuth)" />
-                    <rect x="66" y="15" width="12" height="65" rx="4" fill="url(#neonGradAuth)" />
-                </svg>
-            </div>
-            
-            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(168,85,247,0.1); padding:4px 10px; border-radius:20px; border:1px solid rgba(168,85,247,0.2); margin-bottom:1rem;">
-                <i data-lucide="shield-check" style="width:12px; height:12px; color:var(--accent-purple);"></i>
-                <span style="font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--accent-purple);">Certified 2026 AI</span>
-            </div>
-
-            <h1 class="auth-title" style="font-size: 1.8rem; margin-bottom: 0.25rem;">ViralReels <span class="gradient-text">AI</span></h1>
-            <p class="text-muted" style="font-size: 0.85rem; max-width: 240px; margin: 0 auto 2rem; line-height: 1.4;">Dominate the short-form meta with precision-tuned creator intelligence.</p>
-            
-            <div class="auth-actions" id="authBaseActions">
-                <button class="btn-primary w-full" id="googleLoginBtn" style="margin-bottom: 0.75rem; height: 52px;"><i data-lucide="globe"></i> Continue with Google</button>
-                <button class="btn-secondary w-full border-subtle" id="emailLoginBtn" style="background:rgba(255,255,255,0.05); margin-bottom: 1rem; height: 52px;"><i data-lucide="mail"></i> Continue with Email</button>
-            </div>
-
-            <p class="text-muted" style="font-size: 10px; margin-top: 1rem; opacity: 0.5;">By continuing, you acknowledge that you have read and agree to our <a href="terms.html" class="text-accent" style="text-decoration: underline;">Terms of Service</a> and <a href="privacy.html" class="text-accent" style="text-decoration: underline;">Privacy Policy</a>.</p>
-            
-            <form id="emailLoginForm" class="hidden text-left w-full mt-2">
-                <div class="mb-2">
-                    <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Email Address</label>
-                    <input type="email" id="authEmail" class="text-input w-full"
-                        style="padding:10px; background:rgba(0,0,0,0.3);" required placeholder="creator@example.com">
-                </div>
-                <div class="mb-2">
-                    <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Password</label>
-                    <input type="password" id="authPass" class="text-input w-full"
-                        style="padding:10px; background:rgba(0,0,0,0.3);" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-primary w-full mb-2" id="authSubmitBtn">Sign In / Create
-                    Account</button>
-                <button type="button" class="btn-secondary w-full text-xs" id="backToMethodsBtn"
-                    style="background:transparent; border:none;">← Back</button>
-            </form>
-        </div>
-    </div>
 
     <!-- Premium Paywall Overlay -->
     <div id="paywallOverlay" class="fullscreen-overlay z-paywall hidden">
@@ -1752,7 +1697,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=6.8.1"></script>
+    <script src="app.js?v=6.8.2"></script>
 
 </body>
 
