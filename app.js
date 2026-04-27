@@ -36,6 +36,7 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
         if (isBypass || hasUID) {
+            window.VR_GATE_DISMISSED = true; // LOCK GATE SHUT
             const overlay = document.getElementById('authOverlay');
             const app = document.getElementById('appContainer');
             if (overlay) overlay.classList.add('hidden');
@@ -3555,43 +3556,44 @@ const initApp = () => {
                 appContainer.classList.remove('hidden');
             }
 
-            auth.onAuthStateChanged(async (user) => {
+            auth.onAuthStateChanged((user) => {
                 try {
-                    const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
+                    // --- DYNAMIC STATE CHECK (V6.5.7) ---
+                    const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
                     
-                    // --- DETERMINISTIC UI SYNC (V6.5.4) ---
-                    if (user || isBypassActive) {
+                    if (user || dynamicBypass) {
+                        window.VR_GATE_DISMISSED = true; // Permanent unlock
                         authOverlay.classList.add('hidden');
                         appContainer.classList.remove('hidden');
                         document.getElementById('settingsModal')?.classList.add('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
                     }
 
+                    if (window.VR_GATE_DISMISSED) return; // KILL ALL RE-APPEARANCE
+
                     if (user) {
                         console.log("[ViralReels] AUTH_RESOLVED: Session Active", user.email);
-                        isPro = localStorage.getItem('vr_pro_status') === 'true'; 
                         window.updateAuthUI(user);
                         
                         try {
                             const db = firebase.firestore();
-                            const doc = await db.collection('users').doc(user.uid).get();
-                            if (doc.exists) {
-                                isPro = !!doc.data().isPro;
-                                localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                                window.updateAuthUI(user);
-                            }
+                            db.collection('users').doc(user.uid).get().then(doc => {
+                                if (doc.exists) {
+                                    isPro = !!doc.data().isPro;
+                                    localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
+                                    window.updateAuthUI(user);
+                                }
+                            });
                         } catch (e) {}
 
                         try { initTrial(); renderAllBadges(); } catch(e){}
-                        
-                        if (!isOnboardingComplete && !localStorage.getItem('vr_onboarding_complete')) {
-                            document.getElementById('onboardingOverlay')?.classList.remove('hidden');
-                        }
                     } else {
                         localStorage.removeItem('vr_uid');
-                        if (isBypassActive) {
+                        if (dynamicBypass) {
                             isPro = true;
                             window.updateAuthUI({ email: 'reviewer@viralreels.com' });
+                            authOverlay.classList.add('hidden');
+                            appContainer.classList.remove('hidden');
                         } else {
                             window.updateAuthUI(null);
                             authOverlay.classList.remove('hidden');
@@ -3600,9 +3602,6 @@ const initApp = () => {
                     }
                 } catch (err) {
                     console.error("[ViralReels] Auth Logic Failure:", err);
-                    if (!auth.currentUser && !localStorage.getItem('vr_bypass_active')) {
-                        authOverlay.classList.remove('hidden');
-                    }
                 }
             });
 
