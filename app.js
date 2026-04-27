@@ -3556,25 +3556,36 @@ const initApp = () => {
                 appContainer.classList.remove('hidden');
             }
 
+            // --- OPERATION SILENT BOOT (V6.6.0) ---
             auth.onAuthStateChanged((user) => {
                 try {
-                    // --- DYNAMIC STATE CHECK (V6.5.7) ---
                     const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
                     
                     if (user || dynamicBypass) {
-                        window.VR_GATE_DISMISSED = true; // Permanent unlock
+                        window.VR_GATE_LOCKED = true; // Permanent Lock
                         authOverlay.classList.add('hidden');
                         appContainer.classList.remove('hidden');
-                        document.getElementById('settingsModal')?.classList.add('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
+                        return; // Exit immediately, we are good.
                     }
 
-                    if (window.VR_GATE_DISMISSED) return; // KILL ALL RE-APPEARANCE
+                    // If we are already inside, never show the gate again.
+                    if (window.VR_GATE_LOCKED) return;
+
+                    // If no user/bypass, wait for a grace period before showing the gate
+                    // This prevents the "Flicker Loop" during session hydration.
+                    if (!window.VR_AUTH_GRACE_TIMER) {
+                        window.VR_AUTH_GRACE_TIMER = setTimeout(() => {
+                            if (!auth.currentUser && !localStorage.getItem('vr_bypass_active')) {
+                                console.log("[ViralReels] Grace Period Expired: Showing Gate");
+                                authOverlay.classList.remove('hidden');
+                                appContainer.classList.add('hidden');
+                            }
+                        }, 2500); // 2.5s Grace Period
+                    }
 
                     if (user) {
-                        console.log("[ViralReels] AUTH_RESOLVED: Session Active", user.email);
                         window.updateAuthUI(user);
-                        
                         try {
                             const db = firebase.firestore();
                             db.collection('users').doc(user.uid).get().then(doc => {
@@ -3585,20 +3596,6 @@ const initApp = () => {
                                 }
                             });
                         } catch (e) {}
-
-                        try { initTrial(); renderAllBadges(); } catch(e){}
-                    } else {
-                        localStorage.removeItem('vr_uid');
-                        if (dynamicBypass) {
-                            isPro = true;
-                            window.updateAuthUI({ email: 'reviewer@viralreels.com' });
-                            authOverlay.classList.add('hidden');
-                            appContainer.classList.remove('hidden');
-                        } else {
-                            window.updateAuthUI(null);
-                            authOverlay.classList.remove('hidden');
-                            appContainer.classList.add('hidden');
-                        }
                     }
                 } catch (err) {
                     console.error("[ViralReels] Auth Logic Failure:", err);

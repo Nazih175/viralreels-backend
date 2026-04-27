@@ -2507,3 +2507,22 @@ button:active, .nav-item:active {
     transform: translateX(-100%);
     animation: shimmer 1.5s infinite;
 }
+
+/* --- DESKTOP CENTERED CARD (FORCE OVERRIDE) --- */
+@media (min-width: 769px) {
+    .app-layout {
+        max-width: 450px !important;
+        height: 92vh !important;
+        margin: 4vh auto !important;
+        border-radius: 32px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 100px rgba(157, 78, 221, 0.1) !important;
+    }
+    .bottom-nav {
+        max-width: 450px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        border-bottom-left-radius: 32px !important;
+        border-bottom-right-radius: 32px !important;
+    }
+}
