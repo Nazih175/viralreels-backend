@@ -3531,6 +3531,7 @@ const initApp = () => {
             auth.getRedirectResult().then((result) => {
                 if (result && result.user) {
                     console.log("[ViralReels] GOOGLE_AUTH: Redirect Success", result.user.email);
+                    window.VR_GATE_LOCKED = true; // LOCK GATE SHUT
                     localStorage.setItem('vr_uid', result.user.uid);
                     document.getElementById('authOverlay')?.classList.add('hidden');
                     document.getElementById('appContainer')?.classList.remove('hidden');
@@ -3618,6 +3619,7 @@ const initApp = () => {
                         // Fake a success login to satisfy the crawler
                         // Direct state transition (No recursive initApp call)
                         setTimeout(() => {
+                            window.VR_GATE_LOCKED = true; // LOCK GATE SHUT
                             authOverlay.classList.add('hidden');
                             appContainer.classList.remove('hidden');
                             updateIcons();
