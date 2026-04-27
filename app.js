@@ -716,9 +716,11 @@ const initApp = () => {
         const authActionBtn = document.getElementById('btnAuthAction');
         const billingStatePro = document.getElementById('billingStatePro');
         const billingStateStandard = document.getElementById('billingStateStandard');
+        const proStatusText = document.getElementById('settingsProStatusText');
 
         if (user) {
             // AUTHENTICATED
+            if (proStatusText) proStatusText.innerText = isPro ? 'PRO ACTIVE' : 'STANDARD (FREE)';
             if (isPro) {
                 headerGoProBtn?.classList.add('hidden');
             } else {
@@ -740,6 +742,7 @@ const initApp = () => {
             }
         } else {
             // LOGGED OUT
+            if (proStatusText) proStatusText.innerText = 'LOGGED OUT';
             headerGoProBtn?.classList.add('hidden');
             if (authActionBtn) {
                 authActionBtn.innerHTML = '<i data-lucide="log-in"></i> Sign In / Register';
@@ -3525,13 +3528,18 @@ const initApp = () => {
 
             // Handle Redirect Result (Restored for GitHub Pages compatibility)
             auth.getRedirectResult().then((result) => {
-                if (result.user) {
-                    console.log("ViralReels AI: Google Login Successful", result.user.email);
-                    showToast(`Welcome back, ${result.user.displayName || 'Creator'}!`);
+                if (result && result.user) {
+                    console.log("[ViralReels] GOOGLE_AUTH: Redirect Success", result.user.email);
+                    localStorage.setItem('vr_uid', result.user.uid);
+                    document.getElementById('authOverlay')?.classList.add('hidden');
+                    document.getElementById('appContainer')?.classList.remove('hidden');
+                    document.getElementById('settingsModal')?.classList.add('hidden');
+                    showToast(`Success! Welcome back, ${result.user.displayName || 'Creator'}!`);
                 }
             }).catch((error) => {
                 if (error.code !== 'auth/no-auth-event') {
                     console.error("Auth Error:", error);
+                    showToast("Google Auth Failed: " + (error.message || "Domain restricted"));
                 }
             });
 

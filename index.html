@@ -371,12 +371,18 @@
     </div>
 
     <!-- Advanced Settings Modal (Expanded) -->
-    <div id="settingsModal" class="fullscreen-overlay z-paywall hidden">
-        <div class="glass-card about-card text-left scroll-container interactive-glow"
-            style="max-height: 85vh; width:100%; max-width:450px;">
+    <div id="settingsModal" class="fullscreen-overlay z-paywall hidden" style="padding: 1rem;">
+        <div class="glass-card about-card text-left interactive-glow"
+            style="width:100%; max-width:450px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh;">
             <button class="close-btn modal-closer" id="closeSettingsBtn"><i data-lucide="x"></i></button>
-            <h2 class="font-bold text-xl mb-6 mt-2 flex items-center gap-2"><i data-lucide="settings"
-                    class="text-muted"></i> User Settings <span class="certified-badge" style="margin-bottom:0; font-size: 0.55rem; padding: 2px 8px;">Gold Edition</span></h2>
+            
+            <div class="modal-header-section" style="padding: 1.5rem 1.5rem 0.5rem 1.5rem;">
+                <h2 class="font-bold text-xl mb-1 flex items-center gap-2"><i data-lucide="settings"
+                        class="text-muted"></i> User Settings</h2>
+                <span class="text-xs text-muted">Platform V6.5.6 | Pro Status: <span id="settingsProStatusText">Syncing...</span></span>
+            </div>
+
+            <div class="scroll-container" style="flex: 1; padding: 0.5rem 1.5rem 1.5rem 1.5rem;">
 
             <div class="mb-6">
                 <h4
@@ -549,7 +555,7 @@
                 <a href="terms.html" target="_blank" class="text-xs text-muted">Terms of Service</a>
                 <a href="support.html" target="_blank" class="text-xs text-muted">Support</a>
             </div>
-            <p class="text-center text-xs text-muted mt-2 border-top border-subtle pt-4">ViralReels AI App Version 3.6.0 [Verified Gold Edition]</p>
+            </div>
         </div>
     </div>
 
@@ -1668,7 +1674,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=6.5.5"></script>
+    <script src="app.js?v=6.5.6"></script>
 
 </body>
 
