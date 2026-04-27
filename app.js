@@ -30,30 +30,24 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         });
     }
 
-    // --- IMMEDIATE AUTH SHIELD (Priority 0) ---
-    // Hide overlay immediately if bypass or session is cached to prevent flicker loops.
+    // --- IMMEDIATE AUTH SHIELD (V6.8.0) ---
     (function() {
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
-        // --- GLOBAL AUTH PROTECTOR (V6.7.4) ---
-        window.VR_SHOW_AUTH = () => {
-            const isResolved = window.VR_AUTH_RESOLVED || localStorage.getItem('vr_gate_locked') === 'true';
-            if (isResolved) return; // KILL-SWITCH
-            const overlay = document.getElementById('authOverlay');
-            if (overlay) {
-                overlay.classList.remove('hidden');
-                overlay.style.display = 'flex';
-                document.getElementById('appContainer')?.classList.add('hidden');
-            }
-        };
+        const isLocked = localStorage.getItem('vr_gate_locked') === 'true';
 
-        if (isBypass || hasUID) {
-            localStorage.setItem('vr_gate_locked', 'true'); 
+        if (isBypass || hasUID || isLocked) {
+            localStorage.setItem('vr_gate_locked', 'true');
             window.VR_AUTH_RESOLVED = true; 
-            const overlay = document.getElementById('authOverlay');
+            // We hide the landing page immediately to avoid flicker
+            const landing = document.getElementById('authOverlay');
+            if (landing) landing.remove(); 
             const app = document.getElementById('appContainer');
-            if (overlay) overlay.remove(); 
             if (app) app.classList.remove('hidden');
+        } else {
+            // New user or guest: Show the Landing Page
+            const landing = document.getElementById('authOverlay');
+            if (landing) landing.classList.remove('hidden');
         }
     })();
 
@@ -3563,15 +3557,7 @@ const initApp = () => {
             if (window.VR_AUTH_SETUP) return;
             window.VR_AUTH_SETUP = true;
 
-            // PRE-EMPTIVE BYPASS CHECK (ViralReels V6.5.3 Overdrive)
-            const isBypassActive = localStorage.getItem('vr_bypass_active') === 'true';
-            if (isBypassActive) {
-                console.log("[ViralReels] OVERDRIVE: Bypassing auth gate.");
-                authOverlay.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-            }
-
-            // --- OPERATION DOM PURGE (V6.7.1) ---
+            // --- OPERATION GRAND ENTRANCE (V6.8.0) ---
             auth.onAuthStateChanged((user) => {
                 try {
                     const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
@@ -3580,41 +3566,61 @@ const initApp = () => {
                     if (user || dynamicBypass || persistentLock) {
                         window.VR_AUTH_RESOLVED = true;
                         localStorage.setItem('vr_gate_locked', 'true');
-                        if (authOverlay && authOverlay.parentNode) authOverlay.remove(); // DELETE FROM DOM
+                        const landing = document.getElementById('authOverlay');
+                        if (landing) landing.remove(); 
                         appContainer.classList.remove('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
                         return;
                     }
 
-                    if (window.VR_AUTH_RESOLVED) return; // GLOBAL KILL-SWITCH
-
-                    // If no user/bypass, wait for a grace period before showing the gate
-                    if (!window.VR_AUTH_GRACE_TIMER) {
-                        window.VR_AUTH_GRACE_TIMER = setTimeout(() => {
-                            if (window.VR_AUTH_RESOLVED) return; 
-                            const stillLocked = localStorage.getItem('vr_gate_locked') === 'true';
-                            if (!auth.currentUser && !localStorage.getItem('vr_bypass_active') && !stillLocked) {
-                                window.VR_SHOW_AUTH();
-                            }
-                        }, 5000); 
-                    }
-
+                    // If no user found and no bypass, the Landing Page is already visible from the shield.
                     if (user) {
                         window.updateAuthUI(user);
-                        try {
-                            const db = firebase.firestore();
-                            db.collection('users').doc(user.uid).get().then(doc => {
-                                if (doc.exists) {
-                                    isPro = !!doc.data().isPro;
-                                    localStorage.setItem('vr_pro_status', isPro ? 'true' : 'false');
-                                    window.updateAuthUI(user);
-                                }
-                            });
-                        } catch (e) {}
                     }
                 } catch (err) {
                     console.error("[ViralReels] Auth Logic Failure:", err);
                 }
+            });
+
+            // PRODUCT TOUR CONTROLLER
+            let currentTourStep = 0;
+            const tourSlides = document.querySelectorAll('.tour-slide');
+            const tourDots = document.querySelectorAll('.dot');
+            const btnNextTour = document.getElementById('btnNextTour');
+            const authTour = document.getElementById('authTour');
+            const authBaseActions = document.getElementById('authBaseActions');
+
+            const updateTour = () => {
+                tourSlides.forEach((s, i) => s.classList.toggle('active', i === currentTourStep));
+                tourDots.forEach((d, i) => d.classList.toggle('active', i === currentTourStep));
+                if (currentTourStep >= tourSlides.length - 1) {
+                    btnNextTour.textContent = "Sign In / Create Account";
+                }
+            };
+
+            btnNextTour?.addEventListener('click', () => {
+                if (currentTourStep < tourSlides.length - 1) {
+                    currentTourStep++;
+                    updateTour();
+                } else {
+                    authTour.classList.add('hidden');
+                    authBaseActions.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('btnSkipTour')?.addEventListener('click', () => {
+                authTour.classList.add('hidden');
+                authBaseActions.classList.remove('hidden');
+            });
+
+            document.getElementById('showEmailFormBtn')?.addEventListener('click', () => {
+                authBaseActions.classList.add('hidden');
+                emailLoginForm.classList.remove('hidden');
+            });
+
+            document.getElementById('btnBackToSelection')?.addEventListener('click', () => {
+                emailLoginForm.classList.add('hidden');
+                authBaseActions.classList.remove('hidden');
             });
 
             // Email Form Submit
