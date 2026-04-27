@@ -3555,6 +3555,7 @@ const initApp = () => {
                     if (user || isBypassActive) {
                         authOverlay.classList.add('hidden');
                         appContainer.classList.remove('hidden');
+                        document.getElementById('settingsModal')?.classList.add('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
                     }
 
@@ -3704,7 +3705,7 @@ const initApp = () => {
                 });
             } else {
                 // LOGIN PATH (Open Overlay instead of reloading)
-                document.getElementById('settingsOverlay')?.classList.add('hidden');
+                document.getElementById('settingsModal')?.classList.add('hidden');
                 authOverlay.classList.remove('hidden');
             }
         });
