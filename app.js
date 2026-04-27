@@ -7,17 +7,31 @@ window.safeGet = (key, fallback) => {
     catch (e) { return fallback; }
 };
 
-let isPro = localStorage.getItem('vr_pro_status') === 'true';
-let persona = window.safeGet('vr_persona', { niche: '', tone: 50 });
-let savedEvents = window.safeGet('viralreels_events', {});
-let savedHooks = window.safeGet('viralreels_tracked_hooks', []);
-let savedRewrites = window.safeGet('viralreels_saved_rewrites', []);
-let analyticsData = window.safeGet('vr_analytics_data', []);
-let isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
-let isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
-let savedTheme = localStorage.getItem('vr_theme') || 'dark';
+let isPro = false;
+let persona = { niche: '', tone: 50 };
+let savedEvents = {};
+let savedHooks = [];
+let savedRewrites = [];
+let analyticsData = [];
+let isSubCancelled = false;
+let isOnboardingComplete = false;
+let savedTheme = 'dark';
 let currentAnalyzedIdea = null;
-let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
+let isGuestMode = false;
+
+try {
+    isPro = localStorage.getItem('vr_pro_status') === 'true';
+    persona = window.safeGet('vr_persona', { niche: '', tone: 50 });
+    savedEvents = window.safeGet('viralreels_events', {});
+    savedHooks = window.safeGet('viralreels_tracked_hooks', []);
+    savedRewrites = window.safeGet('viralreels_saved_rewrites', []);
+    analyticsData = window.safeGet('vr_analytics_data', []);
+    isSubCancelled = localStorage.getItem('vr_sub_cancelled') === 'true';
+    isOnboardingComplete = localStorage.getItem('vr_onboarding_complete') === 'true';
+    savedTheme = localStorage.getItem('vr_theme') || 'dark';
+} catch (e) {
+    console.warn("[ViralReels] Storage restricted. Using session state.");
+}
 
     // --- SERVICE WORKER LOCKDOWN (V6.5.4 PURGE) ---
     // Decisively unregister any misconfigured or old Service Workers to stop reload loops.
@@ -30,25 +44,29 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         });
     }
 
-    // --- IMMEDIATE AUTH SHIELD (V7.0.0 - UNICORN ENTRANCE) ---
+    // --- IMMEDIATE AUTH SHIELD (V7.8.5 - BULLETPROOF) ---
     (function() {
-        const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
-        const hasUID = !!localStorage.getItem('vr_uid');
-        const isLocked = localStorage.getItem('vr_gate_locked') === 'true';
+        try {
+            const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
+            const hasUID = !!localStorage.getItem('vr_uid');
+            const isLocked = localStorage.getItem('vr_gate_locked') === 'true';
 
-        if (isBypass || hasUID || isLocked) {
-            window.VR_AUTH_RESOLVED = true; 
-            const landing = document.getElementById('authOverlay');
-            if (landing) landing.remove(); 
-            const app = document.getElementById('appContainer');
-            if (app) app.classList.remove('hidden');
-        } else {
-            const landing = document.getElementById('authOverlay');
-            if (landing) {
-                landing.classList.remove('hidden');
-                // Lock body scroll to ensure the landing page feels like an app
-                document.body.style.overflow = 'hidden';
+            if (isBypass || hasUID || isLocked) {
+                window.VR_AUTH_RESOLVED = true; 
+                const landing = document.getElementById('authOverlay');
+                if (landing) landing.remove(); 
+                const app = document.getElementById('appContainer');
+                if (app) app.classList.remove('hidden');
+            } else {
+                const landing = document.getElementById('authOverlay');
+                if (landing) {
+                    landing.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
             }
+        } catch (err) {
+            const landing = document.getElementById('authOverlay');
+            if (landing) landing.classList.remove('hidden');
         }
     })();
 
