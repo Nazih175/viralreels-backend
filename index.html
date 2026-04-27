@@ -1600,52 +1600,55 @@
     </div>
 
     <!-- ============================================= -->
-    <!-- ENTRANCE PAGE (OPERATION PRO ENTRANCE V6.9.1) -->
+    <!-- ULTIMATE ENTRANCE (V7.0.0 - UNICORN TIER) -->
     <!-- ============================================= -->
-    <div id="authOverlay" class="auth-landing-page hidden" style="background: radial-gradient(circle at top right, #1a1a2e 0%, #0a0a0f 100%);">
-        <!-- Floating Particles Effect -->
-        <div class="particles" id="authParticles"></div>
+    <div id="authOverlay" class="auth-landing-page hidden">
+        <div class="auth-mesh"></div>
         
-        <div class="auth-container animate-appear" style="background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 50px 150px rgba(0,0,0,0.8);">
-            <div class="auth-header mb-8 text-center">
-                <img src="assets/logo.svg" alt="Logo" class="w-16 h-16 mx-auto mb-4" onerror="this.src='https://img.icons8.com/fluency/96/lightning-bolt.png'">
-                <h1 class="text-4xl font-bold text-gradient mb-2">ViralReels AI</h1>
-                <p class="text-white-60 text-lg mb-8">The elite engine for next-gen content creators. Generate, Predict, and Dominate.</p>
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="flex justify-center mb-8">
+                    <div class="w-20 h-20 bg-gradient rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-500/20 animate-pulse-slow">
+                        <i data-lucide="zap" class="text-white w-10 h-10"></i>
+                    </div>
+                </div>
+                <h1 class="animate-appear">ViralReels</h1>
+                <p class="animate-appear" style="animation-delay: 0.1s;">Elite intelligence for the next generation of content creators.</p>
             </div>
 
             <!-- LOGIN SELECTION -->
-            <div id="authBaseActions">
-                <button class="btn-google w-full mb-4" id="googleLoginBtn">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa_light/google.svg" alt="G" class="w-5 h-5 mr-3">
+            <div id="authBaseActions" class="animate-appear" style="animation-delay: 0.2s;">
+                <button class="btn-google w-full mb-6" id="googleLoginBtn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa_light/google.svg" alt="G" class="w-6 h-6 mr-4">
                     Continue with Google
                 </button>
 
                 <div class="auth-divider">
-                    <span>OR</span>
+                    <span>SECURE ACCESS</span>
                 </div>
 
                 <button class="btn-secondary w-full" id="showEmailFormBtn">
-                    <i data-lucide="mail" class="w-5 h-5 mr-3"></i>
+                    <i data-lucide="mail" class="w-6 h-6 mr-4"></i>
                     Continue with Email
                 </button>
             </div>
 
             <!-- EMAIL FORM -->
-            <form id="emailLoginForm" class="hidden">
-                <div class="mb-6">
-                    <label class="block text-sm text-white-40 mb-2 uppercase tracking-widest">Creator Email</label>
-                    <input type="email" id="authEmail" class="text-input" placeholder="name@creator.com" required>
+            <form id="emailLoginForm" class="hidden animate-appear">
+                <div class="mb-6 text-left">
+                    <label class="block text-xs font-bold text-white-40 mb-2 uppercase tracking-widest">Creator Email</label>
+                    <input type="email" id="authEmail" class="text-input" style="background: rgba(0,0,0,0.2); padding: 1.25rem; border-radius: 16px;" placeholder="name@creator.com" required>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-sm text-white-40 mb-2 uppercase tracking-widest">Secure Password</label>
-                    <input type="password" id="authPass" class="text-input" placeholder="••••••••" required>
+                <div class="mb-8 text-left">
+                    <label class="block text-xs font-bold text-white-40 mb-2 uppercase tracking-widest">Secure Password</label>
+                    <input type="password" id="authPass" class="text-input" style="background: rgba(0,0,0,0.2); padding: 1.25rem; border-radius: 16px;" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-primary w-full mb-4" id="authSubmitBtn">Sign In / Create Account</button>
-                <button type="button" class="text-white-40 w-full text-sm" id="btnBackToSelection">← Other methods</button>
+                <button type="submit" class="btn-primary w-full py-4 rounded-2xl mb-6 shadow-xl shadow-purple-500/20" id="authSubmitBtn">Sign In / Create Account</button>
+                <button type="button" class="text-white-40 w-full text-sm font-medium hover:text-white transition-colors" id="btnBackToSelection">← Use another method</button>
             </form>
 
-            <p class="auth-footer text-white-20 text-xs mt-12 text-center">
-                By entering, you agree to our <a href="terms.html" class="underline">Terms</a> & <a href="privacy.html" class="underline">Privacy</a>.
+            <p class="text-white-20 text-[10px] mt-16 uppercase tracking-widest font-bold">
+                By entering, you agree to our <a href="terms.html" class="text-white-40 underline">Terms</a> & <a href="privacy.html" class="text-white-40 underline">Privacy</a>
             </p>
         </div>
     </div>
@@ -1666,7 +1669,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=6.9.1"></script>
+    <script src="app.js?v=7.0.0"></script>
 
 </body>
 

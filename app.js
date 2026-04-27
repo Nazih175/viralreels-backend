@@ -30,13 +30,12 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
         });
     }
 
-    // --- IMMEDIATE AUTH SHIELD (V6.9.0 - PRO ENTRANCE) ---
+    // --- IMMEDIATE AUTH SHIELD (V7.0.0 - UNICORN ENTRANCE) ---
     (function() {
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
         const isLocked = localStorage.getItem('vr_gate_locked') === 'true';
 
-        // If the system remembers you, or you are in a session
         if (isBypass || hasUID || isLocked) {
             window.VR_AUTH_RESOLVED = true; 
             const landing = document.getElementById('authOverlay');
@@ -44,9 +43,12 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
             const app = document.getElementById('appContainer');
             if (app) app.classList.remove('hidden');
         } else {
-            // New user or guest: Show Entrance Page
             const landing = document.getElementById('authOverlay');
-            if (landing) landing.classList.remove('hidden');
+            if (landing) {
+                landing.classList.remove('hidden');
+                // Lock body scroll to ensure the landing page feels like an app
+                document.body.style.overflow = 'hidden';
+            }
         }
     })();
 
@@ -3556,7 +3558,7 @@ const initApp = () => {
             if (window.VR_AUTH_SETUP) return;
             window.VR_AUTH_SETUP = true;
 
-            // --- OPERATION PRO ENTRANCE (V6.9.0) ---
+            // --- OPERATION UNICORN ENTRANCE (V7.0.0) ---
             auth.onAuthStateChanged((user) => {
                 try {
                     const dynamicBypass = localStorage.getItem('vr_bypass_active') === 'true';
@@ -3565,10 +3567,19 @@ const initApp = () => {
                     if (user || dynamicBypass || persistentLock) {
                         window.VR_AUTH_RESOLVED = true;
                         localStorage.setItem('vr_gate_locked', 'true');
-                        const landing = document.getElementById('authOverlay');
-                        if (landing) landing.remove(); 
-                        appContainer.classList.remove('hidden');
                         if (user) localStorage.setItem('vr_uid', user.uid);
+
+                        // Unlock scroll
+                        document.body.style.overflow = '';
+
+                        const landing = document.getElementById('authOverlay');
+                        if (landing) {
+                            landing.style.opacity = '0';
+                            landing.style.transition = 'opacity 0.8s ease';
+                            setTimeout(() => landing.remove(), 800);
+                        }
+                        
+                        appContainer.classList.remove('hidden');
                         
                         // Trigger Gold Tour if not complete
                         const tourDone = localStorage.getItem('vr_onboarding_complete') === 'true';
@@ -3577,11 +3588,10 @@ const initApp = () => {
                                 const onboardingOverlay = document.getElementById('onboardingOverlay');
                                 if (onboardingOverlay) {
                                     onboardingOverlay.classList.remove('hidden');
-                                    // Ensure Lucide icons inside the tour are rendered
                                     if (window.lucide) window.lucide.createIcons();
                                     showTourStep();
                                 }
-                            }, 1500); // 1.5s delay for workspace hydration
+                            }, 1500);
                         }
                         return;
                     }
@@ -3590,20 +3600,7 @@ const initApp = () => {
                 }
             });
 
-            // ENTRANCE PARTICLES (V6.9.1)
-            const authParticles = document.getElementById('authParticles');
-            if (authParticles) {
-                for (let i = 0; i < 20; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = Math.random() * 100 + '%';
-                    p.style.top = Math.random() * 100 + '%';
-                    p.style.width = Math.random() * 4 + 'px';
-                    p.style.height = p.style.width;
-                    p.style.animationDelay = Math.random() * 5 + 's';
-                    authParticles.appendChild(p);
-                }
-            }
+            // Remove legacy entrance particles logic - mesh handles it now
 
             document.getElementById('showEmailFormBtn')?.addEventListener('click', () => {
                 const authBaseActions = document.getElementById('authBaseActions');
