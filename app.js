@@ -35,12 +35,24 @@ let isGuestMode = false; // Zenith V6.5.1: Explicit state initialization
     (function() {
         const isBypass = localStorage.getItem('vr_bypass_active') === 'true';
         const hasUID = !!localStorage.getItem('vr_uid');
+        // --- GLOBAL AUTH PROTECTOR (V6.7.4) ---
+        window.VR_SHOW_AUTH = () => {
+            const isResolved = window.VR_AUTH_RESOLVED || localStorage.getItem('vr_gate_locked') === 'true';
+            if (isResolved) return; // KILL-SWITCH
+            const overlay = document.getElementById('authOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                overlay.style.display = 'flex';
+                document.getElementById('appContainer')?.classList.add('hidden');
+            }
+        };
+
         if (isBypass || hasUID) {
-            localStorage.setItem('vr_gate_locked', 'true'); // PERSISTENT LOCK
+            localStorage.setItem('vr_gate_locked', 'true'); 
             window.VR_AUTH_RESOLVED = true; 
             const overlay = document.getElementById('authOverlay');
             const app = document.getElementById('appContainer');
-            if (overlay) overlay.remove(); // PHYSICAL DELETE
+            if (overlay) overlay.remove(); 
             if (app) app.classList.remove('hidden');
         }
     })();
@@ -868,12 +880,9 @@ const initApp = () => {
             t.style.opacity = '0';
             t.style.transform = 'translate(-50%, 20px)';
             setTimeout(() => t.remove(), 300);
-        }, duration);
-    };
-
     // -- AD MODAL ENGINE (REWARD VIDEO ADS) --
     // TODO: Replace this simulated timer with the Google AdSense H5 Games SDK for Reward Video Ads
-    // Script: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script>
+    // Script: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID"    <script src="app.js?v=6.7.4"></script>
     const adModal = document.getElementById('adModal');
     const adProgressBar = document.getElementById('adProgressBar');
     const adSeconds = document.getElementById('adSeconds');
@@ -1163,10 +1172,10 @@ const initApp = () => {
             if (btnTarget) {
                 const targetSub = btnTarget.getAttribute('data-subtab');
 
-                // --- PREMIUM BLOCKER ---
+                // --- PREMIUM BLOCKER (V6.7.4 SANITIZED) ---
                 if (targetSub === 'sub-analyze-metrics' && (!isPro || window.isGuestMode)) {
-                    if (window.isGuestMode) {
-                        authOverlay.classList.remove('hidden');
+                    if (window.isGuestMode && !window.VR_AUTH_RESOLVED) {
+                        window.VR_SHOW_AUTH();
                     } else {
                         paywallOverlay.classList.remove('hidden');
                     }
@@ -3582,11 +3591,7 @@ const initApp = () => {
                             if (window.VR_AUTH_RESOLVED) return; 
                             const stillLocked = localStorage.getItem('vr_gate_locked') === 'true';
                             if (!auth.currentUser && !localStorage.getItem('vr_bypass_active') && !stillLocked) {
-                                if (authOverlay) {
-                                    authOverlay.classList.remove('hidden');
-                                    authOverlay.style.display = 'flex';
-                                    appContainer.classList.add('hidden');
-                                }
+                                window.VR_SHOW_AUTH();
                             }
                         }, 5000); 
                     }
@@ -3719,7 +3724,7 @@ const initApp = () => {
             } else {
                 // LOGIN PATH (Open Overlay instead of reloading)
                 document.getElementById('settingsModal')?.classList.add('hidden');
-                authOverlay.classList.remove('hidden');
+                window.VR_SHOW_AUTH();
             }
         });
     }
