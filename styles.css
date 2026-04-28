@@ -2824,3 +2824,8 @@ button:active, .nav-item:active {
 /* Ensure app container has padding for the fixed bottom bar */
 #appContainer { padding-bottom: 80px !important; }
 
+
+/* --- CHAT ACTION COLORS (V8.0.5) --- */
+#chatUploadBtn { color: #00f5d4 !important; opacity: 1 !important; }
+#voiceChatBtn { color: #ff006e !important; opacity: 1 !important; }
+
