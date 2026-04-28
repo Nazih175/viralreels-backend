@@ -342,6 +342,24 @@
                             placeholder="e.g. AI / Tech, Fitness, Cooking...">
                     </div>
                     <div class="persona-stat-box">
+                        <label class="persona-label">Target Audience</label>
+                        <input type="text" id="personaAudience"
+                            class="text-input w-full p-2 bg-transparent border-none text-sm text-primary"
+                            placeholder="e.g. 18-24 Gen Z, Solopreneurs...">
+                    </div>
+                    <div class="persona-stat-box">
+                        <label class="persona-label">Primary Goal</label>
+                        <div class="custom-select-wrapper">
+                            <select id="personaGoal" class="text-sm border-none p-0 bg-transparent text-primary">
+                                <option value="virality" selected>Explosive Virality</option>
+                                <option value="conversions">Sales & Conversions</option>
+                                <option value="authority">Expert Authority</option>
+                                <option value="community">Community / Retention</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon" style="right:0;"></i>
+                        </div>
+                    </div>
+                    <div class="persona-stat-box">
                         <label class="persona-label">Strategy Architect</label>
                         <div class="custom-select-wrapper">
                             <select id="personaArchitect" class="text-sm border-none p-0 bg-transparent text-primary">
@@ -1705,7 +1723,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=8.1.1"></script>
+    <script src="app.js?v=8.2.0"></script>
 
     <script>
         // --- EMERGENCY LOAD SHIELD (V7.8.6) ---

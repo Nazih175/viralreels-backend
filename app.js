@@ -3003,6 +3003,8 @@ const initApp = () => {
     // persona = safeGet('vr_persona', { niche: 'AI / Tech', tone: '50', architect: 'disruptor', audio: true }); // REDUNDANT - Declared at line 235
     
     const personaNicheEl = document.getElementById('personaNiche');
+    const personaAudienceEl = document.getElementById('personaAudience');
+    const personaGoalEl = document.getElementById('personaGoal');
     const personaToneEl = document.getElementById('personaTone');
     const personaArchitectEl = document.getElementById('personaArchitect');
     const audioToggleEl = document.getElementById('audioToggle');
@@ -3042,9 +3044,11 @@ const initApp = () => {
         
         let contextText = `SYSTEM OPERATING CONTEXT:
         User Niche: ${persona.niche || 'General Content Creation'}
+        Target Audience: ${persona.audience || 'Broad / Undiscovered'}
+        Primary Goal: ${persona.goal || 'Virality'}
         User Tone: ${toneDesc}
         Current Architect: ${persona.architect || 'Disruptor'}
-        Platform: ViralReels AI Creator Suite (V8.1.0)
+        Platform: ViralReels AI Creator Suite (V8.2.0)
         `;
 
         if (currentAnalyzedIdea) {
@@ -3068,7 +3072,9 @@ const initApp = () => {
     };
 
     if (personaNicheEl && personaToneEl) {
-        personaNicheEl.value = persona.niche;
+        personaNicheEl.value = persona.niche || '';
+        if (personaAudienceEl) personaAudienceEl.value = persona.audience || '';
+        if (personaGoalEl) personaGoalEl.value = persona.goal || 'virality';
         personaToneEl.value = persona.tone;
         if (personaArchitectEl) personaArchitectEl.value = persona.architect || 'disruptor';
         if (audioToggleEl) audioToggleEl.checked = persona.audio !== false;
@@ -3076,6 +3082,8 @@ const initApp = () => {
         const updatePersona = () => {
             persona = { 
                 niche: personaNicheEl.value, 
+                audience: personaAudienceEl ? personaAudienceEl.value : '',
+                goal: personaGoalEl ? personaGoalEl.value : 'virality',
                 tone: personaToneEl.value, 
                 architect: personaArchitectEl ? personaArchitectEl.value : 'disruptor',
                 audio: audioToggleEl ? audioToggleEl.checked : true
@@ -3086,9 +3094,8 @@ const initApp = () => {
         };
 
         personaNicheEl.addEventListener('change', updatePersona);
-        personaToneEl.addEventListener('input', () => {
-             // Use input for smooth sliding persistence if needed, or stick to change for perf
-        });
+        if (personaAudienceEl) personaAudienceEl.addEventListener('change', updatePersona);
+        if (personaGoalEl) personaGoalEl.addEventListener('change', updatePersona);
         personaToneEl.addEventListener('change', updatePersona);
         if (personaArchitectEl) personaArchitectEl.addEventListener('change', updatePersona);
         if (audioToggleEl) audioToggleEl.addEventListener('change', updatePersona);
