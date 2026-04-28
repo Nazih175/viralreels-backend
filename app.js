@@ -2683,7 +2683,7 @@ const initApp = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: msg, 
-                        history: window.chatSession, // Send current session context
+                        history: window.chatSession.slice(0, -1), // Send ONLY previous messages
                         persona: { 
                             niche: persona.niche, 
                             tone: persona.tone, 
@@ -3040,17 +3040,31 @@ const initApp = () => {
         const toneVal = parseInt(persona.tone);
         const toneDesc = toneVal < 30 ? 'relatable and soft' : (toneVal > 70 ? 'high-energy and aggressive' : 'neutral and balanced');
         
-        // --- V6.1.0: ELITE VIRAL ARCHITECTURE MANDATE ---
-        const viralFrameworks = `
-            CRITICAL INSTRUCTIONS:
-            1. DEPTH: Do not give generic advice. Provide deep, actionable blueprints.
-            2. PSYCHOLOGY: Leverage Pattern Interruption, Curiosity Gaps, and the Zeigarnik Effect.
-            3. VISION: If the prompt contains [VISION], perform a visual audit of the described thumbnail/image based on Contrast, Legibility, and Emotional Trigger.
-            4. ACCURACY: All suggestions must be 100% specific to the "${persona.niche || 'General Content'}" niche.
-            5. STRUCTURE: Use Markdown for headers and bolding. Be concise but strategic.
+        let contextText = `SYSTEM OPERATING CONTEXT:
+        User Niche: ${persona.niche || 'General Content Creation'}
+        User Tone: ${toneDesc}
+        Current Architect: ${persona.architect || 'Disruptor'}
+        Platform: ViralReels AI Creator Suite (V8.1.0)
         `;
 
-        return `${archMap[persona.architect || 'disruptor']} Persona: Lead Growth Architect. Tone: ${toneDesc}. ${viralFrameworks}`;
+        if (currentAnalyzedIdea) {
+            contextText += `\nACTIVE PROJECT CONTEXT:
+            Current Idea being analyzed in the workspace: "${currentAnalyzedIdea.idea}"
+            Calculated Viral Score: ${currentAnalyzedIdea.score}%
+            Ensure your advice aligns with this specific idea if the user asks for feedback or improvements.`;
+        }
+
+        const viralFrameworks = `
+        CRITICAL ARCHITECT MANDATES:
+        1. DEPTH: Avoid generic advice. Provide granular, tactical, and psychological blueprints.
+        2. RETENTION: Prioritize techniques that force rewatches (loops, pattern interrupts, micro-text).
+        3. ACCURACY: Tailor every word to the "${persona.niche || 'General'}" niche.
+        4. ANALYSIS: When the user asks for feedback, perform a deep psychological audit of their hooks and retention potential.
+        5. FORMATTING: Use Markdown. Bold keywords. Use lists.
+        6. MEMORY: Analyze the provided conversation history to maintain perfect continuity.
+        `;
+
+        return `${archMap[persona.architect || 'disruptor']}\n\n${contextText}\n\n${viralFrameworks}`;
     };
 
     if (personaNicheEl && personaToneEl) {
