@@ -2825,7 +2825,20 @@ button:active, .nav-item:active {
 #appContainer { padding-bottom: 80px !important; }
 
 
-/* --- CHAT ACTION COLORS (V8.0.5) --- */
-#chatUploadBtn { color: #00f5d4 !important; opacity: 1 !important; }
-#voiceChatBtn { color: #ff006e !important; opacity: 1 !important; }
+/* --- CHAT ACTION COLORS & TRANSPARENCY (V8.0.6) --- */
+#chatUploadBtn, #voiceChatBtn { 
+    background: transparent !important; 
+    border: none !important; 
+    box-shadow: none !important;
+    opacity: 0.8 !important;
+    transition: all 0.2s ease !important;
+}
+
+#chatUploadBtn { color: #00f5d4 !important; }
+#voiceChatBtn { color: #ff006e !important; }
+
+#chatUploadBtn:hover, #voiceChatBtn:hover { 
+    opacity: 1 !important; 
+    transform: scale(1.1);
+}
 
