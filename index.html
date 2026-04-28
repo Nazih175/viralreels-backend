@@ -1610,7 +1610,7 @@
             <!-- Branded Logo Header -->
             <div class="flex flex-col items-center mb-12">
                 <div class="w-24 h-24 mb-6">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 20px rgba(168,85,247,0.4));">
+                    <svg viewBox="0 0 100 100" width="96" height="96" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 20px rgba(168,85,247,0.4));">
                         <defs>
                             <linearGradient id="neonGradAuthPro" x1="0%" y1="100%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="#a855f7" />
@@ -1636,7 +1636,7 @@
             <!-- LOGIN SELECTION -->
             <div id="authBaseActions">
                 <button class="btn-google-pixel w-full mb-6 flex items-center justify-center gap-4 bg-white text-black font-bold py-4 rounded-2xl shadow-xl shadow-white/5" id="googleLoginBtn">
-                    <svg viewBox="0 0 48 48" class="w-6 h-6">
+                    <svg viewBox="0 0 48 48" width="24" height="24" class="flex-shrink-0">
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
@@ -1708,10 +1708,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=7.8.5"></script>
+    <script src="app.js?v=7.8.6"></script>
 
     <script>
-        // --- EMERGENCY LOAD SHIELD (V7.8.5) ---
+        // --- EMERGENCY LOAD SHIELD (V7.8.6) ---
         // Force reveal if app.js hangs or is blocked by browser extensions
         setTimeout(() => {
             const s = document.getElementById('splashScreen');
@@ -1720,7 +1720,12 @@
                 s.style.opacity = '0';
                 setTimeout(() => {
                     s.style.display = 'none';
-                    document.getElementById('appContainer')?.classList.remove('hidden');
+                    const app = document.getElementById('appContainer');
+                    if (app) {
+                        app.classList.remove('hidden');
+                        app.style.display = 'flex';
+                        app.style.visibility = 'visible';
+                    }
                     // Unlock scroll if stuck
                     document.body.style.overflow = 'auto';
                 }, 600);

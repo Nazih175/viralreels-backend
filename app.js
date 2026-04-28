@@ -56,7 +56,11 @@ try {
                 const landing = document.getElementById('authOverlay');
                 if (landing) landing.remove(); 
                 const app = document.getElementById('appContainer');
-                if (app) app.classList.remove('hidden');
+                if (app) {
+                    app.classList.remove('hidden');
+                    app.style.display = 'flex';
+                    app.style.visibility = 'visible';
+                }
             } else {
                 const landing = document.getElementById('authOverlay');
                 if (landing) {
@@ -783,6 +787,11 @@ const initApp = () => {
 
     // Helper to show paywall with one-time trial check
     window.showProPaywall = async () => {
+        // --- REVIEWER/PRO BYPASS (V7.8.6) ---
+        if (localStorage.getItem('vr_pro_status') === 'true' || localStorage.getItem('vr_bypass_active') === 'true') {
+            console.log("Pro Status Verified: Bypassing Paywall.");
+            return;
+        }
         const paywallOverlay = document.getElementById('paywallOverlay');
         const paywallTitle = document.getElementById('paywallTitle');
         const paywallDesc = document.getElementById('paywallDesc');
