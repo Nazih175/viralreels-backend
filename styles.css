@@ -1991,9 +1991,9 @@ body.keyboard-mobile .chat-input-anchored {
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         justify-content: flex-start !important;
-        padding: 10px 16px !important; 
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-        gap: 12px !important;
+        padding: 6px 10px !important; 
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px) !important;
+        gap: 8px !important;
         width: 100% !important;
         max-width: 100% !important;
         left: 0 !important;
@@ -2003,36 +2003,29 @@ body.keyboard-mobile .chat-input-anchored {
         margin: 0 !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none;
-        background: transparent !important;
-        backdrop-filter: blur(20px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-        border-top: none !important;
-        box-shadow: none !important;
+        background: rgba(10, 10, 15, 0.95) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.5) !important;
     }
     
-    .bottom-nav::-webkit-scrollbar { display: none; }
-
-    .nav-grid {
-        display: flex !important;
-        gap: 12px !important;
-    }
-
     .nav-item {
         flex: 0 0 auto !important;
-        min-width: 70px !important;
+        min-width: 62px !important;
         flex-direction: column !important;
-        gap: 4px !important;
-        padding: 8px 4px !important;
-        font-size: 10px !important;
+        gap: 2px !important;
+        padding: 4px 2px !important;
+        font-size: 9px !important;
     }
 
     .nav-item i {
-        width: 20px !important;
-        height: 20px !important;
+        width: 18px !important;
+        height: 18px !important;
     }
-
+    
     .nav-item span {
-        font-size: 9px !important;
+        font-size: 8px !important;
         letter-spacing: 0 !important;
     }
 
@@ -2330,6 +2323,22 @@ body.keyboard-mobile .chat-input-anchored {
 
 .chat-image-attachment:hover {
     transform: scale(1.02);
+}
+
+.daily-pulse-section {
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.daily-pulse-section .flex.justify-between {
+    padding: 0 1.5rem;
+}
+
+#dailyPulseGallery {
+    padding: 0 1.5rem 1rem 1.5rem !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 /* --- DAILY VIRAL PULSE (V6.3.0) --- */
 .no-scrollbar::-webkit-scrollbar { display: none; }
