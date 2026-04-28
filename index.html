@@ -1430,7 +1430,10 @@
                 <div class="tab-header pt-4 content-padding border-bottom pb-2" style="position: relative; z-index: 5;">
                     <div class="flex justify-between items-center w-full">
                         <h2 class="flex items-center gap-2">Architect <i data-lucide="sparkles" class="text-purple"></i></h2>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
+                            <button id="newChatBtn" class="btn-new-chat hidden" title="Start a fresh conversation">
+                                <i data-lucide="plus" style="width:12px;"></i> New
+                            </button>
                             <button class="btn-text text-xs" id="chatHistoryBtn"><i data-lucide="history"></i> History</button>
                             <button type="button" class="icon-button tool-reset-btn" data-view="view-chat" title="Reset Session">
                                 <i data-lucide="trash-2"></i>
@@ -1440,9 +1443,6 @@
                 </div>
 
                 <div class="chat-container" style="position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-                    <button id="newChatBtn" class="btn-new-chat hidden" title="Start a fresh conversation">
-                        <i data-lucide="plus" style="width:12px;"></i> New Chat
-                    </button>
                     <div id="chatMessages" class="chat-messages scroll-container locked-intro" style="flex:1;">
                         <!-- ARCHITECT INTRO STATE -->
                         <div id="chatIntro" class="architect-intro">
@@ -1705,7 +1705,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="app.js?v=8.1.0"></script>
+    <script src="app.js?v=8.1.1"></script>
 
     <script>
         // --- EMERGENCY LOAD SHIELD (V7.8.6) ---
