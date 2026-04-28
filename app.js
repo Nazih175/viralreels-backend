@@ -3755,7 +3755,7 @@ const initApp = () => {
             }
         });
     }
-
+    initDailyPulse();
     updateIcons();
 };
 
@@ -3866,6 +3866,48 @@ if (rewriteInput) {
         }
     });
 }
+
+// -- DYNAMIC VIRAL PULSE ENGINE (V8.0.9) --
+const initDailyPulse = () => {
+    const gallery = document.getElementById('dailyPulseGallery');
+    if (!gallery) return;
+
+    const tipsPool = [
+        { title: "The Glitch Loop", tag: "High Retention", color: "#9d4edd", desc: "A psychological trick that forces the algorithm to count 2-3 views per user.", prompt: "The Glitch Loop: A video that ends exactly where it starts for infinite views" },
+        { title: "The Hidden Truth", tag: "Controversial", color: "#ef476f", desc: "Polarize your audience immediately to skyrocket the comment-to-view ratio.", prompt: "The Hidden Truth: Debunking a common myth in my niche" },
+        { title: "Split-Screen Hook", tag: "Sensory", color: "#a855f7", desc: "Use secondary visual stimulation to maintain attention during deep-dive tips.", prompt: "The Split-Screen Hook: ASMR visual paired with high-value narration" },
+        { title: "The POV Twist", tag: "Engagement", color: "#3b82f6", desc: "Start with a common situation and flip the perspective in the first 3 seconds.", prompt: "The POV Twist: Flip a relatable scenario to surprise the viewer" },
+        { title: "Pattern Interrupt", tag: "High CTR", color: "#ffb703", desc: "Use a sudden visual or audio shift to snap the viewer out of their 'scroll trance'.", prompt: "Pattern Interrupt: A sudden zoom or sound change to grab attention" },
+        { title: "The Infinite Value", tag: "Educational", color: "#00f5d4", desc: "Pack 10 tips into 15 seconds, forcing viewers to rewatch and save.", prompt: "The Infinite Value: Rapid-fire tips for maximum save rate" },
+        { title: "Emotional Spike", tag: "Viral Potential", color: "#ff006e", desc: "Start with a high-emotion reaction to build immediate curiosity.", prompt: "Emotional Spike: High-energy reaction hook to lead into the story" }
+    ];
+
+    // Seed based on current date (UTC)
+    const today = new Date();
+    const seed = today.getUTCDate() + today.getUTCMonth() + today.getUTCFullYear();
+    
+    // Select 3 unique tips based on seed
+    const selected = [];
+    const usedIndices = new Set();
+    
+    let i = 0;
+    while(selected.length < 3 && i < 10) {
+        const index = (seed + i) % tipsPool.length;
+        if (!usedIndices.has(index)) {
+            selected.push(tipsPool[index]);
+            usedIndices.add(index);
+        }
+        i++;
+    }
+
+    gallery.innerHTML = selected.map(tip => `
+        <div class="pulse-card interactive-glow" onclick="document.getElementById('analyzerInput').value = '${tip.prompt}'; document.getElementById('analyzerForm').requestSubmit();">
+            <span class="pulse-tag" style="background:rgba(255,255,255,0.05); color:${tip.color}; border: 1px solid ${tip.color}33;">${tip.tag}</span>
+            <h4 class="text-sm font-bold mb-1">${tip.title}</h4>
+            <p class="text-[10px] text-secondary">${tip.desc}</p>
+        </div>
+    `).join('');
+};
 
 // --- BOOT ENGINE (V6.4.2) ---
 // We execute this at the very end to ensure all safeGet and global helpers are ready.
