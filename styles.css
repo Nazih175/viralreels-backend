@@ -1655,22 +1655,30 @@ body.keyboard-mobile #chatMessages {
 /* --- AI CHAT ANCHORED INPUT (ZENITH V3.7) --- */
 .chat-input-anchored {
     position: fixed;
-    bottom: 125px; /* Precision Alignment: ~15px above the 110px dual-row menu */
+    bottom: 82px; /* Precision Alignment: Above the ~70px mobile menu */
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 1200px;
-    background: rgba(10, 10, 15, 0.95);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(157, 78, 221, 0.4);
-    border-radius: 28px;
-    padding: 16px;
+    width: calc(100% - 24px);
+    max-width: 800px;
+    background: rgba(15, 15, 20, 0.9);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 8px 12px;
     display: flex !important;
     flex-direction: column;
     z-index: 10005;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(157, 78, 221, 0.25);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 769px) {
+    .chat-input-anchored {
+        bottom: 20px;
+        width: calc(100% - 40px);
+        max-width: 760px;
+    }
 }
 
 /* Handle Mobile Keyboard States */
@@ -2751,66 +2759,57 @@ button:active, .nav-item:active {
 .settings-card { width: 100% !important; margin: 10px 0 !important; border-radius: 20px !important; }
 .settings-grid { grid-template-columns: 1fr !important; gap: 15px !important; }
 
-/* AI Chat Mobile Layout Fix */
+/* AI Chat Refinements V8.0.3 */
 .chat-input-container {
-    padding: 12px 16px !important;
-    background: rgba(15, 15, 20, 0.95) !important;
-    border-top: 1px solid rgba(255,255,255,0.05) !important;
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
     width: 100% !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    z-index: 100 !important;
+    background: transparent !important;
 }
 
 .chat-input-wrapper { 
     flex: 1 !important;
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
     display: flex !important;
     align-items: center !important;
-    padding: 0 16px !important;
-    min-height: 48px !important;
+    padding: 0 12px !important;
+    min-height: 44px !important;
 }
 
 .chat-input-field {
     background: transparent !important;
     border: none !important;
     color: #fff !important;
-    padding: 10px 0 !important;
+    padding: 8px 0 !important;
     font-size: 14px !important;
     flex: 1 !important;
     outline: none !important;
 }
 
 .chat-action-btn {
-    width: 40px !important;
-    height: 40px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: transparent !important;
-    color: rgba(255,255,255,0.6) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
     transition: all 0.2s !important;
-    flex-shrink: 0 !important;
 }
 
 .chat-send-btn {
-    width: 40px !important;
-    height: 40px !important;
+    width: 38px !important;
+    height: 38px !important;
     background: var(--accent-purple) !important;
     color: #fff !important;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    flex-shrink: 0 !important;
-    box-shadow: 0 4px 15px rgba(168,85,247,0.3) !important;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3) !important;
 }
 
 /* Ensure app container has padding for the fixed bottom bar */
